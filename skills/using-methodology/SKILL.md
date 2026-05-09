@@ -1,5 +1,5 @@
 ---
-name: ai-ai-process-assessment:using-methodology
+name: ai-process-assessment:using-methodology
 description: Keystone — load at session start. Teaches model how to find and invoke all process-assessment skills, carries phase map, opportunity taxonomy, and master rationalization table.
 ---
 
@@ -13,18 +13,18 @@ You are operating inside the AI & Automation Use Case Identification methodology
 
 | Phase | Skill ID | Purpose | Gate condition | Output file |
 |---|---|---|---|---|
-| 1 | `ai-ai-process-assessment:scoping-engagement` | Front gate — sponsoring question, decision-maker, scope | New engagement prompt | `scope.md` |
-| 2 | `ai-ai-process-assessment:mapping-context` | Org / strategic / political context | `scope.md` exists | `context.md` |
-| 3 | `ai-ai-process-assessment:inventorying-tech-data` | Systems, APIs, data, enablers | `context.md` exists | `tech-inventory.md` |
-| 4 | `ai-ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
-| 5 | `ai-ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities.md` |
-| 6 | `ai-ai-process-assessment:scoring-opportunities` | 7-dimension rubric + Build/Buy/Partner | `opportunities.md` saved; GRC cleared for any flagged | `scored-opportunities.md` |
-| 7 | `ai-ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scored-opportunities.md` saved; reviewer cleared | `roadmap.md` |
-| 8 | `ai-ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs.md` |
-| 9 | `ai-ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `deliverable-gate` cleared | `executive-summary.md` |
-| 10 | `ai-ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
-| Gate A | `ai-ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities.md` | Logged in `evidence-log.md` |
-| Gate B | `ai-ai-process-assessment:deliverable-gate` | Final integrity checklist | Before any external sharing | Clearance recorded in `evidence-log.md` |
+| 1 | `scoping-engagement` | Front gate — sponsoring question, decision-maker, scope | New engagement prompt | `scope.md` |
+| 2 | `mapping-context` | Org / strategic / political context | `scope.md` exists | `context.md` |
+| 3 | `inventorying-tech-data` | Systems, APIs, data, enablers | `context.md` exists | `tech-inventory.md` |
+| 4 | `discovering-processes` | Four-round interviews, baseline metrics | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
+| 5 | `identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities.md` |
+| 6 | `scoring-opportunities` | 7-dimension rubric + Build/Buy/Partner | `opportunities.md` saved; GRC cleared for any flagged | `scored-opportunities.md` |
+| 7 | `prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scored-opportunities.md` saved; reviewer cleared | `roadmap.md` |
+| 8 | `packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs.md` |
+| 9 | `building-executive-summary` | Standalone 1–2 page executive summary | `deliverable-gate` cleared | `executive-summary.md` |
+| 10 | `building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
+| Gate A | `governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities.md` | Logged in `evidence-log.md` |
+| Gate B | `deliverable-gate` | Final integrity checklist | Before any external sharing | Clearance recorded in `evidence-log.md` |
 
 ## Opportunity Type Taxonomy
 
@@ -48,30 +48,30 @@ You are operating inside the AI & Automation Use Case Identification methodology
 
 ## Routing Logic
 
-- On any new engagement prompt → invoke `ai-ai-process-assessment:scoping-engagement`.
+- On any new engagement prompt → invoke `scoping-engagement`.
 - After each phase's output file is saved → invoke the next skill in the chain.
-- If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `ai-ai-process-assessment:governance-risk-gate` before scoring.
-- Before any external sharing of any output → invoke `ai-ai-process-assessment:deliverable-gate`.
-- After `deliverable-gate` clearance → invoke `ai-ai-process-assessment:building-executive-summary` (Phase 9).
-- After `executive-summary.md` is saved → invoke `ai-ai-process-assessment:building-deliverable` (Phase 10).
+- If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `governance-risk-gate` before scoring.
+- Before any external sharing of any output → invoke `deliverable-gate`.
+- After `deliverable-gate` clearance → invoke `building-executive-summary` (Phase 9).
+- After `executive-summary.md` is saved → invoke `building-deliverable` (Phase 10).
 - If CLAUDE.md declares an override for an engagement → honor it, and note the deviation for the deliverable gate's audit.
 
 ## When-to-Invoke Reference
 
 | Trigger phrase / situation | Skill to invoke |
 |---|---|
-| "scope this engagement", "what are we trying to decide" | `ai-ai-process-assessment:scoping-engagement` |
-| "what's the org context", "who else matters" | `ai-ai-process-assessment:mapping-context` |
-| "what systems / data do they have" | `ai-ai-process-assessment:inventorying-tech-data` |
-| "map the process", "interview operators" | `ai-ai-process-assessment:discovering-processes` |
-| "what are the opportunities", "list use cases" | `ai-ai-process-assessment:identifying-opportunities` |
-| "score these", "rank by value" | `ai-ai-process-assessment:scoring-opportunities` |
-| "build the roadmap", "sequence into waves" | `ai-ai-process-assessment:prioritizing-roadmap` |
-| "write the use case briefs", "package for delivery" | `ai-ai-process-assessment:packaging-usecases` |
-| "this opportunity has compliance/risk concerns" | `ai-ai-process-assessment:governance-risk-gate` |
-| "review before delivery", "final check" | `ai-ai-process-assessment:deliverable-gate` |
-| "draft the executive summary", "build the read-ahead", "produce the exec brief" | `ai-ai-process-assessment:building-executive-summary` |
-| "build the HTML deliverable", "render the client deck", "package the final HTML" | `ai-ai-process-assessment:building-deliverable` |
+| "scope this engagement", "what are we trying to decide" | `scoping-engagement` |
+| "what's the org context", "who else matters" | `mapping-context` |
+| "what systems / data do they have" | `inventorying-tech-data` |
+| "map the process", "interview operators" | `discovering-processes` |
+| "what are the opportunities", "list use cases" | `identifying-opportunities` |
+| "score these", "rank by value" | `scoring-opportunities` |
+| "build the roadmap", "sequence into waves" | `prioritizing-roadmap` |
+| "write the use case briefs", "package for delivery" | `packaging-usecases` |
+| "this opportunity has compliance/risk concerns" | `governance-risk-gate` |
+| "review before delivery", "final check" | `deliverable-gate` |
+| "draft the executive summary", "build the read-ahead", "produce the exec brief" | `building-executive-summary` |
+| "build the HTML deliverable", "render the client deck", "package the final HTML" | `building-deliverable` |
 
 ## Engagement Folder Convention
 
@@ -94,4 +94,4 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 
 ## Chain to next skill
 
-→ `ai-ai-process-assessment:scoping-engagement` (on any new engagement prompt)
+→ `scoping-engagement` (on any new engagement prompt)
