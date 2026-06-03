@@ -32,7 +32,21 @@ Add rows as needed for roles specific to this engagement.
 
 ---
 
-## 2. Vendor Quotes Received
+---
+
+## 2. Initiative Implementation Hours
+
+Hours required to build each Wave 1 initiative. Get from the team lead who will own the build work.
+
+| Initiative | Labor type | Hours estimate | Source / notes |
+|---|---|---|---|
+| [OPP-NNN — Title] | [e.g., Enterprise AI team — Azure Cognitive Services configuration] | | |
+
+Add one row per Wave 1 initiative. Labor type comes from the brief's Resolution field — who does the work. If the initiative is Buy and the vendor handles implementation with no internal build work, enter 0 or N/A and note "vendor-implemented."
+
+---
+
+## 3. Vendor Quotes Received
 
 Add a row for each Buy or Partner initiative where a formal or informal quote has been received.
 
@@ -42,7 +56,7 @@ Add a row for each Buy or Partner initiative where a formal or informal quote ha
 
 ---
 
-## 3. IT Integration Estimates
+## 4. IT Integration Estimates
 
 IT team estimates for enabler work (integration, infrastructure, security review).
 
@@ -56,7 +70,7 @@ Add rows for any additional enablers from roadmap.md.
 
 ---
 
-## 4. Override Notes
+## 5. Override Notes
 
 Any actual figures that don't fit the tables above — e.g., fixed-fee contractor agreements, pre-negotiated platform credits, known sunk costs.
 
@@ -69,6 +83,7 @@ Any actual figures that don't fit the tables above — e.g., fixed-fee contracto
 When `cost-actuals.md` exists in the engagement folder, Phase 9 does the following:
 
 - **Labor cost rows** where a rate is supplied: uses the actual rate instead of the benchmark band. Tightens the ROM from ±50% toward ±20–30% on those rows.
+- **Initiative hours rows** where hours are supplied: used directly by the business-case-analyst to compute implementation labor cost (hours × rate). Rows marked PENDING or left blank: that cost category shows as PENDING in the business case — the initiative's ROM range will not be calculated until confirmed.
 - **Vendor quote rows** where a quote is supplied: replaces the "Requires vendor quote — benchmark-based" flag with the actual figure. Marks those rows as confirmed rather than estimated.
 - **IT integration rows** where an estimate is supplied: replaces the hours-derived estimate with the IT-provided figure.
 - **Rows with no actuals supplied:** unchanged — benchmark rates and mandatory flags still apply.

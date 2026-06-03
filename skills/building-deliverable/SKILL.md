@@ -141,7 +141,7 @@ All CSS component systems below must be embedded in the static shell. Section-re
 The static shell includes a single smooth-scroll helper. No tab-switching logic. `showTab()` and `showTabAndScroll()` are removed.
 
 ```js
-function scrollTo(anchorId) {
+function navScrollTo(anchorId) {
   var el = document.getElementById(anchorId);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -150,7 +150,7 @@ function scrollTo(anchorId) {
 Sticky nav usage pattern:
 
 ```html
-<a href="#verdict" onclick="scrollTo('verdict'); return false;">Verdict</a>
+<a href="#verdict" onclick="navScrollTo('verdict'); return false;">Verdict</a>
 ```
 
 ## Sticky nav HTML
@@ -159,15 +159,15 @@ The static shell includes a sticky nav immediately after `<body>`:
 
 ```html
 <nav class="sticky-nav">
-  <a href="#verdict" onclick="scrollTo('verdict'); return false;">Verdict</a>
-  <a href="#problem" onclick="scrollTo('problem'); return false;">Problem</a>
-  <a href="#portfolio" onclick="scrollTo('portfolio'); return false;">Portfolio</a>
-  <a href="#usecases" onclick="scrollTo('usecases'); return false;">Use Cases</a>
-  <a href="#roadmap" onclick="scrollTo('roadmap'); return false;">Roadmap</a>
-  <a href="#investment" onclick="scrollTo('investment'); return false;">Investment</a>
-  <a href="#risks" onclick="scrollTo('risks'); return false;">Risks</a>
-  <a href="#actions" onclick="scrollTo('actions'); return false;">Actions</a>
-  <a href="#evidence" onclick="scrollTo('evidence'); return false;">Evidence</a>
+  <a href="#verdict" onclick="navScrollTo('verdict'); return false;">Verdict</a>
+  <a href="#problem" onclick="navScrollTo('problem'); return false;">Problem</a>
+  <a href="#portfolio" onclick="navScrollTo('portfolio'); return false;">Portfolio</a>
+  <a href="#usecases" onclick="navScrollTo('usecases'); return false;">Use Cases</a>
+  <a href="#roadmap" onclick="navScrollTo('roadmap'); return false;">Roadmap</a>
+  <a href="#investment" onclick="navScrollTo('investment'); return false;">Investment</a>
+  <a href="#risks" onclick="navScrollTo('risks'); return false;">Risks</a>
+  <a href="#actions" onclick="navScrollTo('actions'); return false;">Actions</a>
+  <a href="#evidence" onclick="navScrollTo('evidence'); return false;">Evidence</a>
 </nav>
 ```
 

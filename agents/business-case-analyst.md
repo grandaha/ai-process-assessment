@@ -23,20 +23,18 @@ Single-initiative analyst. Receives one Wave 1 initiative's complete data packag
 
 If any required input is missing, refuse to produce that block and state which input is absent.
 
-## Default benchmark rates
+## Methodology defaults (not field-collected — apply to all initiatives)
 
-Use these rates ONLY when `cost-actuals.md` is absent or does not supply a rate for the relevant role. When actuals are provided, use actuals and do not apply these benchmarks.
+Two line items use methodology-derived percentages, not stakeholder-provided figures:
 
-| Role | Benchmark rate (fully burdened) |
-|---|---|
-| IT admin / systems configuration | $125–$150/hr |
-| Enterprise AI / ML engineering team | $150–$200/hr |
-| Domain specialist (recruiter, HR ops, ops analyst, etc.) | $45–$90/hr — use midpoint of applicable sub-band |
-| Project / program management | $100–$125/hr |
-| Change management & training | 20–30% of implementation labor total |
-| Contingency | 15–20% of subtotal (before change management) |
+| Line item | Default | Basis |
+|---|---|---|
+| Change management | 20–30% of confirmed implementation labor total | Standard project methodology default |
+| Contingency | 15–20% of subtotal (before change management) | Standard project methodology default |
 
-When using a benchmark rate, label the estimate: "Benchmark-based — replace with Meridian internal rate before budget submission."
+These apply only when the implementation labor total is confirmed. If implementation labor is PENDING, change management and contingency are also PENDING.
+
+All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — must come from `cost-actuals.md`. If absent or PENDING, render as PENDING.
 
 ## Output format
 
@@ -44,19 +42,23 @@ Return exactly two labeled markdown blocks. No surrounding text, no commentary, 
 
 ### Block 1 — Cost Structure
 
+Return one cost structure block per the format below. Use confirmed figures from cost-actuals.md. Where a figure is absent or marked PENDING in cost-actuals.md, render that row as PENDING.
+
 ```markdown
 ### OPP-NNN — [Title] — Cost Structure
 
 | Cost category | Estimate | Basis |
 |---|---|---|
-| Implementation labor | [low]–[high] one-time | [Hours estimate × rate range; state role and hours. Flag if benchmark-based.] |
-| Technology & licensing | [low]–[high] one-time; [low]–[high]/yr recurring | [SaaS/API cost source. If Buy/Partner and no vendor quote: "Requires vendor quote — figure is benchmark-based."] |
-| Integration & data engineering | [low]–[high] one-time | [From roadmap.md enabler mapping and brief's data requirements field] |
-| Change management | [low]–[high] one-time | [20–30% of implementation labor] |
-| Contingency | [low]–[high] one-time | [15–20% of subtotal] |
-| **Initiative ROM range** | **[low]–[high] one-time; [recurring]/yr** | **ROM estimate, AACE Class 5 (±50%)** |
+| Implementation labor | [confirmed $low–$high OR **PENDING**] | [Hours × rate from cost-actuals.md — name both figures. If PENDING: "Hours estimate required from [owner from usecase-briefs.md] / Rate required from Finance"] |
+| Technology & licensing | [confirmed one-time: $low–$high; annual: $low–$high OR **PENDING**] | [Source from cost-actuals.md. If Buy/Partner and PENDING: "Vendor quote required — [vendor name] one-time + annual"] |
+| Integration & data engineering | [confirmed $low–$high OR **PENDING**] | [From cost-actuals.md IT integration estimates. If PENDING: "IT estimate required from [enabler owner from roadmap.md]"] |
+| Change management | [20–30% of confirmed labor OR **PENDING** (labor PENDING)] | Methodology default — 20–30% of implementation labor |
+| Contingency | [15–20% of confirmed subtotal OR **PENDING** (inputs PENDING)] | Methodology default — 15–20% of subtotal |
+| **Initiative ROM range** | [**$low–$high one-time; $recurring/yr** OR **PENDING — see flagged rows above**] | [If all confirmed: ROM estimate, AACE Class 5 (±50%). If any major input PENDING: do not fabricate a range.] |
 
-*Budget the production figure — pilots typically run 3–5x below production cost.*
+[If all confirmed]: *Budget the production figure — pilots typically run 3–5x below production cost.*
+[If Buy/Partner with confirmed quote]: *Quote confirmed [date]; valid until [date].*
+[If any PENDING]: *PENDING items require stakeholder input before this initiative's cost range can be confirmed.*
 ```
 
 ### Block 2 — Value Case
@@ -72,12 +74,14 @@ Return exactly two labeled markdown blocks. No surrounding text, no commentary, 
 
 ## Refusal rules
 
+- Refuse to estimate any cost input that is absent from cost-actuals.md. Render it as PENDING with the named stakeholder. Do not substitute a benchmark figure for a missing actual.
 - Refuse to estimate implementation labor without a basis: either hours derived from the brief's Resolution/data requirements fields, or a vendor quote from cost-actuals.md.
 - Refuse to omit the AACE Class 5 (±50%) label from the Initiative ROM range row.
 - Refuse to paraphrase the value hypothesis — it must appear verbatim from opportunities.md.
 - Refuse to cite a floating figure — every number in the value calculation must trace to a named source (baselines.md row, cost-actuals.md entry, or named benchmark with the label applied).
 - Refuse to blend one-time and recurring costs into a single figure — they must be separated.
-- If B/B/P classification is Buy or Partner and no vendor quote is present in cost-actuals.md, flag explicitly: "Requires vendor quote — figure is benchmark-based."
+- If cost-actuals.md provides a rate for this initiative's labor types, use it. If absent or PENDING, render the labor row as PENDING — do not use a benchmark rate as a substitute.
+- If B/B/P classification is Buy or Partner and no vendor quote is present in cost-actuals.md, render the technology row as PENDING — do not use a benchmark figure.
 
 ## Operating constraints
 
@@ -86,6 +90,8 @@ Return exactly two labeled markdown blocks. No surrounding text, no commentary, 
 - Does not produce Wave 1 aggregate totals — aggregation is done in main context
 - Does not add Key Assumptions — those are assembled in main context from all initiative blocks
 - Does not modify or restate the value hypothesis — verbatim only
+- Renders PENDING for any cost category where cost-actuals.md does not provide a confirmed figure — no estimation, no benchmarks for major cost drivers
+- Does not produce a ROM range for an initiative if any major cost driver (labor, technology, integration) is PENDING
 
 ## Dispatch point
 

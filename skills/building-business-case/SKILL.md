@@ -15,7 +15,7 @@ Phase 9 produces no new analysis. Every value claim traces to a source file from
 
 ## Gate condition
 
-`usecase-briefs.md` must exist and the `opportunity-reviewer` clearance for the briefs must be logged in `evidence-log.md`. This skill creates `business-case.md`.
+`usecase-briefs.md` must exist and the `opportunity-reviewer` clearance for the briefs must be logged in `evidence-log.md`. `cost-actuals.md` must also exist in the engagement folder — this file is produced by Phase 8.5 (`ai-process-assessment:collecting-cost-actuals`). If `cost-actuals.md` is absent, halt immediately and invoke `ai-process-assessment:collecting-cost-actuals` before returning to this phase. This skill creates `business-case.md`.
 
 ## Scope constraint
 
@@ -99,7 +99,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 ## Phase checklist
 
 - [ ] Confirm `usecase-briefs.md` saved and reviewer cleared
-- [ ] Check for cost-actuals.md in the engagement folder; extract relevant rows if present
+- [ ] Confirm cost-actuals.md exists in the engagement folder — halt and invoke Phase 8.5 if absent
 - [ ] Confirm all five source files exist
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
 - [ ] Collect returned cost/value blocks
@@ -113,7 +113,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 ## Workflow
 
 1. Confirm preconditions: `usecase-briefs.md` exists and reviewer cleared.
-2. Check for `cost-actuals.md` in the engagement folder. If present, extract: (a) internal labor rates by role, (b) vendor quotes by initiative, (c) IT integration estimates by enabler — these will be passed to each subagent at dispatch. If absent, surface this non-blocking notice to the user and proceed: *"No cost-actuals.md found in the engagement folder. Phase 9 will run on AACE Class 5 benchmark labor rates (±50%). To tighten estimates, copy `templates/cost-actuals-template.md` to this engagement folder, fill in internal rates and any vendor quotes received, and re-run Phase 9."*
+2. Confirm `cost-actuals.md` exists in the engagement folder. If absent: halt. Do not proceed. Invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) and complete it before returning to this phase.
 3. Confirm all five source files present.
 4. For each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data.
 5. Collect returned blocks. In main context: verify mandatory labels, assemble aggregate (sum low/high ranges separately, compute payback as aggregate investment range ÷ annual value range), compile Key Assumptions from all initiative blocks.
