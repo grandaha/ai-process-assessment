@@ -90,15 +90,16 @@ If a `cost-actuals.md` file exists in the engagement folder, reference its entri
 Per-initiative cost and value analysis is independent across Wave 1 initiatives — they parallelize cleanly.
 
 - **When:** After confirming all five source files exist, dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel tool-call batch.
-- **Pass to each subagent:** Only that initiative's data — roadmap.md entry, usecase-briefs.md brief, baselines.md relevant rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification. Do not share other initiatives' data between subagents.
+- **Pass to each subagent:** Only that initiative's data — roadmap.md entry, usecase-briefs.md brief, baselines.md relevant rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification, and the relevant rows from cost-actuals.md (if the file exists). Do not share other initiatives' data between subagents.
 - **Return:** A fully-formed cost structure block and value case block for that initiative, following the formats above.
 - **What stays in main context:** Assembly of returned blocks, Wave 1 aggregate computation (sum ranges, compute payback), mandatory label verification, and Key Assumptions compilation.
 
-**Note:** The `business-case-analyst` agent definition is a follow-on build and does not yet exist in the plugin. Until it is created, this phase runs in the main context following the per-initiative format above. Do not attempt to dispatch a non-existent agent.
+**Note:** Dispatch is the primary path. Do not fall back to main context unless dispatch explicitly fails and you cannot recover.
 
 ## Phase checklist
 
 - [ ] Confirm `usecase-briefs.md` saved and reviewer cleared
+- [ ] Check for cost-actuals.md in the engagement folder; extract relevant rows if present
 - [ ] Confirm all five source files exist
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
 - [ ] Collect returned cost/value blocks
@@ -112,13 +113,14 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 ## Workflow
 
 1. Confirm preconditions: `usecase-briefs.md` exists and reviewer cleared.
-2. Confirm all five source files present.
-3. For each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data.
-4. Collect returned blocks. In main context: verify mandatory labels, assemble aggregate (sum low/high ranges separately, compute payback as aggregate investment range ÷ annual value range), compile Key Assumptions from all initiative blocks.
-5. Add the three cannot-do statements to Key Assumptions.
-6. Add What Would Tighten This Estimate — list specific missing inputs (vendor quotes for Buy/Partner initiatives, internal labor rate, integration complexity from IT).
-7. Add ROM Accuracy section: AACE Class 5 ±50% by default.
-8. Save and chain to deliverable gate.
+2. Check for `cost-actuals.md` in the engagement folder. If present, extract: (a) internal labor rates by role, (b) vendor quotes by initiative, (c) IT integration estimates by enabler — these will be passed to each subagent at dispatch. If absent, surface this non-blocking notice to the user and proceed: *"No cost-actuals.md found in the engagement folder. Phase 9 will run on AACE Class 5 benchmark labor rates (±50%). To tighten estimates, copy `templates/cost-actuals-template.md` to this engagement folder, fill in internal rates and any vendor quotes received, and re-run Phase 9."*
+3. Confirm all five source files present.
+4. For each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data.
+5. Collect returned blocks. In main context: verify mandatory labels, assemble aggregate (sum low/high ranges separately, compute payback as aggregate investment range ÷ annual value range), compile Key Assumptions from all initiative blocks.
+6. Add the three cannot-do statements to Key Assumptions.
+7. Add What Would Tighten This Estimate — list specific missing inputs (vendor quotes for Buy/Partner initiatives, internal labor rate, integration complexity from IT).
+8. Add ROM Accuracy section: AACE Class 5 ±50% by default.
+9. Save and chain to deliverable gate.
 
 ## Rationalization Table
 
