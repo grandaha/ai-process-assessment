@@ -1,15 +1,15 @@
 ---
 name: ai-process-assessment:building-executive-summary
-description: Phase 9 — produces a standalone 1–2 page executive summary (executive-summary.md) sourced entirely from prior phase outputs. Designed to travel independently as a read-ahead for decision meetings. No new analysis.
+description: Phase 10 — produces a standalone 1–2 page executive summary (executive-summary.md) sourced entirely from prior phase outputs. Designed to travel independently as a read-ahead for decision meetings. No new analysis.
 ---
 
-# Phase 9: Building the Executive Summary
+# Phase 10: Building the Executive Summary
 
 ## Role in the system
 
 The executive summary is the only artifact in the methodology designed to travel independently. It is sent as a read-ahead before a decision meeting, attached to a calendar invite, or shared without the full HTML deliverable open. It must stand alone: a reader who has never seen the engagement should be able to make a Go/No-Go decision from this document.
 
-Phase 9 produces no new analysis. Every claim traces to a source file from Phases 1–8. If a claim cannot be sourced, it does not appear in the summary.
+Phase 10 produces no new analysis. Every claim traces to a source file from Phases 1–9. If a claim cannot be sourced, it does not appear in the summary.
 
 ## Gate condition
 
@@ -22,7 +22,8 @@ The drafter receives all five. If any is missing, the skill halts and reports wh
 | File | What it provides |
 |---|---|
 | `scope.md` | Decision-maker, sponsoring question, success criteria, in/out of scope |
-| `roadmap.md` | Waves, sequencing, budget envelope |
+| `roadmap.md` | Waves, sequencing, wave scope |
+| `business-case.md` | Wave 1 investment range, value case, ROM assumptions, payback horizon |
 | `scored-opportunities.md` | Portfolio scores, B/B/P classifications |
 | `opportunities.md` | Value hypotheses, GRC flags |
 | `baselines.md` | Key metrics grounding all value claims |
@@ -36,7 +37,7 @@ The summary contains exactly these sections, in this order:
 3. **Why This, Why Now** — 3–4 sentences, citing ≥2 named baseline metrics from `baselines.md`, sponsoring question from `scope.md`, cost of inaction
 4. **Scoring & Wave Logic** — one paragraph explaining evaluation criteria from `scored-opportunities.md` and wave sequencing from `roadmap.md`
 5. **Portfolio view** — single table covering every initiative: OPP-NNN, title, type, wave, composite score, named owner, month target
-6. **Budget ask vs. envelope** — total ask vs. envelope from `roadmap.md`, with deltas
+6. **Budget ask vs. envelope** — total investment range and value range from `business-case.md`; ROM accuracy label (AACE Class 5 ±50%); rough payback horizon; note that a definitive business case requires finance involvement and procurement data
 7. **Top 3–5 risks with mitigations** — each risk has a named owner (no "the team")
 8. **First Proof Point** — names the specific OPP-ID of the highest-scored Wave 1 item; month target from `roadmap.md`; primary outcome from `opportunities.md`; one-sentence strategic rationale traced to `scope.md`
 9. **Assumptions & Limitations** — two labeled sub-groups (Conditions and Open Items); each open item named and attributed; no vague placeholders
@@ -69,8 +70,8 @@ The summary contains exactly these sections, in this order:
 | Rationalization / Shortcut | Correct Reframe |
 |---|---|
 | "The HTML deliverable already covers this — we don't need a separate summary." | The HTML opens in a browser. The executive summary travels in email, in calendar invites, on phones. They serve different consumption contexts. Skip it and you lose the read-ahead. |
-| "We can re-derive numbers here for clarity." | New analysis in Phase 9 is rework with no review. Every figure must trace to `baselines.md` exactly as it appears in `scored-opportunities.md`. |
-| "Owners can be the role — 'Head of Ops' is fine." | Roles change; people own decisions. Name the person. If unknown, that is a Phase 7 gap to fix in roadmap.md, not a Phase 9 problem to paper over. |
+| "We can re-derive numbers here for clarity." | New analysis in Phase 10 is rework with no review. Every figure must trace to `baselines.md` exactly as it appears in `scored-opportunities.md`. |
+| "Owners can be the role — 'Head of Ops' is fine." | Roles change; people own decisions. Name the person. If unknown, that is a Phase 7 gap to fix in roadmap.md, not a Phase 10 problem to paper over. |
 | "Dates can be quarters — 'Q3' is enough." | Q3 is a planning artifact, not a commitment. Use month-X targets from `roadmap.md`. |
 | "Three risks is enough — we don't need five." | Three to five is the rule. Truncating to three when five matter hides risk; padding to five when three matter dilutes signal. Use the count the engagement evidence supports. |
 | "We can fan out the summary across multiple agents for speed." | The summary is short. Assembly overhead from fan-out exceeds the time savings. Single-pass drafting is the discipline. |
@@ -90,4 +91,4 @@ Key findings to surface for this phase: Go/No-Go verdict, named decision-maker, 
 
 ## Chain to next skill
 
-→ `ai-process-assessment:building-deliverable` (Phase 10 — produces the HTML deliverable)
+→ `ai-process-assessment:building-deliverable` (Phase 11 — produces the HTML deliverable)

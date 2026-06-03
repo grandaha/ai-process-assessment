@@ -25,6 +25,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - [ ] Run Evidence integrity check — sample value claims, walk each to its baseline
 - [ ] Run Logic integrity check — pick a Wave 1 brief, trace process → opportunity → score → roadmap → brief
 - [ ] Run Completeness check — cross-reference scoped domains against deliverable coverage
+- [ ] Run Business Case integrity check — confirm `business-case.md` ROM label is present; every figure has a stated assumption; Buy/Partner initiatives flag missing vendor quotes; one-time and recurring costs are separated
 - [ ] Run Communication check — does the executive summary lead with portfolio view?
 - [ ] Dispatch `opportunity-reviewer` subagent for independent integrity review
 - [ ] Resolve all Critical findings before clearance
@@ -41,6 +42,6 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 
 ## Chain to next skill
 
-→ `ai-process-assessment:building-executive-summary` (on clearance — Phase 9 produces the standalone executive summary).
+→ `ai-process-assessment:building-executive-summary` (on clearance — Phase 10 produces the standalone executive summary).
 
-On non-clearance, route to the skill responsible for the failed dimension. Phase 9 may not begin until clearance is recorded in `evidence-log.md`.
+On non-clearance, route to the skill responsible for the failed dimension. Phase 10 may not begin until clearance is recorded in `evidence-log.md`.

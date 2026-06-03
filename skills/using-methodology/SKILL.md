@@ -21,8 +21,9 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 6 | `ai-process-assessment:scoring-opportunities` | 7-dimension rubric + Build/Buy/Partner | `opportunities.md` saved; GRC cleared for any flagged | `scored-opportunities.md` |
 | 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scored-opportunities.md` saved; reviewer cleared | `roadmap.md` |
 | 8 | `ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs.md` |
-| 9 | `ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `ai-process-assessment:deliverable-gate` cleared | `executive-summary.md` |
-| 10 | `ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
+| 9 | `ai-process-assessment:building-business-case` | Wave 1 ROM business case | `usecase-briefs.md` exists | `business-case.md` |
+| 10 | `ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `ai-process-assessment:deliverable-gate` cleared | `executive-summary.md` |
+| 11 | `ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
 | Gate A | `ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities.md` | Logged in `evidence-log.md` |
 | Gate B | `ai-process-assessment:deliverable-gate` | Final integrity checklist | Before any external sharing | Clearance recorded in `evidence-log.md` |
 
@@ -55,8 +56,8 @@ You are operating inside the AI & Automation Use Case Identification methodology
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
 - If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
-- After `ai-process-assessment:deliverable-gate` clearance → invoke `ai-process-assessment:building-executive-summary` (Phase 9).
-- After `executive-summary.md` is saved → invoke `ai-process-assessment:building-deliverable` (Phase 10).
+- After `ai-process-assessment:deliverable-gate` clearance → invoke `ai-process-assessment:building-executive-summary` (Phase 10).
+- After `executive-summary.md` is saved → invoke `ai-process-assessment:building-deliverable` (Phase 11).
 - If CLAUDE.md declares an override for an engagement → honor it, and note the deviation for the deliverable gate's audit.
 
 ## When-to-Invoke Reference
@@ -75,6 +76,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "review before delivery", "final check" | `ai-process-assessment:deliverable-gate` |
 | "draft the executive summary", "build the read-ahead", "produce the exec brief" | `ai-process-assessment:building-executive-summary` |
 | "build the HTML deliverable", "render the client deck", "package the final HTML" | `ai-process-assessment:building-deliverable` |
+| "build the business case", "what does Wave 1 cost", "estimate the investment" | `ai-process-assessment:building-business-case` |
 
 ## Engagement Folder Convention
 
@@ -89,9 +91,10 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `scored-opportunities.md` — Phase 6
 - `roadmap.md` — Phase 7
 - `usecase-briefs.md` — Phase 8
+- `business-case.md` — Phase 9
 - `evidence-log.md` — running log of subagent reviews and gate clearances
-- `executive-summary.md` — Phase 9 (standalone 1–2 page exec brief; produced after deliverable-gate clearance)
-- `deliverable.html` — Phase 10 (self-contained client-ready HTML deliverable)
+- `executive-summary.md` — Phase 10 (standalone 1–2 page exec brief; produced after deliverable-gate clearance)
+- `deliverable.html` — Phase 11 (self-contained client-ready HTML deliverable)
 
 A phase's skill MUST verify the predecessor file(s) exist before producing any output.
 

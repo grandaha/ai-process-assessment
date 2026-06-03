@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -91,6 +91,7 @@ Upload the following as Project knowledge files:
 - `skills/scoring-opportunities/SKILL.md`
 - `skills/prioritizing-roadmap/SKILL.md`
 - `skills/packaging-usecases/SKILL.md`
+- `skills/building-business-case/SKILL.md`
 - `skills/building-executive-summary/SKILL.md`
 - `skills/building-deliverable/SKILL.md`
 - `skills/governance-risk-gate/SKILL.md`

@@ -44,7 +44,7 @@ Every Wave 1 brief contains the following 11 fields:
 - [ ] Dispatch `opportunity-reviewer` subagent for brief completeness review
 - [ ] Resolve Critical findings
 - [ ] Save to `docs/engagements/<engagement>/usecase-briefs.md`
-- [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:deliverable-gate` before any external sharing
+- [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:building-business-case`
 
 ## Workflow
 
@@ -83,4 +83,4 @@ Key findings to surface for this phase: Wave 1 briefs written (count), Wave 2 su
 
 ## Chain to next skill
 
-→ `ai-process-assessment:deliverable-gate` (before any external sharing of `usecase-briefs.md` or any prior output)
+→ `ai-process-assessment:building-business-case` (Phase 9 — produces the Wave 1 ROM business case before the deliverable gate)
