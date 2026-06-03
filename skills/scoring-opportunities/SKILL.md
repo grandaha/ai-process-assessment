@@ -19,15 +19,18 @@ Score each opportunity across all seven dimensions on a 1–5 scale. Cite the so
 
 | Dimension | What it measures | Required source |
 |---|---|---|
-| Value Potential | Magnitude of value if realized | `baselines.md` |
+| Value Potential | Magnitude of value if realized. For Chain Automation type: cite checkpoints eliminated × effort per checkpoint × volume. Do not aggregate step-level savings linearly — chain value is non-linear. | `baselines.md` |
 | Technical Feasibility | Buildability given current systems and skills | `tech-inventory.md` |
 | Data Readiness | Whether data needed exists, is accessible, and is fit for purpose | `tech-inventory.md` (data asset catalog) |
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` |
 | Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` + `process-map.md` |
 | Risk | Aggregate execution and post-deployment risk | GRC gate output + `context.md` |
+| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. | `process-map.md` chain scan + `context.md` |
 
 **Categorical rule: Each dimension score must cite a source (`process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, or GRC gate output). No dimension may be scored from intuition.**
+
+**Execution Horizon is a required field on every scored opportunity entry: Short-run / Long-run with one-sentence rationale. This field is consumed by Phase 7 sequencing.**
 
 ## Build/Buy/Partner Classification
 
@@ -72,6 +75,7 @@ Output one of: **Build / Buy / Partner / Hybrid**, with rationale citing the fou
 | "We'll figure out Build/Buy/Partner later." | B/B/P is an input to sequencing and brief writing. Deferring it pushes the same decision into less-prepared phases. |
 | "The reviewer subagent slows us down." | The reviewer is the durability mechanism for this phase. Skipping it is how scored portfolios pass through to delivery with sourcing gaps. |
 | "Scoring in main context lets me calibrate scores across OPPs — parallel agents can't do that." | Cross-OPP calibration happens during the consistency review of the assembled file, not during drafting. The `opportunity-reviewer` subagent is the calibration gate. Scoring inline re-introduces context bloat. |
+| "The value estimate is the sum of each step's individual time savings." | For Chain Automation opportunities, value comes primarily from eliminating human verification checkpoints, not from accelerating individual steps. Linear step-count aggregation is the wrong model. Cite checkpoints eliminated and effort per checkpoint from the chain scan. |
 
 ## Handoff Protocol
 

@@ -43,6 +43,8 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 - [ ] Round 3: Adjacent interview(s) — upstream / downstream; record named participants in `evidence-log.md` stakeholder interview log
 - [ ] Round 4: Clarification — resolve conflicts; record named participants in `evidence-log.md` stakeholder interview log
 - [ ] For every process, capture volume, cycle time (median + P90), error/exception rate, FTE effort
+- [ ] For every step in each process, assign AI capability flag (Green / Yellow / Red)
+- [ ] Run chain scan — identify consecutive Green runs; record in process-map.md; flag high-fragmentation processes
 - [ ] Apply Baseline & Value Hypothesis gate — flag any process missing baselines
 - [ ] Save `process-map.md`
 - [ ] Save `baselines.md`
@@ -63,6 +65,8 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 | Exceptions | Common deviations and how they're handled |
 | Upstream / downstream | What feeds this; what consumes its output |
 | Conflicts | Where interview rounds disagreed; resolution |
+| AI capability per step | For each step in the sequence: AI-capable (Green), Uncertain (Yellow), or Not AI-capable (Red). Record what makes a step hard for AI (judgment, unstructured input, regulatory requirement, etc.). |
+| Chain scan | Identify every run of consecutive Green steps. Record the run as [step i → step j] and count how many current human verification points the run would eliminate if chained. Flag processes where Green steps are interleaved with Red steps as high-fragmentation. |
 
 ### baselines.md
 
@@ -108,6 +112,7 @@ After each interview round, append rows to the `## Stakeholder Interview Log` se
 | "FTE effort estimates are sensitive — we'll skip them." | FTE is the most credible value lever to a CFO. Capture it with appropriate framing, not by omission. |
 | "Two interview rounds is enough." | Two rounds gives you the sponsor's view and the operator's view but no triangulation. Adjacent and clarification rounds catch what the first two miss. |
 | "Recording participant names is administrative overhead — we know who we talked to." | The stakeholder interview log is the only record that survives the engagement. Without it, the deliverable cannot answer "who did you talk to?" — the first question any skeptical executive will ask. Record as you go; reconstructing it from memory at the end is error-prone and often incomplete. |
+| "These AI-capable steps are scattered through the process, but we can still automate each one individually." | Scattered AI-capable steps each require their own human verification checkpoint. Linear step-count aggregation overstates value. Record the fragmentation — it determines achievable chain length and is a direct input to opportunity scoring. |
 
 ## Handoff Protocol
 

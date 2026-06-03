@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:prioritizing-roadmap
-description: Phase 7 — sequences scored opportunities into Foundation/Scale/Optimize waves under four constraints: dependency, capacity, quick-win, alignment. Saves roadmap.md.
+description: Phase 7 — sequences scored opportunities into Foundation/Scale/Optimize waves under five constraints: dependency, capacity, quick-win, alignment, job boundary impact. Saves roadmap.md.
 ---
 
 # Phase 7: Prioritizing the Roadmap
@@ -13,12 +13,13 @@ Scoring produces a ranked list. Sequencing produces a roadmap. They are not the 
 
 `scored-opportunities.md` must exist and the `opportunity-reviewer` clearance must be logged in `evidence-log.md`. This skill creates `roadmap.md`.
 
-## Four Sequencing Constraints (apply in order)
+## Five Sequencing Constraints (apply in order)
 
 1. **Dependency ordering** — no initiative begins before its enablers exist. An opportunity that requires a missing enabler is either deferred or its enabler is sequenced ahead of it.
 2. **Capacity-load check** — no wave is overloaded beyond org absorption rate. Capacity is the limit, not the score.
-3. **Quick-win requirement** — at least one opportunity in Wave 1 must produce a measurable outcome by month 3. Programs without early visible wins lose air cover.
+3. **Quick-win requirement** — at least one opportunity in Wave 1 must produce a measurable outcome by month 3. Programs without early visible wins lose air cover. An opportunity flagged Long-run in `scored-opportunities.md` is not eligible for the quick-win slot unless its org design dependency is already resolved.
 4. **Strategic alignment weighting** — used only as the tiebreaker among options that pass the prior three constraints.
+5. **Job boundary impact** — Short-run opportunities (AI deployable within existing job and role structures) are eligible for Wave 1. Long-run opportunities (value requires redesigning how tasks are bundled across workers) belong in Wave 2 at earliest. A Long-run item placed in Wave 1 requires a documented org design workstream as a named dependency — without it, the opportunity is sequenced to Wave 2.
 
 ## Roadmap Wave Definitions
 
@@ -43,6 +44,7 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 - [ ] Apply Constraint 2 (Capacity-load check) — confirm each wave is absorbable
 - [ ] Apply Constraint 3 (Quick-win requirement) — confirm at least one Wave 1 opportunity has a measurable month-3 outcome
 - [ ] Apply Constraint 4 (Strategic alignment) — break ties only after constraints 1–3 are satisfied
+- [ ] Apply Constraint 5 (Job boundary impact) — flag Long-run opportunities; confirm org design workstream exists before placing in Wave 1
 - [ ] Map enablers and dependencies for every Wave 1 initiative
 - [ ] Dispatch `opportunity-reviewer` subagent for sequencing review
 - [ ] Resolve Critical findings
@@ -55,6 +57,7 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 2. Build the candidate Wave 1 set from the top of the scored list.
 3. Apply constraints 1–3 in order. Each may evict or import an item.
 4. Use Constraint 4 only on remaining ties.
+5. Apply Constraint 5 — check Execution Horizon flag on each Wave 1 candidate. Move Long-run items to Wave 2 unless org design dependency is documented and sequenced.
 5. Map enablers for the final Wave 1. Resolve gaps using one of the three options above.
 6. Run `opportunity-reviewer`. Resolve Critical findings.
 7. Save and chain forward.
@@ -68,6 +71,7 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 | "Quick wins are nice but optional." | Quick wins are the air cover that buys you Waves 2 and 3. They are not optional. |
 | "Strategic alignment is the most important factor." | Strategic alignment is the tiebreaker among feasible options, not a substitute for dependency or capacity logic. |
 | "Wave 3 doesn't need real specification." | Wave 3 is strategic intent — but the trigger that promotes a Wave 3 item to Wave 2 must be named, or the wave decays into a wishlist. |
+| "This opportunity scores high — it goes in Wave 1." | Check the Execution Horizon flag. A Long-run opportunity requires job or role boundary redesign before value is realized. High score does not override the org design dependency. Place in Wave 2 unless the redesign workstream is already funded and sequenced ahead of it. |
 
 ## Handoff Protocol
 

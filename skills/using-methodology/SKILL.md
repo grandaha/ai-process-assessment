@@ -33,6 +33,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | RPA | Deterministic, rules-based execution of structured tasks across digital systems. No judgment required. |
 | AI Augmentation | AI assists a human in the loop — human retains decision authority. Examples: drafting, summarization, recommendation. |
 | AI Automation | AI executes end-to-end without per-instance human review for bounded, well-specified tasks with measurable accuracy thresholds. |
+| Chain Automation | Two or more consecutive AI-executed steps forming an uninterrupted sequence. A human verifies only the final output; intermediate checkpoints are eliminated. Value source is checkpoint elimination, not individual step acceleration. |
 | Agentic | Multi-step, tool-using AI that plans and acts toward a goal across systems with state and feedback. Higher autonomy, higher risk. |
 | Data & Analytics | Decision support through measurement, modeling, or visualization. No process automation — informs human action. |
 
@@ -45,6 +46,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "There's no time for the full methodology." | Time pressure is the strongest argument for the methodology, not against it. Skipping phases shifts cost from discovery to rework. |
 | "The client wants AI, not automation." | The client wants outcomes. Type is determined by the work, not the brand. A misclassified RPA opportunity sold as AI fails on cost and reliability. |
 | "We've done this kind of engagement before." | The methodology travels; the answers don't. Reuse the structure, re-derive the content. |
+| "This step doesn't look like an AI candidate — let's skip it." | Evaluate every step in the context of its neighbors, not in isolation. A step where humans have comparative advantage on its own may belong in a chain because appending it eliminates a human verification checkpoint. Step-by-step comparative advantage logic fails when chains are present. |
 
 ## Routing Logic
 
