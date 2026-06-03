@@ -30,6 +30,15 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 
 **Categorical rule: Hypothesis statement must be written before value is estimated. This prevents reverse-engineering the hypothesis from a desired outcome.**
 
+## Subagent Dispatch
+
+Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.
+
+- **When:** After `process-map.md` and `baselines.md` are confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
+- **Pass to each subagent:** Only that process's `process-map.md` entry (including its chain scan), the matching `baselines.md` rows, the relevant `tech-inventory.md` sections, and the Opportunity Type Taxonomy. Do not share other processes' entries between subagents.
+- **Return:** Fully-formed OPP-NNN entries — type, hypothesis (written before value), value range citing a named baseline, chain formation, and the three flags. Collect and assemble into `opportunities.md` in the main context.
+- **What stays in main context:** OPP-NNN identifier assignment (must be unique and sequential across the whole log), the GRC-flag branch decision, and final review of the assembled log for cross-process consistency. Hypothesis-before-value is enforced inside each subagent AND verified on assembly.
+
 ## Phase checklist
 
 - [ ] Confirm `process-map.md` and `baselines.md` exist

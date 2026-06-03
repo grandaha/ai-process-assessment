@@ -35,6 +35,15 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 3. **Adjacent — upstream and downstream.** Talk to the people who feed this process and the people who consume its output. Their pain often defines the real opportunity.
 4. **Clarification — resolve conflicts.** Where rounds 1–3 disagree, return with specific questions and reconcile. Document the resolved version AND the disagreement.
 
+## Subagent Dispatch
+
+Interview-round synthesis is offloaded to subagents to keep the main context clean. The main context owns the gate decisions; subagents own the per-round write-up.
+
+- **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `process-map.md` content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
+- **Pass to each subagent:** Only that round's raw notes, the relevant `tech-inventory.md` sections, and the `process-map.md` field schema from this skill's Key outputs table. Do not share other rounds' notes between subagents.
+- **Return:** Structured per-round entries plus any baseline values the round surfaced. Assemble returned entries into `process-map.md` and `baselines.md` in the main context.
+- **What stays in main context:** The Baseline & Value Hypothesis gate, the chain scan across the assembled map, and the conflict-resolution decision from Round 4. These are cross-round judgments and must not be delegated.
+
 ## Phase checklist
 
 - [ ] Confirm `tech-inventory.md` exists

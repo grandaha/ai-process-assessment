@@ -43,6 +43,16 @@ Required for every scored opportunity. Inputs:
 
 Output one of: **Build / Buy / Partner / Hybrid**, with rationale citing the four inputs.
 
+## Subagent Dispatch
+
+This phase already runs two subagents. This section names the pattern so it reads consistently with the other phases — the operational detail lives in the Phase checklist and Workflow below, which are authoritative.
+
+- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives only its own OPP entry plus the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, and GRC gate output. No cross-OPP context is shared. Each scorer returns dimensional scores (sourced), the Execution Horizon flag, and a Build/Buy/Partner classification.
+- **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scored-opportunities.md` draft, for independent cross-OPP calibration and consistency review. It receives the document content under review only.
+- **What stays in main context:** Assembly of returned scorer entries, composite-score computation (dimensional scores retained alongside), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
+
+See the Phase checklist and Workflow sections for the authoritative step sequence and ordering.
+
 ## Phase checklist
 
 - [ ] Confirm `opportunities.md` exists and GRC gate cleared for flagged items

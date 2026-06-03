@@ -52,6 +52,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 
 - On any new engagement prompt → invoke `ai-process-assessment:scoping-engagement`.
 - After each phase's output file is saved → invoke the next skill in the chain.
+- For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
 - If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
 - After `ai-process-assessment:deliverable-gate` clearance → invoke `ai-process-assessment:building-executive-summary` (Phase 9).

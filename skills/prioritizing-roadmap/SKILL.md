@@ -37,6 +37,15 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 - Move the dependent opportunity to Wave 2 with the enabler in Wave 1, OR
 - Document a remediation plan with named owner and completion date
 
+## Subagent Dispatch
+
+Sequencing is a whole-portfolio judgment and stays in the main context — the five constraints interact, so they cannot be parallelized per opportunity. Only the independent review is delegated.
+
+- **When:** After the candidate waves are built and enablers are mapped, dispatch the `opportunity-reviewer` subagent over the assembled `roadmap.md` draft for sequencing review.
+- **Pass to the subagent:** The `roadmap.md` draft content under review, plus the Execution Horizon flags from `scored-opportunities.md` so the reviewer can verify Constraint 5 placement. Pass document content only — not the full source-file set.
+- **Return:** Findings classified Critical / Important / Minor. The reviewer checks dependency ordering, capacity load, quick-win presence, and Long-run placement.
+- **What stays in main context:** All five sequencing constraints, wave assignment, enabler/dependency resolution, and Critical-finding resolution. The constraint logic is never delegated — only its review.
+
 ## Phase checklist
 
 - [ ] Confirm `scored-opportunities.md` saved and reviewer cleared
