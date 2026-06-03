@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -103,11 +103,11 @@ Upload the following as Project knowledge files:
 - `agents/opportunity-scorer.md`
 - `agents/usecase-brief-drafter.md`
 - `agents/executive-summary-drafter.md`
-- `agents/tab-renderer-briefing.md`
-- `agents/tab-renderer-recommendation.md`
-- `agents/tab-renderer-roadmap.md`
-- `agents/tab-renderer-briefs.md`
-- `agents/tab-renderer-evidence.md`
+- `agents/section-renderer-executive.md`
+- `agents/section-renderer-problem.md`
+- `agents/section-renderer-portfolio.md`
+- `agents/section-renderer-roadmap.md`
+- `agents/section-renderer-evidence.md`
 
 **Engagement context** (optional but recommended):
 - A filled-in `CLAUDE.md` for the specific engagement

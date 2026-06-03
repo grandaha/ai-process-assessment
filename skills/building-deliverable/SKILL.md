@@ -1,180 +1,243 @@
 ---
 name: ai-process-assessment:building-deliverable
-description: Phase 10 — assembles a self-contained client-ready HTML deliverable (deliverable.html) by dispatching 5 tab-renderer agents in parallel and concatenating their output sections into a static shell. Generates no new content — renders existing .md files.
-updated: 2026-05-08T10:44
+description: Phase 11 — assembles a single-scroll client-facing HTML deliverable (deliverable.html) by dispatching 5 section-renderer agents in parallel and interleaving their returned blocks into the correct page order. Synthesis renderers — not document converters. Each renderer distills its source to specified density.
+updated: 2026-06-03T18:08
 ---
 
-# Phase 10: Building the HTML Deliverable
+# Phase 11: Building the HTML Deliverable
 
 ## Role in the system
 
-The HTML deliverable is the client-facing single-page artifact that synthesizes all engagement outputs into a single readable file. It is the final delivery package.
+The HTML deliverable is the client-facing single-scroll artifact that synthesizes all engagement outputs into a single readable page. It is the final delivery package.
 
-Phase 10 produces NO new content. Every section traces to a named source `.md` file from prior phases. If a section is wrong, the fix is in the source file — re-run the relevant tab-renderer agent against the corrected source. Do not edit the HTML directly to patch source-file errors.
+Phase 11 produces NO new content. Every section traces to a named source `.md` file from prior phases. If a section is wrong, the fix is in the source file — re-run the affected section-renderer agent against the corrected source. Do not edit the HTML directly to patch source-file errors.
+
+Synthesis renderers receive specific sections to extract at specified density — not raw file dumps. They distill to the stated format. If an agent returns more than the specified output, reject it and re-dispatch with the constraint re-stated.
 
 ## Gate condition
 
 `executive-summary.md` exists in the engagement folder. (Implicit: `deliverable-gate` clearance is required, since Phase 9 cannot complete without it.) This skill creates `deliverable.html`.
 
-## Tab structure
+## Section structure
 
-The deliverable contains exactly 5 tabs, in this order:
+The deliverable contains exactly 9 sections in this scroll order:
 
-| Tab | Content | Source files |
-|---|---|---|
-| Briefing | Engagement context, discovery narrative, tech & data landscape, opportunity overview | `scope.md`, `context.md`, `tech-inventory.md`, `process-map.md`, `baselines.md`, `opportunities.md`, `scored-opportunities.md` |
-| Recommendation | Verdict, budget ask, portfolio table, quick-win callout, key risks, assumptions & limitations | `executive-summary.md` |
-| Roadmap | Sequencing logic, wave cards (W1 fully specified / W2 directional / W3 intent), budget envelope, enabler dependency map | `roadmap.md` |
-| Use Case Briefs | Portfolio at a Glance, Wave 1 SCRA briefs (full 11-field), Wave 2 summaries, Wave 3 placeholder | `usecase-briefs.md` |
-| Evidence | Phase completion log, GRC gate clearance records, deliverable-gate four-dimension results, package manifest, stakeholder interview log | `evidence-log.md` |
+| Section | Content summary | Source agent | Anchor ID |
+|---|---|---|---|
+| Verdict | GO/NO-GO verdict, pull-quote, 3 why-now bullets | section-renderer-executive (block 1) | `#verdict` |
+| Problem | 3 oversized stat cards (time-to-fill, Day-1 incompletion, attrition cost) | section-renderer-problem | `#problem` |
+| Portfolio | 12-row visual portfolio table with type badges, score bars, wave pills | section-renderer-portfolio | `#portfolio` |
+| Use Cases | 7 compact Wave 1 initiative cards in a grid | section-renderer-roadmap (block 1) | `#usecases` |
+| Roadmap | 3-band wave timeline graphic | section-renderer-roadmap (block 2) | `#roadmap` |
+| Investment | 4 stat cards + ROM note | section-renderer-roadmap (block 3) | `#investment` |
+| Top Risks | Compact 3-column risk table | section-renderer-executive (block 2) | `#risks` |
+| Actions | Next actions table | section-renderer-executive (block 3) | `#actions` |
+| Evidence | Phase completion chips + gate callouts | section-renderer-evidence | `#evidence` |
 
 ## Required CSS components
 
-All CSS component systems defined in the static shell must be used. Tab-renderer agents must not invent new CSS classes — if a new class is genuinely needed, it must be added to the static shell and documented here first.
+All CSS component systems below must be embedded in the static shell. Section-renderer agents must not invent new CSS classes. If a new class is genuinely needed, it must be added to the static shell and documented here first.
 
 ### Structural / layout components
 
 | CSS class | Purpose | Used in |
 |---|---|---|
-| `.briefing-pane` and children | Editorial narrative section with DM Serif Display, numbered sections, vision block, AI callouts | Briefing tab |
-| `.phase-strip` / `.phase-chip` | Horizontal timeline showing 8 phases as chips | Briefing tab — "What we did" section |
-| `.legend-wrapper` / `.legend-item` / `.swatch` / `.legend-pill` | Type taxonomy color-swatch legend | Briefing tab — opportunity overview |
-| `.doc-footer` | Document footer with border-top separator | Bottom of page — confidentiality, preparer, date |
-| `.tab-header-nav` | Back-to-Recommendation strip at the top of secondary tabs | Roadmap, Briefs, Evidence tabs |
-| `.brief-nav` | Breadcrumb nav on Wave 1 brief cards | Use Case Briefs tab |
-| `.brief-pagination` | Prev/Next navigation on Wave 1 brief cards | Use Case Briefs tab |
+| `.sticky-nav` | Sticky top navigation bar — links to all 9 section anchors | Page-level — top of body |
+| `.sticky-nav a` | Nav link style — 11px bold uppercase, slate color | Sticky nav |
+| `.section-block` | Padded scrollable content section with bottom border; `scroll-margin-top: 52px` for sticky nav offset | All 9 sections |
+| `.section-block h2` | Section heading — 20px bold | All sections |
+| `.doc-footer` | Document footer with border-top separator — confidentiality, preparer, date | Bottom of page |
 
-### Data visualization components (Recommendation tab)
+### Stat card components
 
 | CSS class | Purpose | Used in |
 |---|---|---|
-| `.verdict-block` / `.verdict-label` / `.verdict-text` | Bold Go/No-Go verdict block — large colored label + rationale text | Recommendation tab — Section 1 (The Decision) |
-| `.stat-row` | CSS grid wrapper for stat cards (auto-fit columns, min 180px) | Recommendation tab — Section 5 (The Investment) |
-| `.stat-card` / `.stat-value` / `.stat-label` / `.stat-sub` | KPI card with large bold number, uppercase label, sub-note | Recommendation tab — Section 5 (The Investment) |
-| `.score-bar-wrap` / `.score-bar-track` / `.score-bar-fill` / `.score-value` | Horizontal score bar with numeric value; fill width = score/5 × 100% | Recommendation tab — portfolio table Score column |
-| `.wave-badge` + `.w1` / `.w2` / `.w3` / `.w12` | Color-coded wave pill badges (green/blue/gray/amber) | Recommendation tab — portfolio table Wave column |
+| `.stat-row` | CSS grid wrapper for stat cards (auto-fit columns, min 180px) | Problem section, Investment section |
+| `.stat-card` / `.stat-value` / `.stat-label` / `.stat-sub` | KPI card with large bold number, uppercase label, sub-note | Problem section, Investment section |
+| `.stat-context` | Supplementary context line below stat-sub — 11px slate gray | Problem section, Investment section |
+
+### Verdict components
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.verdict-block` / `.verdict-label` / `.verdict-text` | Bold GO/NO-GO verdict block — large colored label + rationale text | Verdict section |
+
+### Score bar components
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.score-bar-wrap` / `.score-bar-track` / `.score-bar-fill` / `.score-value` | Horizontal score bar with numeric value; fill width = score/5 × 100% | Portfolio table, Use Cases grid |
+
+### Wave components
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.wave-badge` + `.w1` / `.w2` / `.w3` | Color-coded wave pill badges (green/blue/gray) | Portfolio table, Use Cases grid |
+| `.wave-timeline` | 3-band container for wave roadmap — flexbox, rounded, overflow hidden | Roadmap section |
+| `.wave-band` | Individual wave band — flex 1, padded | Roadmap section |
+| `.wave-band.w1` / `.wave-band.w2` / `.wave-band.w3` | Wave band background and border colors | Roadmap section |
+| `.wave-band-label` | Small uppercase band label (e.g., "Wave 1 · Foundation") | Roadmap section |
+| `.wave-band-horizon` | Large bold horizon text (e.g., "Months 0–6") — color varies by wave | Roadmap section |
+| `.wave-pills` | Flex wrapping container for wave pills | Roadmap section |
+| `.wave-pill` | Individual initiative pill — rounded, muted background | Roadmap section |
+| `.wave-band-note` | Small muted note below pills | Roadmap section |
+
+### Use case card components
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.uc-grid` | CSS grid for use case cards — auto-fit, min 360px columns | Use Cases section |
+| `.uc-card` | Individual use case card — bordered, rounded, flex column | Use Cases section |
+| `.uc-card-header` | Card header — flex row, type badge + score bar | Use Cases section |
+| `.uc-card-title` | Card title — 14px bold | Use Cases section |
+| `.uc-card-body` | Card body — padded flex column | Use Cases section |
+| `.uc-card-type` | Type badge — 11px pill with modifier class | Portfolio table, Use Cases cards |
+| `.uc-problem` | Problem statement text — 13px, line-height 1.5 | Use Cases cards |
+| `.uc-outcome` | Outcome statement — 12px bold green on green-tint background | Use Cases cards |
+| `.uc-meta` | Meta row — flex wrap, 11px slate | Use Cases cards |
+| `.uc-quickwin` | Quick-win badge — yellow tint, 10px bold | Use Cases cards |
+
+### Type badge modifier classes
+
+| CSS class | Type | Colors |
+|---|---|---|
+| `.type-rpa` | RPA | slate background, slate text |
+| `.type-aug` | Augmentation | purple-tint background, purple text |
+| `.type-ai` | AI | blue-tint background, blue text |
+| `.type-chain` | Chain | teal-tint background, teal text |
+| `.type-data` | Data | amber-tint background, amber text |
+| `.type-agentic` | Agentic | orange-tint background, orange text |
+
+### Phase completion log components (evidence section)
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.phase-log` | Vertical stack of phase chip rows | Evidence section |
+| `.phase-chip-row` | One row — dot + label/meta stacked | Evidence section |
+| `.phase-dot` | Filled green dot (complete) | Evidence section |
+| `.phase-dot.pending` | Empty gray dot (pending) | Evidence section |
+| `.phase-chip-label` | Phase name — 13px bold | Evidence section |
+| `.phase-chip-meta` | Output filename + status — 11px slate | Evidence section |
+
+### Owner chip
+
+| CSS class | Purpose | Used in |
+|---|---|---|
+| `.owner-chip` | Inline owner name pill — 11px, slate background, rounded | Risks table, Actions table |
 
 ### Callout variants
 
 | CSS class | Purpose | Used in |
 |---|---|---|
-| `.callout` | Standard informational callout (blue left border) | Multiple tabs |
-| `.callout-highlight` | Success callout (green left border) | Multiple tabs |
-| `.callout-warning` | Warning callout (amber left border) | Multiple tabs |
-| `.callout-note` | Muted callout (slate left border) | Multiple tabs |
-| `.callout-success` | Success callout — distinct from `.callout-highlight`; use for First Proof Point | Recommendation tab — Section 6 |
-| `.gap-note` | Gray italic text for data gaps | Multiple tabs |
+| `.callout` | Standard informational callout (blue left border) | Multiple sections |
+| `.callout-highlight` | Success callout (green left border) | Evidence section — Gate B |
+| `.callout-warning` | Warning callout (amber left border) | Evidence section — GRC gates |
+| `.callout-note` | Muted callout (slate left border) | Portfolio section, Roadmap section |
+| `.callout-success` | Success callout — distinct from `.callout-highlight` | Use where appropriate |
+| `.gap-note` | Gray italic text for data gaps and ROM notes | Problem section, Investment section |
 
-## Interoperability conventions
+## JS helper
 
-All cross-tab and within-tab links in the deliverable follow these conventions:
-
-### Anchor ID format
-- Opportunity anchors: `id="opp-NNN"` (zero-padded 3 digits, e.g., `id="opp-008"`)
-- Wave anchors: `id="wave-1"`, `id="wave-2"`, `id="wave-3"`
-- Wave 3 briefs placeholder: `id="wave-3-placeholder"`
-- Tab-level back-to-top: `id="section-top"` on the Recommendation tab
-
-### JS helper function (add to static shell)
-The static shell must include a `showTabAndScroll(tabId, anchorId, btn)` helper alongside the existing `showTab()`:
+The static shell includes a single smooth-scroll helper. No tab-switching logic. `showTab()` and `showTabAndScroll()` are removed.
 
 ```js
-function showTabAndScroll(tabId, anchorId, btn) {
-  showTab(tabId, null);
-  if (anchorId) {
-    setTimeout(function() {
-      var el = document.getElementById(anchorId);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  }
+function scrollTo(anchorId) {
+  var el = document.getElementById(anchorId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 ```
 
-### Cross-tab link patterns
-For links that switch tab AND scroll to anchor:
-```
-onclick="showTabAndScroll('briefs', 'opp-008', this); return false;"
+Sticky nav usage pattern:
+
+```html
+<a href="#verdict" onclick="scrollTo('verdict'); return false;">Verdict</a>
 ```
 
-For links that switch tab only:
-```
-onclick="showTab('recommendation', null); return false;"
-```
+## Sticky nav HTML
 
-For same-tab scroll links (within Briefs tab):
-```
-href="#opp-008"
-```
+The static shell includes a sticky nav immediately after `<body>`:
 
-### Visual distinction rule
-Cross-tab links (tab-switching) must be visually distinct from same-tab scroll links.
-Recommended: cross-tab links use a small icon (→) or styled differently in the shell CSS.
-Tab-renderer agents MUST NOT invent new CSS classes — if a distinction class is needed, it must be added to the static shell and documented here first.
+```html
+<nav class="sticky-nav">
+  <a href="#verdict" onclick="scrollTo('verdict'); return false;">Verdict</a>
+  <a href="#problem" onclick="scrollTo('problem'); return false;">Problem</a>
+  <a href="#portfolio" onclick="scrollTo('portfolio'); return false;">Portfolio</a>
+  <a href="#usecases" onclick="scrollTo('usecases'); return false;">Use Cases</a>
+  <a href="#roadmap" onclick="scrollTo('roadmap'); return false;">Roadmap</a>
+  <a href="#investment" onclick="scrollTo('investment'); return false;">Investment</a>
+  <a href="#risks" onclick="scrollTo('risks'); return false;">Risks</a>
+  <a href="#actions" onclick="scrollTo('actions'); return false;">Actions</a>
+  <a href="#evidence" onclick="scrollTo('evidence'); return false;">Evidence</a>
+</nav>
+```
 
 ## Phase checklist
 
 - [ ] Confirm `executive-summary.md` exists in the engagement folder
-- [ ] Confirm all source files for all 5 tabs exist
-- [ ] In a single tool-call batch, dispatch all 5 tab-renderer agents in parallel:
-  - `tab-renderer-briefing` ← scope.md, context.md, tech-inventory.md, process-map.md, baselines.md, opportunities.md, scored-opportunities.md
-  - `tab-renderer-recommendation` ← executive-summary.md
-  - `tab-renderer-roadmap` ← roadmap.md
-  - `tab-renderer-briefs` ← usecase-briefs.md
-  - `tab-renderer-evidence` ← evidence-log.md
-- [ ] Collect all 5 returned `<section>` blocks
-- [ ] Verify each return is a single `<section>` block — no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
-- [ ] Assemble the final file in main context: static shell (CSS + JS + masthead + tab nav) + 5 tab sections + `.doc-footer`
-- [ ] Confirm the static shell includes the `showTabAndScroll()` helper function
-- [ ] Confirm anchor ID convention is consistent across all 5 sections (spot-check: verify `id="opp-001"` through the highest OPP-ID exist in the Briefs section; verify `id="wave-1"`, `id="wave-2"`, `id="wave-3"` exist in the Roadmap section)
+- [ ] Confirm all 5 source files exist: `executive-summary.md`, `baselines.md`, `scored-opportunities.md`, `roadmap.md`, `evidence-log.md`
+- [ ] In a single tool-call batch, dispatch all 5 section-renderer agents in parallel:
+  - `section-renderer-executive` ← `executive-summary.md`
+  - `section-renderer-problem` ← `baselines.md`
+  - `section-renderer-portfolio` ← `scored-opportunities.md`
+  - `section-renderer-roadmap` ← `roadmap.md`
+  - `section-renderer-evidence` ← `evidence-log.md`
+- [ ] Collect all returned HTML blocks — each renderer returns only `<div class="section-block">` elements, no wrapper markup
+- [ ] Verify each return: no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
+- [ ] Assemble in main context in the specified page order (see assembly pattern below)
 - [ ] Write `docs/engagements/<engagement>/deliverable.html`
-- [ ] Open the file and visually confirm: 5 tabs render, tab navigation works, no missing-class styling artifacts
+- [ ] Open the file and confirm: scroll works, sticky nav links target correct sections, all 9 anchors present, no missing-class artifacts
 
 ## Assembly pattern
 
-Main context performs assembly only — it generates no content.
+Main context performs assembly only — it generates no content. Section-renderer agents return HTML blocks; main context interleaves them in page order.
 
 ```
-CSS + JS + masthead + tab nav
-  + [briefing section from tab-renderer-briefing]
-  + [recommendation section from tab-renderer-recommendation]
-  + [roadmap section from tab-renderer-roadmap]
-  + [briefs section from tab-renderer-briefs]
-  + [evidence section from tab-renderer-evidence]
-  + .doc-footer
+Static shell:
+  <head> CSS + JS </head>
+  <body>
+    <nav class="sticky-nav"> [9 nav links] </nav>
+    [masthead block]
+
+Page sections in this order:
+    #verdict        ← section-renderer-executive block 1
+    #problem        ← section-renderer-problem block 1
+    #portfolio      ← section-renderer-portfolio block 1
+    #usecases       ← section-renderer-roadmap block 1
+    #roadmap        ← section-renderer-roadmap block 2
+    #investment     ← section-renderer-roadmap block 3
+    #risks          ← section-renderer-executive block 2
+    #actions        ← section-renderer-executive block 3
+    #evidence       ← section-renderer-evidence block 1
+
+    .doc-footer
+
+  </body>
 → write deliverable.html
 ```
 
-The static shell (CSS, JS, masthead, tab nav) lives in main context. Tab agents return only inner `<section>` content.
+Because `section-renderer-executive` returns three blocks and `section-renderer-roadmap` returns three blocks, main context extracts each block by its `id="..."` anchor and places it in the specified page order. Blocks from a single renderer are not necessarily adjacent in the page.
 
-## Optional second fan-out — Briefs tab
+## Rationalization table
 
-The `tab-renderer-briefs` agent handles 10 items: 5 full Wave 1 SCRA briefs (heavy), 4 Wave 2 summaries, 1 Wave 3 placeholder. The briefs tab renderer MAY itself dispatch 5 brief-card sub-agents in parallel (one per Wave 1 UC) and assemble the tab internally before returning. This keeps Wave 1 brief detail out of both main context and the tab renderer's window.
-
-This second fan-out is at the tab renderer's discretion, based on the size of `usecase-briefs.md`. The Phase 10 skill does not mandate it.
-
-## Rationalization Table
-
-| Rationalization / Shortcut | Correct Reframe |
+| Rationalization / Shortcut | Correct reframe |
 |---|---|
-| "Just write the HTML in main context — fan-out is overkill." | All 5 tabs in one context window blows the budget on a single engagement. The fan-out exists to keep main context clean for assembly. |
-| "Generate any missing content here — the source file has a gap." | Phase 10 generates no content. A gap in the source is a Phase 1–9 problem. Fix the source, re-run the tab agent. |
-| "Tab agents can return full HTML pages — easier to assemble." | Five full pages cannot be concatenated into one. Agents return inner `<section>` only. Wrapper markup from agents is rejected. |
-| "Invent a CSS class if you need a new visual." | The shell defines the design system. Inventing classes breaks the package and bypasses design review. Use existing classes; if a new one is genuinely needed, that is a shell change, not a tab change. |
-| "Skip the document footer — the masthead has the date." | The `.doc-footer` is part of the design system and carries confidentiality + preparer info. Omitting it ships an incomplete artifact. |
-| "The briefs tab is too big — drop Wave 2 summaries." | Wave 2 summaries are commitments. The optional brief-card sub-fan-out exists exactly to handle the size — use it. |
-| "The interoperability links can be added after assembly." | Cross-tab links depend on anchor IDs that must be set by the tab renderers. Assembly-time patching is fragile and error-prone. The renderers own the anchors; the skill owns the convention. |
+| "Just render the full source file — synthesis is overkill." | Verbatim renders produce thousands of words per section that no executive reads in a deliverable. Synthesis renderers produce designed artifacts at specified density. |
+| "Generate any missing content here — the source file has a gap." | Phase 11 generates no content. A gap in the source is a Phase 1–9 problem. Fix the source, re-run the affected renderer. |
+| "Place the three executive blocks adjacent to each other." | The page order is intentional. #verdict opens the page; #risks and #actions close it after the portfolio and roadmap. Assembly interleaving is the design. |
+| "Section renderers can return full HTML pages — easier to collect." | Full pages cannot be interleaved. Agents return inner `<div class="section-block">` only. Wrapper markup from agents is rejected. |
+| "Invent a CSS class if you need a new visual." | The shell defines the design system. Inventing classes breaks the package. Use existing classes; if a new one is genuinely needed, that is a shell change — add it here and document it before using it. |
 
 ## Chain to next skill
 
-Terminal — Phase 10 completes the methodology output sequence. On successful write, `deliverable.html` may be shared externally alongside `executive-summary.md`. Any subsequent change to source `.md` files requires re-running the affected tab agent and reassembling the deliverable.
+Terminal — Phase 11 completes the methodology output sequence. On successful write, `deliverable.html` may be shared externally alongside `executive-summary.md`. Any subsequent change to source `.md` files requires re-running the affected section-renderer agent and reassembling the deliverable.
 
-## Completion Confirmation
+## Completion confirmation
 
-After writing `deliverable.html`, Janice must present the deliverable to the user:
+After writing `deliverable.html`, present the deliverable to the user:
 
-1. **Name the file written** and its path
-2. **Confirm all 5 tabs rendered** — name each tab
-3. **Flag any visual artifacts** noted during the open/confirm step
-4. **Invite the user to review** the deliverable and provide feedback
+1. Name the file written and its path
+2. Confirm all 9 sections rendered — name each section
+3. Flag any visual artifacts noted during the open/confirm step
+4. Invite the user to review the deliverable and provide feedback
 
 This is the end of the methodology chain. No further phase is invoked unless the user requests a re-run or revision.
