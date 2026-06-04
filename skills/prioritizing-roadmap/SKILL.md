@@ -55,6 +55,10 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 - [ ] Apply Constraint 4 (Strategic alignment) — break ties only after constraints 1–3 are satisfied
 - [ ] Apply Constraint 5 (Job boundary impact) — flag Long-run opportunities; confirm org design workstream exists before placing in Wave 1
 - [ ] Map enablers and dependencies for every Wave 1 initiative
+- [ ] For any Wave 2/3 item with conditional placement, flag it explicitly in the wave summary table row — not only in dependency notes
+- [ ] For every cross-wave dependency (e.g., Wave 2 item depends on Wave 1 item being live), state a minimum operational maturity threshold (e.g., "OPP-NNN must be in stable production for ≥60 days before this item is scoped")
+- [ ] For cascading timelines (Wave 2 start date derived from Wave 1 go-live date), document the slip risk explicitly: if Wave 1 item slips N months, Wave 2 item's earliest start slides by the same N
+- [ ] For Wave 3 re-scoping triggers, verify each trigger is a measurable operational state — not a budget event, procurement approval, or funding decision. If a budget dependency exists, call it a precondition separate from the trigger.
 - [ ] Dispatch `opportunity-reviewer` subagent for sequencing review
 - [ ] Resolve Critical findings
 - [ ] Save to `docs/engagements/<engagement>/roadmap.md`

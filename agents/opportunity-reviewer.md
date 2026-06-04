@@ -1,6 +1,6 @@
 ---
 name: opportunity-reviewer
-description: Structured-skeptic reviewer for scored-opportunities.md and usecase-briefs.md. Validates evidence sourcing, type consistency, brief completeness, build/buy/partner presence. Returns Critical / Important / Minor findings.
+description: Structured-skeptic reviewer for scored-opportunities.md and usecase-briefs/ folder. Validates evidence sourcing, type consistency, brief completeness, build/buy/partner presence. Returns Critical / Important / Minor findings. When reviewing use case briefs, receives _index.md content; may request specific UC-NNN.md files for completeness checks.
 ---
 
 # Opportunity Reviewer

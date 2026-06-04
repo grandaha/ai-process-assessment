@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:packaging-usecases
-description: Phase 8 — produces self-contained Use Case Brief (UC-NNN) per Wave 1 initiative using Situation-Complication-Resolution-Action structure. Saves usecase-briefs.md.
+description: Phase 8 — produces self-contained Use Case Brief (UC-NNN) per Wave 1 initiative using Situation-Complication-Resolution-Action structure. Saves individual UC-NNN.md files + _index.md to usecase-briefs/ folder.
 ---
 
 # Phase 8: Packaging Use Cases
@@ -11,7 +11,7 @@ The brief is the unit of delivery. Each Wave 1 opportunity becomes a self-contai
 
 ## Gate condition
 
-`roadmap.md` must exist and the `opportunity-reviewer` clearance for the roadmap must be logged. This skill creates `usecase-briefs.md`.
+`roadmap.md` must exist and the `opportunity-reviewer` clearance for the roadmap must be logged. This skill creates the `usecase-briefs/` folder containing `_index.md` and individual `UC-NNN.md` files (one per opportunity across all three waves).
 
 ## UC-NNN Brief Structure
 
@@ -36,28 +36,27 @@ Every Wave 1 brief contains the following 11 fields:
 ## Phase checklist
 
 - [ ] Confirm `roadmap.md` saved and reviewer cleared
-- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch (pass: OPP entry, relevant process-map.md sections, baselines.md rows, scored-opportunities.md row, roadmap.md entry, GRC conditions if applicable, and staging file path: `<engagement-folder>/_staging/phase8/UC-NNN.md`)
-- [ ] Collect one-line summaries from agents (UC-NNN, OPP-NNN, wave, any flags). Full briefs are in staging files.
-- [ ] Assemble via Bash: `cat docs/engagements/<name>/_staging/phase8/UC-*.md > docs/engagements/<name>/usecase-briefs.md`
-- [ ] Verify: `wc -l docs/engagements/<name>/usecase-briefs.md`
-- [ ] Run a consistency pass on the assembled file — read the file once with offset/limit and patch inconsistencies (voice, terminology, owner naming format) via Edit tool. Do NOT re-draft briefs.
-- [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/phase8`
-- [ ] For each Wave 2 initiative, write a summary brief (Opportunity reference, type, situation, hypothesis, expected value range, dependencies)
-- [ ] For Wave 3, list capability areas with the trigger that promotes them
-- [ ] Dispatch `opportunity-reviewer` subagent for brief completeness review
-- [ ] Resolve Critical findings
-- [ ] Save to `docs/engagements/<engagement>/usecase-briefs.md`
-- [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:building-business-case`
+- [ ] Create `usecase-briefs/` folder in the engagement run directory
+- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch (pass: OPP entry, relevant process-map.md sections, baselines.md rows, scored-opportunities.md row, roadmap.md entry, GRC conditions if applicable, and UC-NNN assignment — e.g., "Write this as UC-001")
+- [ ] Collect returned brief content from agents; write each as `usecase-briefs/UC-NNN.md` — one Write call per brief
+- [ ] Run a consistency pass — read each Wave 1 UC file and patch inconsistencies (voice, terminology, owner naming format, Action field) via Edit on the specific file. Do NOT re-draft briefs.
+- [ ] Write Wave 2 summary briefs in main context — one file per initiative (`usecase-briefs/UC-008.md` onward). Schema: Opportunity reference, type, situation, hypothesis, expected value range, key dependencies.
+- [ ] Write Wave 3 placeholders in main context — one file per initiative. Schema: Opportunity reference, type, capability area, strategic hypothesis, re-scoping trigger.
+- [ ] Assemble `usecase-briefs/_index.md` in main context — master index table (UC-NNN, OPP ref, title, type, wave, month target, sourcing, one-line description)
+- [ ] Dispatch `opportunity-reviewer` subagent — pass `_index.md` content; reviewer may flag specific UC files for completeness issues
+- [ ] Resolve Critical findings by editing the specific `UC-NNN.md` file affected
+- [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:collecting-cost-actuals`
 
 ## Workflow
 
 1. Confirm preconditions.
-2. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent its OPP entry, the relevant sections from the source files, and its staging file path (`_staging/phase8/UC-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only.
-3. Assemble: `cat _staging/phase8/UC-*.md > usecase-briefs.md`. Verify with `wc -l`. Cleanup `_staging/phase8`. Run a consistency pass on the assembled file: normalize voice (direct, present-tense situation / conditional resolution/action), verify owner naming format, confirm wave month targets match roadmap.md. Do NOT re-draft briefs — patch inconsistencies only via Edit tool.
+2. Create the `usecase-briefs/` folder. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent its OPP entry, the relevant source sections, and its UC-NNN assignment. Do NOT share cross-OPP context between agents. Collect returned brief content.
+3. Write each returned brief as `usecase-briefs/UC-NNN.md` — one Write call per brief. Run a consistency pass: normalize voice (direct, present-tense situation / conditional resolution/action), verify owner naming format, confirm wave month targets match roadmap.md. Patch inconsistencies via Edit on the specific file — do NOT re-draft briefs.
 4. Action field requires a named owner and a date — not "the team will...".
-5. Wave 2 summary briefs follow a thinner schema; Wave 3 are placeholders with promotion triggers.
-6. Dispatch reviewer. Resolve Critical findings.
-7. Save. Final step before any external sharing is the `deliverable-gate`.
+5. Write Wave 2 summary briefs in main context, one at a time, as separate `UC-NNN.md` files. Wave 2 summary schema: Opportunity reference, type, situation, hypothesis, expected value range, key dependencies. Write Wave 3 placeholders in main context, one at a time, as separate `UC-NNN.md` files. Wave 3 schema: Opportunity reference, type, capability area, strategic hypothesis, re-scoping trigger.
+6. Assemble `usecase-briefs/_index.md` — a master table: UC-NNN, OPP ref, title, type, wave, month target, sourcing, one-line description. One row per UC across all three waves.
+7. Dispatch reviewer with `_index.md` content. Resolve Critical findings by editing the specific `UC-NNN.md` file affected.
+8. All files are written. Final step before any external sharing is the `deliverable-gate`.
 
 ## Rationalization Table
 
@@ -86,4 +85,4 @@ Key findings to surface for this phase: Wave 1 briefs written (count), Wave 2 su
 
 ## Chain to next skill
 
-→ `ai-process-assessment:building-business-case` (Phase 9 — produces the Wave 1 ROM business case before the deliverable gate)
+→ `ai-process-assessment:collecting-cost-actuals` (Phase 8.5 — collects labor rates, vendor quotes, and IT estimates before the business case)

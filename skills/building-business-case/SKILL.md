@@ -15,7 +15,7 @@ Phase 9 produces no new analysis. Every value claim traces to a source file from
 
 ## Gate condition
 
-`usecase-briefs.md` must exist and the `opportunity-reviewer` clearance for the briefs must be logged in `evidence-log.md`. `cost-actuals.md` must also exist in the engagement folder — this file is produced by Phase 8.5 (`ai-process-assessment:collecting-cost-actuals`). If `cost-actuals.md` is absent, halt immediately and invoke `ai-process-assessment:collecting-cost-actuals` before returning to this phase. This skill creates `business-case.md`.
+`usecase-briefs/_index.md` must exist and the `opportunity-reviewer` clearance for the briefs must be logged in `evidence-log.md`. `cost-actuals.md` must also exist in the engagement folder — this file is produced by Phase 8.5 (`ai-process-assessment:collecting-cost-actuals`). If `cost-actuals.md` is absent, halt immediately and invoke `ai-process-assessment:collecting-cost-actuals` before returning to this phase. This skill creates `business-case.md`.
 
 ## Scope constraint
 
@@ -28,7 +28,7 @@ All five must be present. If any is missing, the skill halts and reports which f
 | File | What it provides |
 |---|---|
 | `roadmap.md` | Wave 1 initiative list, sequencing, enablers |
-| `usecase-briefs.md` | Fully specified Wave 1 briefs (SCRA structure, sourcing recommendations) |
+| `usecase-briefs/_index.md` + Wave 1 `UC-NNN.md` files | Fully specified Wave 1 briefs (SCRA structure, sourcing recommendations). Read the index to identify Wave 1 UC file names, then read only those files. |
 | `baselines.md` | Current-state metrics — the value denominator |
 | `opportunities.md` | Value hypotheses (written before value — must be honored as written, not re-derived) |
 | `scored-opportunities.md` | Build/Buy/Partner classifications per initiative |
@@ -90,7 +90,7 @@ If a `cost-actuals.md` file exists in the engagement folder, reference its entri
 Per-initiative cost and value analysis is independent across Wave 1 initiatives — they parallelize cleanly.
 
 - **When:** After confirming all five source files exist, dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel tool-call batch.
-- **Pass to each subagent:** Only that initiative's data — roadmap.md entry, usecase-briefs.md brief, baselines.md relevant rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification, and the relevant rows from cost-actuals.md (if the file exists). Do not share other initiatives' data between subagents.
+- **Pass to each subagent:** Only that initiative's data — roadmap.md entry, the initiative's `usecase-briefs/UC-NNN.md` file content, baselines.md relevant rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification, and the relevant rows from cost-actuals.md (if the file exists). Do not share other initiatives' data between subagents.
 - **Return:** A fully-formed cost structure block and value case block for that initiative, following the formats above.
 - **What stays in main context:** Assembly of returned blocks, Wave 1 aggregate computation (sum ranges, compute payback), mandatory label verification, and Key Assumptions compilation.
 
@@ -98,7 +98,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 
 ## Phase checklist
 
-- [ ] Confirm `usecase-briefs.md` saved and reviewer cleared
+- [ ] Confirm `usecase-briefs/_index.md` saved and reviewer cleared
 - [ ] Confirm cost-actuals.md exists in the engagement folder — halt and invoke Phase 8.5 if absent
 - [ ] Confirm all five source files exist
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
@@ -112,7 +112,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 
 ## Workflow
 
-1. Confirm preconditions: `usecase-briefs.md` exists and reviewer cleared.
+1. Confirm preconditions: `usecase-briefs/_index.md` exists and reviewer cleared.
 2. Confirm `cost-actuals.md` exists in the engagement folder. If absent: halt. Do not proceed. Invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) and complete it before returning to this phase.
 3. Confirm all five source files present.
 4. For each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data.

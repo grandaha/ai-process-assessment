@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:collecting-cost-actuals
-description: Phase 8.5 — required gate between Phase 8 and Phase 9. Reads roadmap.md, usecase-briefs.md, and scored-opportunities.md to generate a stakeholder data collection worksheet, then walks the consultant through capturing labor rates, implementation hours, vendor quotes, and IT integration estimates. Writes cost-actuals.md to the engagement folder. Phase 9 will not run without this file.
+description: Phase 8.5 — required gate between Phase 8 and Phase 9. Reads roadmap.md, usecase-briefs/_index.md + Wave 1 UC-NNN.md files, and scored-opportunities.md to generate a stakeholder data collection worksheet, then walks the consultant through capturing labor rates, implementation hours, vendor quotes, and IT integration estimates. Writes cost-actuals.md to the engagement folder. Phase 9 will not run without this file.
 updated: 2026-06-03T19:43
 ---
 
@@ -14,14 +14,14 @@ Business cases require real input. A figure labeled PENDING in the business case
 
 ## Gate condition
 
-`usecase-briefs.md` must exist in the engagement folder. This skill creates `cost-actuals.md`.
+`usecase-briefs/_index.md` must exist in the engagement folder. This skill creates `cost-actuals.md`.
 
 ## Required source files
 
 | File | What it provides |
 |---|---|
 | `roadmap.md` | Wave 1 initiative list, B/B/P per initiative, enabler list and owners |
-| `usecase-briefs.md` | Resolution and data requirements fields per initiative — identifies who does the build work |
+| `usecase-briefs/_index.md` + Wave 1 `UC-NNN.md` files | Resolution and data requirements fields per initiative — identifies who does the build work. Read the index first to identify Wave 1 UC file names, then read only those individual files. |
 | `scored-opportunities.md` | B/B/P classification per initiative with rationale |
 
 If any of these three files is missing, halt and report which file is absent.
@@ -143,7 +143,7 @@ After writing, show the user:
 
 ## Phase checklist
 
-- [ ] Confirm `usecase-briefs.md` exists
+- [ ] Confirm `usecase-briefs/_index.md` exists
 - [ ] Confirm `roadmap.md` and `scored-opportunities.md` exist
 - [ ] Complete analysis pass — identify labor types, Buy/Partner flags, enabler dependencies per initiative
 - [ ] Surface Data Collection Worksheet to user; wait for acknowledgment before starting capture

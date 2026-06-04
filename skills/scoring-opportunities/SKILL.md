@@ -15,7 +15,7 @@ Scoring converts a typed opportunity log into a ranked portfolio. The rubric is 
 
 ## Scoring Rubric
 
-Score each opportunity across all seven dimensions on a 1–5 scale. Cite the source for each score.
+Score each opportunity across all seven dimensions on a 1–5 scale. Cite the source for each score. Use the scale anchors below — do not interpret the scale without them.
 
 | Dimension | What it measures | Required source |
 |---|---|---|
@@ -25,8 +25,59 @@ Score each opportunity across all seven dimensions on a 1–5 scale. Cite the so
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` |
 | Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` + `process-map.md` |
-| Risk | Aggregate execution and post-deployment risk | GRC gate output + `context.md` |
-| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. | `process-map.md` chain scan + `context.md` |
+| Risk | Aggregate execution and post-deployment risk — **higher score = lower risk** | GRC gate output + `context.md` |
+| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. **Long-run is NOT a long timeline or complex prerequisites — it specifically means the opportunity cannot deliver value until someone's job or role boundary is redesigned. A long GRC clearance track or missing integration is a dependency (Constraint 1), not a Long-run classification.** | `process-map.md` chain scan + `context.md` |
+
+### Scale Anchors (apply to all 7 dimensions)
+
+**Value Potential**
+- 1 — No supporting baseline; value is speculative or negligible
+- 2 — Directional claim only; no named metric supports magnitude
+- 3 — Moderate value; partially baselined; recovers meaningful cost or cycle time
+- 4 — High value; strong baseline; recovers significant cost or time (>$100K/yr or >1 FTE or meaningful cycle-time compression across high volume)
+- 5 — Very high value; strong baseline; major cost or strategic impact (>$500K/yr, or directly addresses the largest identified cost driver in the engagement)
+
+**Technical Feasibility**
+- 1 — Not feasible given current stack; requires capabilities that do not exist
+- 2 — Major barriers; significant new capability required beyond the current stack
+- 3 — Feasible but requires new integrations (8–12 week security review) or substantial new configuration
+- 4 — Mostly in existing stack; Workday config changes only (6–10 week lead time); no new integration required
+- 5 — Uses existing licensed features; minimal configuration; no new integration; quickest deployment path
+
+**Data Readiness**
+- 1 — Critical gaps; data does not exist, is inaccessible, or is fundamentally unfit for purpose
+- 2 — Poor quality or major gaps in key datasets; significant remediation required before deployment
+- 3 — Moderate quality; data exists with known gaps; usable with documented limitations
+- 4 — Good quality; minor gaps that do not block deployment
+- 5 — Good quality, real-time, complete; no relevant gaps for this use case
+
+**Org Change Readiness**
+- 1 — Active resistance; change will fail without a major multi-year intervention
+- 2 — Meaningful resistance; targeted change management program required; key skeptical stakeholders with real veto risk
+- 3 — Mixed; some champions, some skeptics; standard change management needed; no active blockers
+- 4 — Favorable; key stakeholders aligned; limited adoption friction expected
+- 5 — High readiness; champion-driven; team actively wants the change
+
+**Strategic Alignment**
+- 1 — No alignment with any stated strategic priority
+- 2 — Tangential or indirect alignment to one priority
+- 3 — Directly supports one stated strategic priority
+- 4 — Directly supports two stated strategic priorities
+- 5 — Core to three or more stated priorities, including CEO- or Board-level initiatives
+
+**Time to Value**
+- 1 — 12+ months to first measurable outcome; major prerequisites on the critical path
+- 2 — 9–12 months; significant dependencies or prerequisites
+- 3 — 6–9 months including IT lead time and any prerequisite work
+- 4 — 3–6 months; uses existing stack with known lead times
+- 5 — Under 3 months or measurable within one quarter; minimal dependencies
+
+**Risk (higher score = lower risk)**
+- 1 — Very high risk; unresolved regulatory or legal exposure; high failure consequence; Red GRC flag
+- 2 — High risk; complex conditions; significant EEOC or compliance exposure; Yellow GRC with multiple governance dependencies
+- 3 — Moderate risk; Yellow GRC cleared with conditions; conditions are manageable but require active governance
+- 4 — Low risk; Green GRC; limited failure consequence; failure is detectable and recoverable
+- 5 — Minimal risk; Green GRC; no regulatory exposure; no candidate PII; failure is trivially reversible
 
 **Categorical rule: Each dimension score must cite a source (`process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, or GRC gate output). No dimension may be scored from intuition.**
 

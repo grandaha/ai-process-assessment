@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"

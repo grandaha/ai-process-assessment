@@ -20,8 +20,8 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities.md` |
 | 6 | `ai-process-assessment:scoring-opportunities` | 7-dimension rubric + Build/Buy/Partner | `opportunities.md` saved; GRC cleared for any flagged | `scored-opportunities.md` |
 | 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scored-opportunities.md` saved; reviewer cleared | `roadmap.md` |
-| 8 | `ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs.md` |
-| 8.5 | `ai-process-assessment:collecting-cost-actuals` | Cost data collection from stakeholders — labor rates, implementation hours, vendor quotes, IT estimates | `usecase-briefs.md` exists | `cost-actuals.md` |
+| 8 | `ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs/` (folder: `_index.md` + `UC-NNN.md` per opportunity) |
+| 8.5 | `ai-process-assessment:collecting-cost-actuals` | Cost data collection from stakeholders — labor rates, implementation hours, vendor quotes, IT estimates | `usecase-briefs/_index.md` exists | `cost-actuals.md` |
 | 9 | `ai-process-assessment:building-business-case` | Wave 1 ROM business case | `cost-actuals.md` exists | `business-case.md` |
 | 10 | `ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `ai-process-assessment:deliverable-gate` cleared | `executive-summary.md` |
 | 11 | `ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
@@ -57,7 +57,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
 - If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
-- After `usecase-briefs.md` is saved and reviewer cleared → invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) before Phase 9.
+- After `usecase-briefs/_index.md` is saved and reviewer cleared → invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) before Phase 9.
 - After `ai-process-assessment:deliverable-gate` clearance → invoke `ai-process-assessment:building-executive-summary` (Phase 10).
 - After `executive-summary.md` is saved → invoke `ai-process-assessment:building-deliverable` (Phase 11).
 - If CLAUDE.md declares an override for an engagement → honor it, and note the deviation for the deliverable gate's audit.
@@ -93,7 +93,7 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `opportunities.md` — Phase 5
 - `scored-opportunities.md` — Phase 6
 - `roadmap.md` — Phase 7
-- `usecase-briefs.md` — Phase 8
+- `usecase-briefs/` — Phase 8 (folder: `_index.md` master index + `UC-NNN.md` per opportunity, one file per UC across all three waves)
 - `cost-actuals.md` — Phase 8.5 (labor rates, implementation hours, vendor quotes, IT integration estimates — required before Phase 9)
 - `business-case.md` — Phase 9
 - `evidence-log.md` — running log of subagent reviews and gate clearances

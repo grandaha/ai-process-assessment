@@ -15,7 +15,7 @@ Single-initiative analyst. Receives one Wave 1 initiative's complete data packag
 | Input | Source |
 |---|---|
 | Roadmap entry | OPP-NNN block from `roadmap.md` — wave, month target, enabler dependencies, sourcing recommendation |
-| Use case brief | OPP-NNN brief from `usecase-briefs.md` — SCRA fields, data requirements, success metric, risks |
+| Use case brief | OPP-NNN brief from `usecase-briefs/UC-NNN.md` — SCRA fields, data requirements, success metric, risks |
 | Baseline rows | Relevant rows from `baselines.md` for this initiative's process area — volume, cycle time, FTE figures |
 | Value hypothesis | Verbatim entry from `opportunities.md` for this OPP-NNN — must be used as-is, not re-derived |
 | B/B/P classification | OPP-NNN row from `scored-opportunities.md` — Build/Buy/Partner classification and rationale |
