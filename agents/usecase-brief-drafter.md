@@ -19,6 +19,7 @@ Single-opportunity brief writer. Produces one self-contained UC-NNN brief in SCR
 | Scoring record | OPP-NNN row from `scored-opportunities.md` (includes B/B/P classification and rationale) |
 | Roadmap placement | OPP-NNN entry from `roadmap.md` (wave, month target, enabler dependencies) |
 | GRC conditions | Conditions block from `opportunities.md` if Cleared with Conditions; omit if Cleared |
+| Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase8/UC-NNN.md` |
 
 If any required input is missing, refuse to draft the brief and state which input is absent.
 
@@ -64,8 +65,14 @@ For Wave 2 items, produce a 6-field summary instead of the full 11-field brief:
 - Produces one brief only — the OPP-NNN specified at dispatch
 - Voice: direct, past-present tense for Situation, conditional for Resolution and Action
 - Length: each field 1–4 sentences; Action may be a short bullet list if multiple steps
+- Writes its brief to the staging file path provided at dispatch using the Write tool
+- Returns only a one-line summary — does NOT return the brief content to main context
 
-## Output format
+## Output
+
+Write the complete UC-NNN brief to the staging file path provided at dispatch. Use the Write tool with the exact path given.
+
+Structure the written content as:
 
 ```markdown
 ## UC-NNN — [Opportunity title]
@@ -93,6 +100,12 @@ For Wave 2 items, produce a 6-field summary instead of the full 11-field brief:
 **Wave assignment:** Wave N — Month X target; enablers: [list]
 ```
 
+After writing the file, return exactly this one-line summary and nothing else:
+```
+<UC-NNN> (<OPP-NNN>): Brief complete. Wave <N>. Written to <staging_file_path>.
+```
+Do NOT return the brief content in your response.
+
 ## Dispatch point
 
-Invoked by `ai-process-assessment:packaging-usecases` — one agent per Wave 1 opportunity, dispatched in parallel. Each agent receives only its own OPP entry.
+Invoked by `ai-process-assessment:packaging-usecases` — one agent per Wave 1 opportunity, dispatched in parallel. Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase8/UC-NNN.md`.

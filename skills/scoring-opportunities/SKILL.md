@@ -47,9 +47,10 @@ Output one of: **Build / Buy / Partner / Hybrid**, with rationale citing the fou
 
 This phase already runs two subagents. This section names the pattern so it reads consistently with the other phases — the operational detail lives in the Phase checklist and Workflow below, which are authoritative.
 
-- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives only its own OPP entry plus the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, and GRC gate output. No cross-OPP context is shared. Each scorer returns dimensional scores (sourced), the Execution Horizon flag, and a Build/Buy/Partner classification.
+- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives only its own OPP entry plus the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, GRC gate output, and its staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
 - **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scored-opportunities.md` draft, for independent cross-OPP calibration and consistency review. It receives the document content under review only.
-- **What stays in main context:** Assembly of returned scorer entries, composite-score computation (dimensional scores retained alongside), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
+- **Assembly:** After all scorer agents complete, assemble via Bash: `cat docs/engagements/<name>/_staging/phase6/OPP-*.md > docs/engagements/<name>/scored-opportunities.md`. Verify with: `wc -l scored-opportunities.md`. Cleanup: `rm -rf _staging/phase6`.
+- **What stays in main context:** One-line summaries from each scorer agent (OPP-NNN, composite score, B/B/P), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
 
 See the Phase checklist and Workflow sections for the authoritative step sequence and ordering.
 
@@ -57,8 +58,10 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 
 - [ ] Confirm `opportunities.md` exists and GRC gate cleared for flagged items
 - [ ] Dispatch one `opportunity-scorer` agent per opportunity in a single parallel tool-call batch (pass: OPP entry, relevant process-map.md sections, baselines.md rows, tech-inventory.md sections, context.md sections, GRC gate output if applicable)
-- [ ] Collect returned scored entries; assemble into scored-opportunities.md
-- [ ] Apply Build/Buy/Partner classification per opportunity
+- [ ] Collect one-line summaries from scorer agents (OPP-NNN, composite, B/B/P). Full scored entries are in staging files.
+- [ ] Assemble via Bash: `cat docs/engagements/<name>/_staging/phase6/OPP-*.md > docs/engagements/<name>/scored-opportunities.md`
+- [ ] Verify: `wc -l docs/engagements/<name>/scored-opportunities.md`
+- [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/phase6`
 - [ ] Compute composite score AND retain dimensional scores (composite alone is insufficient)
 - [ ] Dispatch the `opportunity-reviewer` subagent for independent review
 - [ ] Resolve any Critical findings before save
@@ -69,8 +72,8 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 ## Workflow
 
 1. Confirm `opportunities.md` exists and GRC clearance is recorded for all flagged opportunities.
-2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent only its own OPP entry and the relevant sections from the four source files. Do NOT share cross-OPP context between agents. Collect returned scored entries.
-3. Verify that each returned entry includes a Build/Buy/Partner classification — `opportunity-scorer` produces this. Do not re-derive B/B/P in main context. Assemble the verified entries into the scored-opportunities.md draft.
+2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent its OPP entry, the relevant sections from the four source files, and its staging file path (`_staging/phase6/OPP-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only — do NOT request the full scored entry back.
+3. After all agents complete, assemble: `cat _staging/phase6/OPP-*.md > scored-opportunities.md`. Verify with `wc -l`. Cleanup `_staging/phase6`. B/B/P is in the staging files and the assembled output — do not re-derive in main context.
 4. Run the full scored set through the `opportunity-reviewer` subagent. Pass it the document content under review only.
 5. Resolve all Critical findings. Important findings should be addressed; Minor findings are noted.
 6. Save and chain forward.

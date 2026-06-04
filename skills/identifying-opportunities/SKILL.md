@@ -35,9 +35,17 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.
 
 - **When:** After `process-map.md` and `baselines.md` are confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
-- **Pass to each subagent:** Only that process's `process-map.md` entry (including its chain scan), the matching `baselines.md` rows, the relevant `tech-inventory.md` sections, and the Opportunity Type Taxonomy. Do not share other processes' entries between subagents.
-- **Return:** Fully-formed OPP-NNN entries — type, hypothesis (written before value), value range citing a named baseline, chain formation, and the three flags. Collect and assemble into `opportunities.md` in the main context.
-- **What stays in main context:** OPP-NNN identifier assignment (must be unique and sequential across the whole log), the GRC-flag branch decision, and final review of the assembled log for cross-process consistency. Hypothesis-before-value is enforced inside each subagent AND verified on assembly.
+- **Pass to each subagent:** Only that process's `process-map.md` entry (including its chain scan), the matching `baselines.md` rows, the relevant `tech-inventory.md` sections, the Opportunity Type Taxonomy, and the staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. Do not share other processes' entries between subagents.
+- **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
+- **Assembly:** After all agents complete, assemble with Bash:
+  ```bash
+  cat docs/engagements/<name>/_staging/phase5/proc-*.md \
+    | awk '/^## TEMP/{printf "## OPP-%03d", ++n; sub(/^## TEMP-[^ ]+/, ""); print; next} {print}' \
+    > docs/engagements/<name>/opportunities.md
+  ```
+  Verify with: `grep "^## OPP" docs/engagements/<name>/opportunities.md` (returns only headings — trivially small).
+  Cleanup: `rm -rf docs/engagements/<name>/_staging/phase5`
+- **What stays in main context:** The one-line summaries from each agent (process ID, counts, GRC flags), the OPP headings from the grep verification, the GRC-flag branch decision, and cross-process consistency review of headings only.
 
 ## Phase checklist
 

@@ -19,6 +19,7 @@ Single-opportunity scorer. Evaluates one OPP-NNN entry against the seven-dimensi
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, data asset catalog, enabler gaps, build/buy posture) |
 | Org context | Relevant sections from `context.md` (AI maturity, risk posture, org change readiness, strategic priorities) |
 | GRC gate output | GRC clearance block from `evidence-log.md` if applicable; omit if GRC flag is Green |
+| Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase6/OPP-NNN.md` |
 
 If any required input is missing, refuse to score dimensions that depend on it and state which input is absent.
 
@@ -66,8 +67,14 @@ Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `c
 - Produces one scored entry only — the OPP-NNN specified at dispatch
 - Composite score = arithmetic mean of 7 dimensional scores, rounded to 1 decimal place
 - Dimensional scores are the decision input; composite is a sort key only
+- Writes its scored entry to the staging file path provided at dispatch using the Write tool
+- Returns only a one-line summary — does NOT return the scored entry content to main context
 
-## Output format
+## Output
+
+Write the complete scored entry to the staging file path provided at dispatch. Use the Write tool with the exact path given.
+
+Structure the written content as:
 
 ```markdown
 ## OPP-NNN — [Opportunity title]
@@ -88,6 +95,8 @@ Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `c
 
 **Composite:** N.N / 5
 
+**Execution Horizon:** [Short-run / Long-run] — [one-sentence rationale]
+
 ### Build/Buy/Partner
 
 **Classification:** [Build / Buy / Partner / Hybrid]
@@ -102,6 +111,12 @@ Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `c
 **Rationale:** [1–3 sentences citing the inputs above]
 ```
 
+After writing the file, return exactly this one-line summary and nothing else:
+```
+<OPP-NNN>: Composite <N.N>. B/B/P: <classification>. Written to <staging_file_path>.
+```
+Do NOT return the scored entry content in your response.
+
 ## Dispatch point
 
-Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its own OPP entry and the four source files (no cross-OPP context).
+Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its own OPP entry and the four source files (no cross-OPP context). Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase6/OPP-NNN.md`.

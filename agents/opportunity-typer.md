@@ -17,6 +17,7 @@ Single-process opportunity identifier. Converts one mapped process into typed OP
 | Baselines | Matching rows from `baselines.md` (volume, cycle time, FTE effort, confidence level) for this process |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, API map, data asset catalog, enabler gaps) for the systems this process touches |
 | Opportunity Type Taxonomy | The six-type table: RPA / AI Augmentation / AI Automation / Chain Automation / Agentic / Data & Analytics |
+| Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase5/proc-<process-id>.md` |
 
 If any required input is missing, refuse to type the affected work and state which input is absent.
 
@@ -72,12 +73,20 @@ For each opportunity, build the OPP entry in this exact order:
 - Reviews the chain scan BEFORE walking the per-step taxonomy — order is mandatory
 - Writes the hypothesis statement BEFORE estimating value on every opportunity
 - Every type assignment carries a source citation; every value range cites a named baseline
-- Leaves OPP-NNN identifier assignment, the GRC-flag branch decision, and cross-process consistency review to the main context
+- Uses TEMP identifiers in the format `## TEMP-<process-id>-<N>` (e.g., `## TEMP-HRTA01-1`). OPP-NNN sequential assignment happens in the main context via Bash renumber after assembly.
+- Writes output to the staging file path provided at dispatch using the Write tool
+- Returns only a one-line summary — does NOT return OPP entry content to main context
 
-## Output format
+## Output
+
+Write all OPP entries for this process to the staging file path provided at dispatch. Use the Write tool with the exact path given.
+
+Use `## TEMP-<process-id>-<N>` identifiers in place of OPP-NNN (e.g., `## TEMP-HRTA01-1`, `## TEMP-HRTA01-2`). The main context assigns sequential OPP-NNN numbers after assembly.
+
+Each entry follows this structure:
 
 ```markdown
-## OPP — [Opportunity title] (process: [process ID from process-map.md])
+## TEMP-<process-id>-<N> — [Opportunity title] (process: <process-id>)
 
 **Type:** [RPA / AI Augmentation / AI Automation / Chain Automation / Agentic / Data & Analytics]
 **Type source:** [specific step(s) + taxonomy row that justify the type]
@@ -93,8 +102,12 @@ For each opportunity, build the OPP entry in this exact order:
 **Data / system dependencies:** [data assets and systems from tech-inventory.md this opportunity requires]
 ```
 
-Return one block per opportunity found in this process. Do not assign OPP-NNN numbers — the main context numbers them on assembly.
+After writing the file, return exactly this one-line summary and nothing else:
+```
+Process <process-id>: <N> opportunities written. GRC flags: Green <G> / Yellow <Y> / Red <R>. Written to <staging_file_path>.
+```
+Do NOT return the OPP entry content in your response.
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:identifying-opportunities` — one agent per mapped process, dispatched in parallel in a single tool-call batch. Each agent receives only its own process entry (including the chain scan), the matching baselines, the relevant tech-inventory sections, and the six-type taxonomy (no cross-process context).
+Invoked by `ai-process-assessment:identifying-opportunities` — one agent per mapped process, dispatched in parallel in a single tool-call batch. Each agent receives only its own process entry (including the chain scan), the matching baselines, the relevant tech-inventory sections, the six-type taxonomy, and the staging file path for its output (no cross-process context).

@@ -36,9 +36,12 @@ Every Wave 1 brief contains the following 11 fields:
 ## Phase checklist
 
 - [ ] Confirm `roadmap.md` saved and reviewer cleared
-- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch (pass: OPP entry, relevant process-map.md sections, baselines.md rows, scored-opportunities.md row, roadmap.md entry, GRC conditions if applicable)
-- [ ] Collect returned brief drafts
-- [ ] Run a consistency pass in main context (voice, terminology, owner naming format) before assembling into usecase-briefs.md
+- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch (pass: OPP entry, relevant process-map.md sections, baselines.md rows, scored-opportunities.md row, roadmap.md entry, GRC conditions if applicable, and staging file path: `<engagement-folder>/_staging/phase8/UC-NNN.md`)
+- [ ] Collect one-line summaries from agents (UC-NNN, OPP-NNN, wave, any flags). Full briefs are in staging files.
+- [ ] Assemble via Bash: `cat docs/engagements/<name>/_staging/phase8/UC-*.md > docs/engagements/<name>/usecase-briefs.md`
+- [ ] Verify: `wc -l docs/engagements/<name>/usecase-briefs.md`
+- [ ] Run a consistency pass on the assembled file — read the file once with offset/limit and patch inconsistencies (voice, terminology, owner naming format) via Edit tool. Do NOT re-draft briefs.
+- [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/phase8`
 - [ ] For each Wave 2 initiative, write a summary brief (Opportunity reference, type, situation, hypothesis, expected value range, dependencies)
 - [ ] For Wave 3, list capability areas with the trigger that promotes them
 - [ ] Dispatch `opportunity-reviewer` subagent for brief completeness review
@@ -49,8 +52,8 @@ Every Wave 1 brief contains the following 11 fields:
 ## Workflow
 
 1. Confirm preconditions.
-2. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent only its own OPP entry and the relevant sections from the four source files. Do NOT share cross-OPP context between agents.
-3. Collect returned brief drafts. Run a consistency pass in main context: normalize voice (direct, present-tense situation / conditional resolution/action), verify owner naming format is consistent, confirm wave month targets match roadmap.md. Do NOT re-draft briefs — patch inconsistencies only.
+2. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent its OPP entry, the relevant sections from the source files, and its staging file path (`_staging/phase8/UC-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only.
+3. Assemble: `cat _staging/phase8/UC-*.md > usecase-briefs.md`. Verify with `wc -l`. Cleanup `_staging/phase8`. Run a consistency pass on the assembled file: normalize voice (direct, present-tense situation / conditional resolution/action), verify owner naming format, confirm wave month targets match roadmap.md. Do NOT re-draft briefs — patch inconsistencies only via Edit tool.
 4. Action field requires a named owner and a date — not "the team will...".
 5. Wave 2 summary briefs follow a thinner schema; Wave 3 are placeholders with promotion triggers.
 6. Dispatch reviewer. Resolve Critical findings.
@@ -66,7 +69,7 @@ Every Wave 1 brief contains the following 11 fields:
 | "Wave 2 briefs can be skipped — they'll get rewritten in 6 months." | Wave 2 briefs are commitments at directional depth. Without them, Wave 1 lands without a credible follow-on. |
 | "Risks were captured during scoring — we don't need them in the brief." | The brief is read independently of the scoring output. Risks must travel with the recommendation. |
 | "Sourcing recommendation is an implementation detail." | Sourcing is the most consequential decision after type. It belongs in the brief, with rationale. |
-| "Agent-drafted briefs will have inconsistent voice — better to draft in main context." | Voice drift is real; the consistency pass in main context is its fix. Drafting inline re-introduces the context bloat the fan-out pattern exists to prevent. |
+| "Agent-drafted briefs will have inconsistent voice — better to draft in main context." | Voice drift is real; the consistency pass on the assembled file is its fix. Drafting inline re-introduces the context bloat the WFS pattern exists to prevent. |
 
 ## Handoff Protocol
 
