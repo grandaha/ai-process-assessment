@@ -1,3 +1,15 @@
 .DS_Store
 *.swp
 *.swo
+
+# Local Claude Code settings
+.claude/
+
+# Session handoff / personal logs
+.remember/
+
+# Client engagement data
+docs/engagements/
+
+# Subagent staging area
+_staging/
