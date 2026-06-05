@@ -5,6 +5,14 @@ description: Phase 4 — evidence-gathering core. Maps processes via four-round 
 
 # Phase 4: Discovering Processes
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `tech-inventory.md`, `context.md`, and `scope.md` — confirm each exists.
+
+Gate condition: `tech-inventory.md` must be present before proceeding.
+
 ## Role in the system
 
 This is the evidence-gathering core of the methodology. Everything downstream — opportunity identification, scoring, sequencing, brief writing — cites this phase's output. Two artifacts come out: `process-map.md` describes how work actually happens, and `baselines.md` captures the metrics that ground every later value claim.
@@ -40,8 +48,8 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 Interview-round synthesis is offloaded to subagents to keep the main context clean. The main context owns the gate decisions; subagents own the per-round write-up.
 
 - **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `process-map.md` content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
-- **Pass to each subagent:** Only that round's raw notes, the relevant `tech-inventory.md` sections, and the `process-map.md` field schema from this skill's Key outputs table. Do not share other rounds' notes between subagents.
-- **Return:** Structured per-round entries plus any baseline values the round surfaced. Assemble returned entries into `process-map.md` and `baselines.md` in the main context.
+- **Pass to each subagent:** engagement folder path, round number, and the raw notes for that round only. The agent reads `tech-inventory.md` itself to extract relevant sections. The agent reads the process-map.md field schema from this skill file at the engagement path. Do not pass any file content to the subagent.
+- **Return:** Write structured entries to `<engagement-folder>/_staging/phase4/round-N.md`. Return a one-line summary only: "Round N complete: N processes mapped, N baselines captured." The orchestrator assembles `process-map.md` and `baselines.md` from staging files — it does NOT receive entry content from the subagent.
 - **What stays in main context:** The Baseline & Value Hypothesis gate, the chain scan across the assembled map, and the conflict-resolution decision from Round 4. These are cross-round judgments and must not be delegated.
 
 ## Phase checklist
@@ -125,6 +133,8 @@ After each interview round, append rows to the `## Stakeholder Interview Log` se
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `process-map.md` or `baselines.md` in this response. State the file paths only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -135,6 +145,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: processes mapped (count), baselines captured, any "baseline unavailable" flags, stakeholder interview log completeness.
+
+**Session boundary:** After the user approves `process-map.md` and `baselines.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:identifying-opportunities` to begin Phase 5. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

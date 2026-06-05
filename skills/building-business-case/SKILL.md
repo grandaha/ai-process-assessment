@@ -5,6 +5,20 @@ description: Phase 9 — produces a Wave 1 ROM business case (business-case.md) 
 
 # Phase 9: Building the Business Case
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read the following files and confirm each exists:
+   - `cost-actuals.md`
+   - `usecase-briefs/_index.md`
+   - `roadmap.md`
+   - `baselines.md`
+   - `opportunities.md`
+   - `scored-opportunities.md`
+
+Gate condition: All six files must be present. `cost-actuals.md` must have no unresolved PENDING items for Wave 1 initiatives.
+
 ## Role in the system
 
 The business case answers "what does Wave 1 cost and what is it worth?" — sourced entirely from methodology artifacts already produced. It is not a financial model. It is a ROM estimate (AACE Class 5, ±50%) that gives decision-makers a magnitude check before the deliverable gate.
@@ -90,8 +104,8 @@ If a `cost-actuals.md` file exists in the engagement folder, reference its entri
 Per-initiative cost and value analysis is independent across Wave 1 initiatives — they parallelize cleanly.
 
 - **When:** After confirming all five source files exist, dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel tool-call batch.
-- **Pass to each subagent:** Only that initiative's data — roadmap.md entry, the initiative's `usecase-briefs/UC-NNN.md` file content, baselines.md relevant rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification, and the relevant rows from cost-actuals.md (if the file exists). Do not share other initiatives' data between subagents.
-- **Return:** A fully-formed cost structure block and value case block for that initiative, following the formats above.
+- **Pass to each subagent:** engagement folder path and UC-NNN file path for this initiative. The agent reads its own roadmap.md entry, UC-NNN.md, baselines.md rows, opportunities.md value hypothesis, scored-opportunities.md B/B/P classification, and cost-actuals.md rows itself. Do not pass file content to the subagent.
+- **Return:** The agent writes its cost structure block and value case block to `<engagement-folder>/_staging/phase9/<initiative-id>.md`. Returns one-line summary: "initiative-id: ROM $X–$Y, value category." The orchestrator assembles `business-case.md` from staging files — it does NOT receive block content from subagents.
 - **What stays in main context:** Assembly of returned blocks, Wave 1 aggregate computation (sum ranges, compute payback), mandatory label verification, and Key Assumptions compilation.
 
 **Note:** Dispatch is the primary path. Do not fall back to main context unless dispatch explicitly fails and you cannot recover.
@@ -133,6 +147,8 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `business-case.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, surface the phase output to the user:
 
 1. **Name the file written** and its path
@@ -143,6 +159,8 @@ Before invoking the next skill, surface the phase output to the user:
 **Do not auto-chain.** Every phase transition is a human decision.
 
 Key findings to surface for this phase: Wave 1 aggregate ROM range (low/high), aggregate annual value range, rough payback horizon, count of initiatives requiring vendor quotes before estimates can be tightened.
+
+**Session boundary:** After the user approves `business-case.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:deliverable-gate` to begin Gate B. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

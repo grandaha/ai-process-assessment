@@ -5,6 +5,14 @@ description: Phase 5 — applies opportunity type taxonomy to every mapped proce
 
 # Phase 5: Identifying Opportunities
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `process-map.md`, `baselines.md`, and `tech-inventory.md` — confirm each exists.
+
+Gate condition: Both `process-map.md` and `baselines.md` must be present before proceeding.
+
 ## Role in the system
 
 This phase converts mapped processes into a typed opportunity log. Type — RPA / AI Augmentation / Chain Automation / AI Automation / Agentic / Data & Analytics — is assigned BEFORE scoring because the rubric weights vary by type. A misclassified opportunity gets the wrong scoring lens and the wrong sourcing recommendation.
@@ -35,7 +43,7 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.
 
 - **When:** After `process-map.md` and `baselines.md` are confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
-- **Pass to each subagent:** Only that process's `process-map.md` entry (including its chain scan), the matching `baselines.md` rows, the relevant `tech-inventory.md` sections, the Opportunity Type Taxonomy, and the staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. Do not share other processes' entries between subagents.
+- **Pass to each subagent:** engagement folder path, process ID, and staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. The agent reads its own `process-map.md` entry, `baselines.md` rows, and `tech-inventory.md` sections. Do not pass file content to the subagent.
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
 - **Assembly:** After all agents complete, assemble with Bash:
   ```bash
@@ -83,6 +91,8 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `opportunities.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -93,6 +103,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: opportunities identified (count), GRC flag summary (Green/Yellow/Red counts), next routing decision.
+
+**Session boundary:** After the user approves `opportunities.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke either `ai-process-assessment:governance-risk-gate` (if any non-Green GRC flags exist) or `ai-process-assessment:scoring-opportunities` (if all Green). Do not continue methodology work in this session.
 
 ## Chain to next skill
 

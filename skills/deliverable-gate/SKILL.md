@@ -5,6 +5,17 @@ description: Cross-cutting terminal gate — runs four-dimension integrity check
 
 # [CROSS-CUTTING] Deliverable Gate
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read all phase output files for integrity check:
+   `scope.md`, `context.md`, `tech-inventory.md`, `process-map.md`, `baselines.md`,
+   `opportunities.md`, `scored-opportunities.md`, `roadmap.md`,
+   `usecase-briefs/_index.md`, `cost-actuals.md`, `business-case.md`
+
+Gate condition: All phase output files must exist before the integrity check can proceed.
+
 ## Role in the system
 
 Fires before ANY external sharing of outputs, regardless of phase. The terminal gate. Cannot be bypassed without explicit CLAUDE.md override.
@@ -28,6 +39,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - [ ] Run Business Case integrity check — confirm `business-case.md` ROM label is present; every figure has a stated assumption; Buy/Partner initiatives flag missing vendor quotes; one-time and recurring costs are separated
 - [ ] Run Communication check — does the executive summary lead with portfolio view?
 - [ ] Dispatch `opportunity-reviewer` subagent for independent integrity review
+  Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content. Resolve all Critical findings before recording clearance.
 - [ ] Resolve all Critical findings before clearance
 - [ ] Mark cleared for delivery in `evidence-log.md` OR route back to the relevant skill for remediation
 
@@ -42,6 +54,10 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 
 ## Chain to next skill
 
+**Output rule:** Do NOT reproduce the contents of any phase file in this response. State clearance status, critical finding count, and file paths only.
+
 → `ai-process-assessment:building-executive-summary` (on clearance — Phase 10 produces the standalone executive summary).
 
 On non-clearance, route to the skill responsible for the failed dimension. Phase 10 may not begin until clearance is recorded in `evidence-log.md`.
+
+**Session boundary:** After clearance is recorded in `evidence-log.md`, this gate session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:building-executive-summary` to begin Phase 10. Do not continue methodology work in this session.

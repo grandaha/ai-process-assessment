@@ -6,6 +6,14 @@ updated: 2026-06-03T18:08
 
 # Phase 11: Building the HTML Deliverable
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `executive-summary.md` and confirm it exists.
+
+Gate condition: `executive-summary.md` must be present before proceeding.
+
 ## Role in the system
 
 The HTML deliverable is the client-facing single-scroll artifact that synthesizes all engagement outputs into a single readable page. It is the final delivery package.
@@ -176,12 +184,13 @@ The static shell includes a sticky nav immediately after `<body>`:
 - [ ] Confirm `executive-summary.md` exists in the engagement folder
 - [ ] Confirm all 5 source files exist: `executive-summary.md`, `baselines.md`, `scored-opportunities.md`, `roadmap.md`, `evidence-log.md`
 - [ ] In a single tool-call batch, dispatch all 5 section-renderer agents in parallel:
-  - `section-renderer-executive` ← `executive-summary.md`
-  - `section-renderer-problem` ← `baselines.md`
-  - `section-renderer-portfolio` ← `scored-opportunities.md`
-  - `section-renderer-roadmap` ← `roadmap.md`
-  - `section-renderer-evidence` ← `evidence-log.md`
-- [ ] Collect all returned HTML blocks — each renderer returns only `<div class="section-block">` elements, no wrapper markup
+  - `section-renderer-executive` ← engagement folder path, section ID: `executive`
+  - `section-renderer-problem` ← engagement folder path, section ID: `problem`
+  - `section-renderer-portfolio` ← engagement folder path, section ID: `portfolio`
+  - `section-renderer-roadmap` ← engagement folder path, section ID: `roadmap`
+  - `section-renderer-evidence` ← engagement folder path, section ID: `evidence`
+  - Pass to each renderer: engagement folder path and its section ID. Each renderer reads the source files it needs for its section. Do not pass document content to renderers.
+- [ ] Each renderer writes its section to `<engagement-folder>/_staging/phase11/<section-id>.html`. Returns one-line confirmation: "section <id> written." Orchestrator collects confirmations, then assembles `deliverable.html` from staging files. The orchestrator does NOT receive HTML block content from renderers.
 - [ ] Verify each return: no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
 - [ ] Assemble in main context in the specified page order (see assembly pattern below)
 - [ ] Write `docs/engagements/<engagement>/deliverable.html`
@@ -233,6 +242,8 @@ Terminal — Phase 11 completes the methodology output sequence. On successful w
 
 ## Completion confirmation
 
+**Output rule:** Do NOT reproduce or echo the HTML content of `deliverable.html` in this response. State the file path only.
+
 After writing `deliverable.html`, present the deliverable to the user:
 
 1. Name the file written and its path
@@ -241,3 +252,5 @@ After writing `deliverable.html`, present the deliverable to the user:
 4. Invite the user to review the deliverable and provide feedback
 
 This is the end of the methodology chain. No further phase is invoked unless the user requests a re-run or revision.
+
+**Session boundary:** This is the end of the methodology chain. This session is complete. No further phase invocation is needed unless the user requests a re-run or revision.

@@ -6,6 +6,15 @@ updated: 2026-06-03T19:43
 
 # Phase 8.5: Collecting Cost Actuals
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `roadmap.md` and `usecase-briefs/_index.md` — confirm both exist.
+3. Read each Wave 1 UC-NNN.md file listed in `_index.md` to build the collection checklist.
+
+Gate condition: `usecase-briefs/_index.md` must be present before proceeding.
+
 ## Role in the system
 
 Produces `cost-actuals.md` by walking the consultant through cost data collection for each Wave 1 initiative. The consultant gathers data from stakeholders (IT, Finance, vendors) before or during this phase. The skill captures what is available, marks the rest PENDING, and writes the file. Phase 9 does not run without this file.
@@ -78,6 +87,8 @@ Do not rush. Do not skip items. Do not assume a value because one similar item w
 **Step 4 — Write cost-actuals.md**
 
 Write `cost-actuals.md` to the engagement folder. Use the format below. Pre-populate with the engagement's actual initiative names, labor types, and owner names from the source files — not generic placeholders.
+
+**Output rule:** Do NOT reproduce the contents of `cost-actuals.md` in this response. Confirm totals and PENDING item count only. State the file path — do not echo file content.
 
 **Step 5 — Surface summary**
 
@@ -155,3 +166,5 @@ After writing, show the user:
 ## Chain to next skill
 
 → `ai-process-assessment:building-business-case` (Phase 9)
+
+**Session boundary:** After Phase 9 is authorized to proceed, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:building-business-case` to begin Phase 9. Do not continue methodology work in this session.

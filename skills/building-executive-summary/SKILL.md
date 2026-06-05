@@ -5,6 +5,21 @@ description: Phase 10 — produces a standalone 1–2 page executive summary (ex
 
 # Phase 10: Building the Executive Summary
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read the following files and confirm each exists:
+   - `business-case.md`
+   - `roadmap.md`
+   - `scored-opportunities.md`
+   - `opportunities.md`
+   - `baselines.md`
+   - `scope.md`
+3. Check `evidence-log.md` — confirm deliverable-gate clearance is recorded.
+
+Gate condition: All six source files present; deliverable-gate clearance logged in `evidence-log.md`.
+
 ## Role in the system
 
 The executive summary is the only artifact in the methodology designed to travel independently. It is sent as a read-ahead before a decision meeting, attached to a calendar invite, or shared without the full HTML deliverable open. It must stand alone: a reader who has never seen the engagement should be able to make a Go/No-Go decision from this document.
@@ -47,8 +62,8 @@ The summary contains exactly these sections, in this order:
 
 - [ ] Confirm `deliverable-gate` clearance is recorded in `evidence-log.md`
 - [ ] Confirm all five source files exist
-- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call (passes: scope.md, roadmap.md, scored-opportunities.md, opportunities.md, baselines.md)
-- [ ] Receive returned `executive-summary.md` content
+- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all five source files itself: `scope.md`, `roadmap.md`, `scored-opportunities.md`, `opportunities.md`, `baselines.md`. Do not pass file content to the subagent.
+- [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 - [ ] Verify every value claim cites a baseline; every owner is named (not a role); every date is concrete
 - [ ] Confirm `Why This, Why Now` cites ≥2 named baseline metrics
 - [ ] Confirm `Pull-quote` is ≤25 words and all figures are traceable to source files
@@ -61,8 +76,8 @@ The summary contains exactly these sections, in this order:
 ## Workflow
 
 1. Confirm preconditions: deliverable-gate cleared; all five source files present.
-2. Dispatch the `executive-summary-drafter` agent. Pass it the full content of all five source files. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
-3. Receive the draft. Verify in main context: the Go/No-Go has a named decision-maker; the portfolio table covers every OPP from `scored-opportunities.md`; every risk has a named mitigation owner; every next action has a date. Confirm `Why This, Why Now` cites ≥2 named baseline metrics; confirm `Pull-quote` is ≤25 words and all figures are traceable to source files; confirm `Scoring & Wave Logic` names the wave framing used in `roadmap.md`; confirm `First Proof Point` names the specific highest-scored Wave 1 OPP-ID; confirm `Assumptions & Limitations` contains both a Conditions sub-group and an Open Items sub-group with no vague placeholders.
+2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all five source files itself: `scope.md`, `roadmap.md`, `scored-opportunities.md`, `opportunities.md`, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
+3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 4. Save the file. The chain advances to `building-deliverable`.
 
 ## Rationalization Table
@@ -78,6 +93,8 @@ The summary contains exactly these sections, in this order:
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `executive-summary.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -88,6 +105,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: Go/No-Go verdict, named decision-maker, wave portfolio (count of OPPs per wave), total budget ask, quick-win OPP-ID.
+
+**Session boundary:** After the user approves `executive-summary.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:building-deliverable` to begin Phase 11. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

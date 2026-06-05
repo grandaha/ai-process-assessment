@@ -5,6 +5,15 @@ description: Phase 6 — applies multi-dimensional scoring rubric (7 dimensions,
 
 # Phase 6: Scoring Opportunities
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `opportunities.md` and confirm it exists.
+3. Check `evidence-log.md` — confirm GRC gate clearance is recorded for any flagged opportunities.
+
+Gate condition: `opportunities.md` present; all non-Green GRC flags resolved in `evidence-log.md`.
+
 ## Role in the system
 
 Scoring converts a typed opportunity log into a ranked portfolio. The rubric is multi-dimensional on purpose — a single composite score hides the trade-offs that determine sequencing. Every dimension must be sourced; intuition is not a source.
@@ -98,8 +107,8 @@ Output one of: **Build / Buy / Partner / Hybrid**, with rationale citing the fou
 
 This phase already runs two subagents. This section names the pattern so it reads consistently with the other phases — the operational detail lives in the Phase checklist and Workflow below, which are authoritative.
 
-- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives only its own OPP entry plus the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, GRC gate output, and its staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
-- **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scored-opportunities.md` draft, for independent cross-OPP calibration and consistency review. It receives the document content under review only.
+- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives: engagement folder path, OPP-ID, and staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. The agent reads its own OPP entry from `opportunities.md` and the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, and `context.md` itself. Do not pass file content to the subagent. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
+- **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scored-opportunities.md` draft, for independent cross-OPP calibration and consistency review. Pass to the reviewer: engagement folder path. The reviewer reads `scored-opportunities.md` itself. Do not pass document content. Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary to main context: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
 - **Assembly:** After all scorer agents complete, assemble via Bash: `cat docs/engagements/<name>/_staging/phase6/OPP-*.md > docs/engagements/<name>/scored-opportunities.md`. Verify with: `wc -l scored-opportunities.md`. Cleanup: `rm -rf _staging/phase6`.
 - **What stays in main context:** One-line summaries from each scorer agent (OPP-NNN, composite score, B/B/P), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
 
@@ -143,6 +152,8 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `scored-opportunities.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -153,6 +164,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: top 3 scored opportunities with scores, score distribution, any critical reviewer findings and how resolved.
+
+**Session boundary:** After the user approves `scored-opportunities.md` and the reviewer is cleared, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:prioritizing-roadmap` to begin Phase 7. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

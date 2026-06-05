@@ -5,6 +5,14 @@ description: Cross-cutting gate — evaluates GRC-flagged opportunities across r
 
 # [CROSS-CUTTING] Governance, Risk & Compliance Gate
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `opportunities.md` — confirm it exists and identify all non-Green GRC flagged entries.
+
+Gate condition: At least one non-Green GRC flag must be present to invoke this gate.
+
 ## Role in the system
 
 Fires after `opportunities.md` is saved for every opportunity with a non-Green GRC flag. Independent of strategic priority and scoring outcome. Returns one of three statuses; routing depends on the status.
@@ -42,6 +50,8 @@ This gate cannot be bypassed without an explicit CLAUDE.md override naming the e
 - [ ] Assemble full reviews into `evidence-log.md` via Bash: `cat docs/engagements/<name>/_staging/grc/*.md >> docs/engagements/<name>/evidence-log.md`
 - [ ] For Cleared with Conditions, use the inline conditions from the one-line summaries to update the OPP entry in `opportunities.md` — no staging file read required
 - [ ] For Blocked, route the opportunity back to Phase 5 for re-classification or removal
+**Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
+
 - [ ] Update `opportunities.md` with clearance status per OPP
 - [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/grc`
 
@@ -59,3 +69,5 @@ This gate cannot be bypassed without an explicit CLAUDE.md override naming the e
 
 → `ai-process-assessment:scoring-opportunities` (Cleared / Cleared with Conditions)
 → `ai-process-assessment:identifying-opportunities` (Blocked — re-classify or remove)
+
+**Session boundary:** After GRC review is complete and `opportunities.md` is updated, this gate session is complete. Instruct the user to start a fresh Claude Code session and invoke the appropriate next skill: `ai-process-assessment:scoring-opportunities` (Cleared / Cleared with Conditions) or `ai-process-assessment:identifying-opportunities` (Blocked). Do not continue methodology work in this session.

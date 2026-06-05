@@ -5,6 +5,14 @@ description: Phase 1 — front gate for all analytical work. Elicits sponsoring 
 
 # Phase 1: Scoping the Engagement
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. No predecessor files required — this is Phase 1.
+
+Gate condition: None. Proceed directly to scoping.
+
 ## Role in the system
 
 This is the front gate. No other phase may begin until scope.md exists. The purpose is to convert a vague request ("we want to identify AI use cases") into a decision the engagement is meant to enable. If you cannot name the decision-maker and what they will do differently, you do not yet have an engagement — you have a request for a list.
@@ -59,6 +67,8 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `scope.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -69,6 +79,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: decision-maker named, sponsoring question, in/out of scope domains, success criteria defined.
+
+**Session boundary:** After the user approves `scope.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:mapping-context` to begin Phase 2. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

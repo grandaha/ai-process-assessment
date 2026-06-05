@@ -5,6 +5,14 @@ description: Phase 3 — catalogs systems, APIs, datasets, foundational enablers
 
 # Phase 3: Inventorying Technology and Data
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `context.md` and confirm it exists.
+
+Gate condition: `context.md` must be present before proceeding.
+
 ## Role in the system
 
 Feasibility scoring and sourcing recommendations are downstream of what actually exists. This phase produces an honest snapshot of systems, integrations, data, and enabler gaps. Without this, every later feasibility claim is speculation.
@@ -59,6 +67,8 @@ Feasibility scoring and sourcing recommendations are downstream of what actually
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `tech-inventory.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -69,6 +79,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: systems cataloged (count), integration gaps, data quality flags, IT governance posture, any shadow IT surfaced.
+
+**Session boundary:** After the user approves `tech-inventory.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:discovering-processes` to begin Phase 4. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

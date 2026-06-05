@@ -5,6 +5,15 @@ description: Phase 7 — sequences scored opportunities into Foundation/Scale/Op
 
 # Phase 7: Prioritizing the Roadmap
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `scored-opportunities.md` and confirm it exists.
+3. Check `evidence-log.md` — confirm opportunity-reviewer clearance from Phase 6.
+
+Gate condition: `scored-opportunities.md` present; reviewer clearance logged in `evidence-log.md`.
+
 ## Role in the system
 
 Scoring produces a ranked list. Sequencing produces a roadmap. They are not the same. A high-scoring opportunity that depends on an unbuilt enabler does not belong in Wave 1. This phase applies four sequencing constraints in order to produce Foundation / Scale / Optimize waves.
@@ -42,8 +51,8 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 Sequencing is a whole-portfolio judgment and stays in the main context — the five constraints interact, so they cannot be parallelized per opportunity. Only the independent review is delegated.
 
 - **When:** After the candidate waves are built and enablers are mapped, dispatch the `opportunity-reviewer` subagent over the assembled `roadmap.md` draft for sequencing review.
-- **Pass to the subagent:** The `roadmap.md` draft content under review, plus the Execution Horizon flags from `scored-opportunities.md` so the reviewer can verify Constraint 5 placement. Pass document content only — not the full source-file set.
-- **Return:** Findings classified Critical / Important / Minor. The reviewer checks dependency ordering, capacity load, quick-win presence, and Long-run placement.
+- **Pass to the subagent:** engagement folder path. The reviewer reads `roadmap.md` and `scored-opportunities.md` itself. Do not pass document content.
+- **Return:** The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
 - **What stays in main context:** All five sequencing constraints, wave assignment, enabler/dependency resolution, and Critical-finding resolution. The constraint logic is never delegated — only its review.
 
 ## Phase checklist
@@ -88,6 +97,8 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `roadmap.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -98,6 +109,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: wave assignments summary, quick-win confirmed (name it), any capacity or dependency flags.
+
+**Session boundary:** After the user approves `roadmap.md` and the reviewer is cleared, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:packaging-usecases` to begin Phase 8. Do not continue methodology work in this session.
 
 ## Chain to next skill
 

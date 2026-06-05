@@ -5,6 +5,14 @@ description: Phase 2 — establishes organizational and strategic context. Maps 
 
 # Phase 2: Mapping Organizational Context
 
+## Session Start
+
+This skill runs as a standalone session. At session start:
+1. Confirm the engagement folder path with the user if not already provided.
+2. Read `scope.md` and confirm it exists.
+
+Gate condition: `scope.md` must be present before proceeding.
+
 ## Role in the system
 
 Opportunities don't exist in a vacuum. Two organizations with identical processes can have opposite right answers depending on funding model, risk posture, and political reality. This phase captures the surrounding conditions so later scoring and sequencing reflect the organization that actually exists, not a generic one.
@@ -57,6 +65,8 @@ Opportunities don't exist in a vacuum. Two organizations with identical processe
 
 ## Handoff Protocol
 
+**Output rule:** Do NOT reproduce the contents of `context.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+
 Before invoking the next skill, Janice must surface the phase output to the user:
 
 1. **Name the file(s) written** and their path
@@ -67,6 +77,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 **Do not auto-chain.** Every phase transition is a human decision. If the user says "stop," "hold," or does not respond with approval, do not proceed to the next phase.
 
 Key findings to surface for this phase: strategic priorities, AI maturity assessment, risk posture, funding model.
+
+**Session boundary:** After the user approves `context.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:inventorying-tech-data` to begin Phase 3. Do not continue methodology work in this session.
 
 ## Chain to next skill
 
