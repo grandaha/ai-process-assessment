@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:collecting-cost-actuals
-description: Phase 8.5 — required gate between Phase 8 and Phase 9. Reads roadmap.md, usecase-briefs/_index.md + Wave 1 UC-NNN.md files, and scored-opportunities.md to generate a stakeholder data collection worksheet, then walks the consultant through capturing labor rates, implementation hours, vendor quotes, and IT integration estimates. Writes cost-actuals.md to the engagement folder. Phase 9 will not run without this file.
+description: Phase 8.5 — required gate between Phase 8 and Phase 9. Reads roadmap.md, usecase-briefs/_index.md + Wave 1 UC-NNN.md files, and scores/_index.md + per-initiative scores/OPP-NNN.md files to generate a stakeholder data collection worksheet, then walks the consultant through capturing labor rates, implementation hours, vendor quotes, and IT integration estimates. Writes cost-actuals.md to the engagement folder. Phase 9 will not run without this file.
 updated: 2026-06-03T19:43
 ---
 
@@ -31,14 +31,14 @@ Business cases require real input. A figure labeled PENDING in the business case
 |---|---|
 | `roadmap.md` | Wave 1 initiative list, B/B/P per initiative, enabler list and owners |
 | `usecase-briefs/_index.md` + Wave 1 `UC-NNN.md` files | Resolution and data requirements fields per initiative — identifies who does the build work. Read the index first to identify Wave 1 UC file names, then read only those individual files. |
-| `scored-opportunities.md` | B/B/P classification per initiative with rationale |
+| `scores/_index.md` + `scores/OPP-NNN.md` per Wave 1 initiative | B/B/P classification per initiative with rationale; read `scores/_index.md` to identify Wave 1 OPP-IDs, then read each `scores/OPP-NNN.md` for B/B/P detail |
 
 If any of these three files is missing, halt and report which file is absent.
 
 ## Workflow
 
 **Step 1 — Analysis pass**
-Read all three source files. For each Wave 1 initiative, determine:
+Read all source files. For B/B/P data, read `scores/_index.md` to identify Wave 1 OPP-IDs, then read each `scores/OPP-NNN.md` for Build/Buy/Partner classification and rationale. For each Wave 1 initiative, determine:
 - Labor type(s) involved: who does the build work (derived from the brief's Resolution and Data requirements fields — e.g., IT admin, enterprise AI team, domain specialist, PM)
 - Whether B/B/P is Buy or Partner (requires vendor quote)
 - Whether the initiative has enabler dependencies listed in roadmap.md (requires IT integration estimate)
@@ -155,7 +155,7 @@ After writing, show the user:
 ## Phase checklist
 
 - [ ] Confirm `usecase-briefs/_index.md` exists
-- [ ] Confirm `roadmap.md` and `scored-opportunities.md` exist
+- [ ] Confirm `roadmap.md` and `scores/_index.md` exist
 - [ ] Complete analysis pass — identify labor types, Buy/Partner flags, enabler dependencies per initiative
 - [ ] Surface Data Collection Worksheet to user; wait for acknowledgment before starting capture
 - [ ] Complete interactive capture — all sections, all line items; no skipped items
