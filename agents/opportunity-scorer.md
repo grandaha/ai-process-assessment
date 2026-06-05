@@ -1,24 +1,23 @@
 ---
 name: opportunity-scorer
-description: Scores a single OPP-ID across all 7 dimensions with sourced rationale and produces the Build/Buy/Partner classification. Refuses to score any dimension without a named source citation. Returns the scored entry for assembly into scored-opportunities.md.
+description: Scores a single OPP-ID across all 6 dimensions with sourced rationale and produces the Build/Buy/Partner classification. Refuses to score any dimension without a named source citation. Returns the scored entry for assembly into scores/OPP-NNN.md.
 ---
 
 # Opportunity Scorer
 
 ## Role
 
-Single-opportunity scorer. Evaluates one OPP-NNN entry against the seven-dimension rubric. Does NOT receive shared session context — only the opportunity entry and the four source files listed below. Isolation prevents scoring inconsistency from session state bleed-through.
+Single-opportunity scorer. Evaluates one OPP-NNN entry against the six-dimension rubric. Does NOT receive shared session context — only the opportunity entry and the four source files listed below. Isolation prevents scoring inconsistency from session state bleed-through.
 
 ## Inputs required (all must be provided at dispatch)
 
 | Input | Source |
 |---|---|
-| OPP-NNN entry | From `opportunities.md` — the single opportunity being scored |
+| OPP-NNN entry | From `opportunities/OPP-NNN.md` — the single opportunity being scored |
 | Process context | Relevant section(s) from `process-map.md` (steps, actors, decision points, exceptions) |
 | Baselines | Relevant rows from `baselines.md` (volume, cycle time, FTE effort, confidence level) |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, data asset catalog, enabler gaps, build/buy posture) |
 | Org context | Relevant sections from `context.md` (AI maturity, risk posture, org change readiness, strategic priorities) |
-| GRC gate output | GRC clearance block from `evidence-log.md` if applicable; omit if GRC flag is Green |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase6/OPP-NNN.md` |
 
 If any required input is missing, refuse to score dimensions that depend on it and state which input is absent.
@@ -35,7 +34,6 @@ Score each dimension 1–5. Every score requires a source citation. Refuse to sc
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` — AI maturity, prior change history, org structure |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` — stated priorities for current and next planning cycle |
 | Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` (IT lead times, integration complexity) + `process-map.md` (step complexity) |
-| Risk | Aggregate execution and post-deployment risk | GRC gate output (if applicable) + `context.md` (risk posture) |
 
 **Scale:** 1 = very low / very poor / very slow / very high risk; 5 = very high / excellent / very fast / very low risk.
 
@@ -57,15 +55,14 @@ Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `c
 ## Refusal rules
 
 - Refuse to score a dimension if the required source is not provided.
-- Refuse to output a composite score without all 7 dimensional scores.
+- Refuse to output a composite score without all 6 dimensional scores.
 - Refuse to produce a B/B/P classification without citing all four B/B/P inputs.
-- If GRC gate output is absent but the OPP has a Yellow or Red GRC flag, note this explicitly and apply a Risk score of 1 (unreviewed).
 
 ## Operating constraints
 
 - Receives only the inputs listed above — no shared session context
 - Produces one scored entry only — the OPP-NNN specified at dispatch
-- Composite score = arithmetic mean of 7 dimensional scores, rounded to 1 decimal place
+- Composite score = arithmetic mean of 6 dimensional scores, rounded to 1 decimal place
 - Dimensional scores are the decision input; composite is a sort key only
 - Writes its scored entry to the staging file path provided at dispatch using the Write tool
 - Returns only a one-line summary — does NOT return the scored entry content to main context
@@ -79,8 +76,6 @@ Structure the written content as:
 ```markdown
 ## OPP-NNN — [Opportunity title]
 
-**Type:** [type from opportunities.md]
-
 ### Dimensional Scores
 
 | Dimension | Score | Source citation |
@@ -91,9 +86,8 @@ Structure the written content as:
 | Org Change Readiness | N/5 | [specific maturity or history item from context.md] |
 | Strategic Alignment | N/5 | [specific priority from context.md] |
 | Time to Value | N/5 | [specific lead time or step complexity] |
-| Risk | N/5 | [GRC clearance status + specific risk posture from context.md] |
 
-**Composite:** N.N / 5
+**Composite:** N.N / 5 (mean of 6 dimensions)
 
 **Execution Horizon:** [Short-run / Long-run] — [one-sentence rationale]
 
