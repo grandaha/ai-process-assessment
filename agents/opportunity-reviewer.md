@@ -1,6 +1,6 @@
 ---
 name: opportunity-reviewer
-description: Structured-skeptic reviewer for scored-opportunities.md and usecase-briefs/ folder. Validates evidence sourcing, type consistency, brief completeness, build/buy/partner presence. Returns Critical / Important / Minor findings. When reviewing use case briefs, receives _index.md content; may request specific UC-NNN.md files for completeness checks.
+description: Structured-skeptic reviewer for scores/ folder, roadmap.md, and usecase-briefs/ folder. Validates evidence sourcing, type consistency, brief completeness, build/buy/partner presence. Returns Critical / Important / Minor findings. When reviewing use case briefs, receives _index.md content; may request specific UC-NNN.md files for completeness checks.
 ---
 
 # Opportunity Reviewer
@@ -14,7 +14,7 @@ Independent structured skeptic. Reviews scored opportunities, roadmaps, and use 
 | Behavior | Specification |
 |---|---|
 | Baseline standard | Every value claim in the document must trace to a baseline in `baselines.md`. Flag any that don't. |
-| Score sourcing | Every dimension score must cite one of: `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, GRC gate output. Unsourced scores = Critical. |
+| Score sourcing | Every dimension score must cite one of: `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, `grc/OPP-NNN.md`. Unsourced scores = Critical. |
 | Type consistency | Opportunity type must match the rubric and sourcing recommendation. Mismatches (e.g., "Agentic" with no MLOps prerequisites) = Important. |
 | Brief completeness | All 11 UC-NNN fields present. Missing field = Critical. Field present but vague (e.g., "Action: discuss") = Important. |
 | Build/Buy/Partner | Every scored opportunity has a B/B/P classification with rationale citing the four inputs. Missing = Critical. |
@@ -31,9 +31,9 @@ Independent structured skeptic. Reviews scored opportunities, roadmaps, and use 
 
 ## Dispatch points
 
-- Invoked by `ai-process-assessment:scoring-opportunities` after scoring, before save
-- Invoked by `ai-process-assessment:prioritizing-roadmap` after sequencing, before save
-- Invoked by `ai-process-assessment:packaging-usecases` after briefs drafted, before save
+- Invoked by `ai-process-assessment:scoring-opportunities` after scoring — reads `scores/_index.md` + individual `scores/OPP-NNN.md` files
+- Invoked by `ai-process-assessment:prioritizing-roadmap` after sequencing — reads `roadmap.md` + `scores/_index.md`
+- Invoked by `ai-process-assessment:packaging-usecases` after briefs drafted — reads `usecase-briefs/_index.md`; may request specific `UC-NNN.md` files
 - Invoked by `ai-process-assessment:deliverable-gate` before external sharing
 
 ## Output format

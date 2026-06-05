@@ -9,10 +9,10 @@ description: Phase 7 — sequences scored opportunities into Foundation/Scale/Op
 
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
-2. Read `scored-opportunities.md` and confirm it exists.
+2. Read `scores/_index.md` — confirm it exists.
 3. Check `evidence-log.md` — confirm opportunity-reviewer clearance from Phase 6.
 
-Gate condition: `scored-opportunities.md` present; reviewer clearance logged in `evidence-log.md`.
+Gate condition: `scores/_index.md` present; reviewer clearance logged in `evidence-log.md`.
 
 ## Role in the system
 
@@ -20,13 +20,13 @@ Scoring produces a ranked list. Sequencing produces a roadmap. They are not the 
 
 ## Gate condition
 
-`scored-opportunities.md` must exist and the `opportunity-reviewer` clearance must be logged in `evidence-log.md`. This skill creates `roadmap.md`.
+`scores/_index.md` must exist and the `opportunity-reviewer` clearance must be logged in `evidence-log.md`. This skill creates `roadmap.md`.
 
 ## Five Sequencing Constraints (apply in order)
 
 1. **Dependency ordering** — no initiative begins before its enablers exist. An opportunity that requires a missing enabler is either deferred or its enabler is sequenced ahead of it.
 2. **Capacity-load check** — no wave is overloaded beyond org absorption rate. Capacity is the limit, not the score.
-3. **Quick-win requirement** — at least one opportunity in Wave 1 must produce a measurable outcome by month 3. Programs without early visible wins lose air cover. An opportunity flagged Long-run in `scored-opportunities.md` is not eligible for the quick-win slot unless its org design dependency is already resolved.
+3. **Quick-win requirement** — at least one opportunity in Wave 1 must produce a measurable outcome by month 3. Programs without early visible wins lose air cover. An opportunity flagged Long-run in `scores/OPP-NNN.md` is not eligible for the quick-win slot unless its org design dependency is already resolved.
 4. **Strategic alignment weighting** — used only as the tiebreaker among options that pass the prior three constraints.
 5. **Job boundary impact** — Short-run opportunities (AI deployable within existing job and role structures) are eligible for Wave 1. Long-run opportunities (value requires redesigning how tasks are bundled across workers) belong in Wave 2 at earliest. A Long-run item placed in Wave 1 requires a documented org design workstream as a named dependency — without it, the opportunity is sequenced to Wave 2.
 
@@ -51,13 +51,13 @@ Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies d
 Sequencing is a whole-portfolio judgment and stays in the main context — the five constraints interact, so they cannot be parallelized per opportunity. Only the independent review is delegated.
 
 - **When:** After the candidate waves are built and enablers are mapped, dispatch the `opportunity-reviewer` subagent over the assembled `roadmap.md` draft for sequencing review.
-- **Pass to the subagent:** engagement folder path. The reviewer reads `roadmap.md` and `scored-opportunities.md` itself. Do not pass document content.
+- **Pass to the subagent:** engagement folder path. The reviewer reads `roadmap.md` and `scores/_index.md` (plus individual `scores/OPP-NNN.md` files as needed) itself. Do not pass document content.
 - **Return:** The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
 - **What stays in main context:** All five sequencing constraints, wave assignment, enabler/dependency resolution, and Critical-finding resolution. The constraint logic is never delegated — only its review.
 
 ## Phase checklist
 
-- [ ] Confirm `scored-opportunities.md` saved and reviewer cleared
+- [ ] Confirm `scores/_index.md` exists and reviewer cleared from Phase 6
 - [ ] Apply Constraint 1 (Dependency ordering) — flag opportunities with unmet enablers
 - [ ] Apply Constraint 2 (Capacity-load check) — confirm each wave is absorbable
 - [ ] Apply Constraint 3 (Quick-win requirement) — confirm at least one Wave 1 opportunity has a measurable month-3 outcome
@@ -79,7 +79,7 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 2. Build the candidate Wave 1 set from the top of the scored list.
 3. Apply constraints 1–3 in order. Each may evict or import an item.
 4. Use Constraint 4 only on remaining ties.
-5. Apply Constraint 5 — check Execution Horizon flag on each Wave 1 candidate. Move Long-run items to Wave 2 unless org design dependency is documented and sequenced.
+5. Apply Constraint 5 — check Execution Horizon flag (from `scores/OPP-NNN.md`) on each Wave 1 candidate. Move Long-run items to Wave 2 unless org design dependency is documented and sequenced.
 5. Map enablers for the final Wave 1. Resolve gaps using one of the three options above.
 6. Run `opportunity-reviewer`. Resolve Critical findings.
 7. Save and chain forward.
