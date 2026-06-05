@@ -17,15 +17,15 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 2 | `ai-process-assessment:mapping-context` | Org / strategic / political context | `scope.md` exists | `context.md` |
 | 3 | `ai-process-assessment:inventorying-tech-data` | Systems, APIs, data, enablers | `context.md` exists | `tech-inventory.md` |
 | 4 | `ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
-| 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities.md` |
-| 6 | `ai-process-assessment:scoring-opportunities` | 7-dimension rubric + Build/Buy/Partner | `opportunities.md` saved; GRC cleared for any flagged | `scored-opportunities.md` |
-| 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scored-opportunities.md` saved; reviewer cleared | `roadmap.md` |
+| 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
+| 6 | `ai-process-assessment:scoring-opportunities` | 6-dimension rubric + Build/Buy/Partner | `opportunities/_index.md` exists; GRC cleared for any flagged | `scores/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
+| 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scores/_index.md` saved; reviewer cleared | `roadmap.md` |
 | 8 | `ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs/` (folder: `_index.md` + `UC-NNN.md` per opportunity) |
 | 8.5 | `ai-process-assessment:collecting-cost-actuals` | Cost data collection from stakeholders — labor rates, implementation hours, vendor quotes, IT estimates | `usecase-briefs/_index.md` exists | `cost-actuals.md` |
 | 9 | `ai-process-assessment:building-business-case` | Wave 1 ROM business case | `cost-actuals.md` exists | `business-case.md` |
 | 10 | `ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `ai-process-assessment:deliverable-gate` cleared | `executive-summary.md` |
 | 11 | `ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
-| Gate A | `ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities.md` | Logged in `evidence-log.md` |
+| Gate A | `ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities/_index.md` | `grc/` folder + logged in `evidence-log.md` |
 | Gate B | `ai-process-assessment:deliverable-gate` | Final integrity checklist | Before any external sharing | Clearance recorded in `evidence-log.md` |
 
 ## Opportunity Type Taxonomy
@@ -55,7 +55,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 - On any new engagement prompt → invoke `ai-process-assessment:scoping-engagement`.
 - After each phase's output file is saved → invoke the next skill in the chain.
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
-- If any opportunity in `opportunities.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
+- If any opportunity in `opportunities/_index.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
 - After `usecase-briefs/_index.md` is saved and reviewer cleared → invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) before Phase 9.
 - After `ai-process-assessment:deliverable-gate` clearance → invoke `ai-process-assessment:building-executive-summary` (Phase 10).
@@ -90,9 +90,10 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `tech-inventory.md` — Phase 3
 - `process-map.md` — Phase 4
 - `baselines.md` — Phase 4 (load-bearing — see Baseline & Value Hypothesis gate)
-- `opportunities.md` — Phase 5
-- `scored-opportunities.md` — Phase 6
+- `opportunities/` — Phase 5 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
+- `scores/` — Phase 6 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
 - `roadmap.md` — Phase 7
+- `grc/` — GRC Gate (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran)
 - `usecase-briefs/` — Phase 8 (folder: `_index.md` master index + `UC-NNN.md` per opportunity, one file per UC across all three waves)
 - `cost-actuals.md` — Phase 8.5 (labor rates, implementation hours, vendor quotes, IT integration estimates — required before Phase 9)
 - `business-case.md` — Phase 9
