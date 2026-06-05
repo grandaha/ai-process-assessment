@@ -13,12 +13,12 @@ Single-opportunity brief writer. Produces one self-contained UC-NNN brief in SCR
 
 | Input | Source |
 |---|---|
-| OPP-NNN entry | From `opportunities.md` — the single opportunity being briefed |
+| OPP-NNN entry | Read from `opportunities/OPP-NNN.md` — the single opportunity being briefed |
 | Process context | Relevant section(s) from `process-map.md` |
 | Baselines | Relevant rows from `baselines.md` |
-| Scoring record | OPP-NNN row from `scored-opportunities.md` (includes B/B/P classification and rationale) |
+| Scoring record | Read from `scores/OPP-NNN.md` (includes B/B/P classification and 6-dimension rationale) |
 | Roadmap placement | OPP-NNN entry from `roadmap.md` (wave, month target, enabler dependencies) |
-| GRC conditions | Conditions block from `opportunities.md` if Cleared with Conditions; omit if Cleared |
+| GRC conditions | Read from `grc/OPP-NNN.md` if the file exists; omit if file is absent (opportunity was Cleared) |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase8/UC-NNN.md` |
 
 If any required input is missing, refuse to draft the brief and state which input is absent.
@@ -29,16 +29,16 @@ Draft fields in this order. Do not skip fields. Do not write Resolution before C
 
 | # | Field | Source and rule |
 |---|---|---|
-| 1 | Opportunity reference | OPP-NNN identifier from `opportunities.md` |
-| 2 | Opportunity type | From `opportunities.md`; must match rubric (RPA / AI Augmentation / AI Automation / Agentic / Data & Analytics / Hybrid) |
+| 1 | Opportunity reference | OPP-NNN identifier from `opportunities/OPP-NNN.md` |
+| 2 | Opportunity type | From `opportunities/OPP-NNN.md`; must match rubric (RPA / AI Augmentation / AI Automation / Agentic / Data & Analytics / Hybrid) |
 | 3 | Situation | Current state — cite `process-map.md` step or actor; cite `baselines.md` volume/cycle/FTE figure |
 | 4 | Complication | Why this is on the roadmap now — the pain, gap, or changed condition. Must precede Resolution. |
 | 5 | Resolution | The intervention — tied to opportunity type; describe the system behavior, not the project plan |
 | 6 | Action | Specific next step. Requires: named owner (not "the team"), date or month target. "Evaluate" or "discuss" are not actions. |
 | 7 | Data requirements | What data is needed; source system; quality flag from `tech-inventory.md` data asset catalog |
 | 8 | Success metric | Measurable outcome; cite the baseline it improves against; label as "design target" if no pre-existing baseline |
-| 9 | Risks & mitigations | From `scored-opportunities.md` Risk dimension rationale + GRC conditions if applicable |
-| 10 | Sourcing recommendation | Build / Buy / Partner / Hybrid with rationale citing: internal capacity, vendor maturity, strategic differentiation, TCO. Copy from `scored-opportunities.md` B/B/P field. |
+| 9 | Risks & mitigations | Scoring rationale from `scores/OPP-NNN.md` + conditions from `grc/OPP-NNN.md` if file exists |
+| 10 | Sourcing recommendation | Build / Buy / Partner / Hybrid with rationale citing: internal capacity, vendor maturity, strategic differentiation, TCO. Copy from `scores/OPP-NNN.md` B/B/P field. |
 | 11 | Wave assignment | Wave N with month-X target; copy from `roadmap.md`; include enabler dependencies |
 
 ## Wave 2 summary brief (thinner schema)

@@ -9,7 +9,7 @@ description: Phase 8 — produces self-contained Use Case Brief (UC-NNN) per Wav
 
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
-2. Read `roadmap.md` and `scored-opportunities.md` — confirm both exist.
+2. Read `roadmap.md` and `scores/_index.md` — confirm both exist.
 3. Check `evidence-log.md` — confirm opportunity-reviewer clearance from Phase 7.
 
 Gate condition: `roadmap.md` present; reviewer clearance logged in `evidence-log.md`.
@@ -28,7 +28,7 @@ Every Wave 1 brief contains the following 11 fields:
 
 | Field | Content |
 |---|---|
-| Opportunity reference | OPP-NNN from `opportunities.md` |
+| Opportunity reference | OPP-NNN from `opportunities/OPP-NNN.md` |
 | Opportunity type | RPA / AI Augmentation / AI Automation / Agentic / Data & Analytics |
 | Situation | Current state — sourced to `process-map.md` and `baselines.md` |
 | Complication | What changed or what's broken — the reason this is on the roadmap now |
@@ -36,7 +36,7 @@ Every Wave 1 brief contains the following 11 fields:
 | Action | Specific next step with named owner and date |
 | Data requirements | What data is needed; sourced to `tech-inventory.md` |
 | Success metric | Measurable outcome; sourced to a baseline |
-| Risks & mitigations | From scoring + GRC gate output |
+| Risks & mitigations | From `scores/OPP-NNN.md` (scoring rationale) + `grc/OPP-NNN.md` (conditions, if file exists) |
 | Sourcing recommendation | Build / Buy / Partner / Hybrid with rationale |
 | Wave assignment | Wave 1 (with month-X target) |
 
@@ -46,7 +46,7 @@ Every Wave 1 brief contains the following 11 fields:
 
 - [ ] Confirm `roadmap.md` saved and reviewer cleared
 - [ ] Create `usecase-briefs/` folder in the engagement run directory
-- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch (pass: engagement folder path, OPP-ID, UC-NNN assignment, and any GRC conditions (inline — short strings only). The agent reads its own OPP entry and source file sections itself. Do not pass file content to the subagent.)
+- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch. Pass: engagement folder path, OPP-ID, and UC-NNN assignment. The agent reads `opportunities/OPP-NNN.md` for Phase 5 data and `grc/OPP-NNN.md` (if it exists) for GRC conditions directly — do not pass file content to the subagent.
 - [ ] Each agent writes its brief directly to `<engagement-folder>/usecase-briefs/UC-NNN.md`. Returns one-line confirmation: "UC-NNN written." Orchestrator collects confirmations only — does NOT receive brief content. After all confirmations received, verify each UC-NNN.md file exists on disk.
 - [ ] Run a consistency pass — read each Wave 1 UC file and patch inconsistencies (voice, terminology, owner naming format, Action field) via Edit on the specific file. Do NOT re-draft briefs.
 - [ ] Write Wave 2 summary briefs in main context — one file per initiative (`usecase-briefs/UC-008.md` onward). Schema: Opportunity reference, type, situation, hypothesis, expected value range, key dependencies.
@@ -59,7 +59,7 @@ Every Wave 1 brief contains the following 11 fields:
 ## Workflow
 
 1. Confirm preconditions.
-2. Create the `usecase-briefs/` folder. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent its OPP entry, the relevant source sections, and its UC-NNN assignment. Do NOT share cross-OPP context between agents. Collect returned brief content.
+2. Create the `usecase-briefs/` folder. Dispatch `usecase-brief-drafter` agents in parallel — one per Wave 1 opportunity. Pass each agent: engagement folder path, OPP-ID, UC-NNN assignment. The agent reads `opportunities/OPP-NNN.md`, `scores/OPP-NNN.md`, and `grc/OPP-NNN.md` (if it exists) directly. Do NOT share cross-OPP context between agents.
 3. Write each returned brief as `usecase-briefs/UC-NNN.md` — one Write call per brief. Run a consistency pass: normalize voice (direct, present-tense situation / conditional resolution/action), verify owner naming format, confirm wave month targets match roadmap.md. Patch inconsistencies via Edit on the specific file — do NOT re-draft briefs.
 4. Action field requires a named owner and a date — not "the team will...".
 5. Write Wave 2 summary briefs in main context, one at a time, as separate `UC-NNN.md` files. Wave 2 summary schema: Opportunity reference, type, situation, hypothesis, expected value range, key dependencies. Write Wave 3 placeholders in main context, one at a time, as separate `UC-NNN.md` files. Wave 3 schema: Opportunity reference, type, capability area, strategic hypothesis, re-scoping trigger.
