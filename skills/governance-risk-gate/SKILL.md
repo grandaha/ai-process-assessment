@@ -44,7 +44,7 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
 
 ## Phase checklist
 
-> Dispatch all flagged OPPs to `grc-reviewer` in a single parallel batch. Sequential dispatch is a context-bloat anti-pattern — wait for all clearance statuses before proceeding to update opportunities.md.
+> Dispatch all flagged OPPs to `grc-reviewer` in a single parallel batch. Sequential dispatch is a context-bloat anti-pattern — wait for all clearance statuses before proceeding to update `opportunities/OPP-NNN.md` files.
 
 - [ ] Dispatch one `grc-reviewer` agent per flagged opportunity in a SINGLE parallel tool-call batch. Do not dispatch sequentially. Each agent receives: engagement folder path, OPP-ID, and staging file path `<engagement-folder>/_staging/grc/OPP-NNN.md`. The agent reads `opportunities/OPP-NNN.md` directly — do not pass file content. Never pass the full engagement context.
 - [ ] Collect one-line summaries from agents (status + inline conditions list). Full reviews are in staging files — do NOT request them back.
