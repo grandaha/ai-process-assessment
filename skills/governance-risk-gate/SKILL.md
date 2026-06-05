@@ -9,19 +9,21 @@ description: Cross-cutting gate — evaluates GRC-flagged opportunities across r
 
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
-2. Read `opportunities.md` — confirm it exists and identify all non-Green GRC flagged entries.
+2. Read `opportunities/_index.md` — confirm it exists and identify all non-Green GRC flagged entries from the GRC column.
 
 Gate condition: At least one non-Green GRC flag must be present to invoke this gate.
 
 ## Role in the system
 
-Fires after `opportunities.md` is saved for every opportunity with a non-Green GRC flag. Independent of strategic priority and scoring outcome. Returns one of three statuses; routing depends on the status.
+Fires after `opportunities/_index.md` is saved for every opportunity with a non-Green GRC flag. Independent of strategic priority and scoring outcome. Returns one of three statuses; routing depends on the status.
 
 This gate cannot be bypassed without an explicit CLAUDE.md override naming the engagement and the rationale.
 
 ## Gate condition
 
-`opportunities.md` exists and contains at least one opportunity with a Yellow or Red GRC flag.
+`opportunities/_index.md` exists and contains at least one opportunity with a Yellow or Red GRC flag.
+
+This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_index.md`.
 
 ## GRC Evaluation Dimensions
 
@@ -44,15 +46,31 @@ This gate cannot be bypassed without an explicit CLAUDE.md override naming the e
 
 > Dispatch all flagged OPPs to `grc-reviewer` in a single parallel batch. Sequential dispatch is a context-bloat anti-pattern — wait for all clearance statuses before proceeding to update opportunities.md.
 
-- [ ] Dispatch one `grc-reviewer` agent per flagged opportunity in a SINGLE parallel tool-call batch. Do not dispatch sequentially. Each agent receives only its own OPP entry, relevant process context, and its staging file path: `<engagement-folder>/_staging/grc/OPP-NNN.md` — never the full engagement context.
+- [ ] Dispatch one `grc-reviewer` agent per flagged opportunity in a SINGLE parallel tool-call batch. Do not dispatch sequentially. Each agent receives: engagement folder path, OPP-ID, and staging file path `<engagement-folder>/_staging/grc/OPP-NNN.md`. The agent reads `opportunities/OPP-NNN.md` directly — do not pass file content. Never pass the full engagement context.
 - [ ] Collect one-line summaries from agents (status + inline conditions list). Full reviews are in staging files — do NOT request them back.
 - [ ] Assign one of: Cleared / Cleared with Conditions / Blocked (from the one-line summaries)
-- [ ] Assemble full reviews into `evidence-log.md` via Bash: `cat docs/engagements/<name>/_staging/grc/*.md >> docs/engagements/<name>/evidence-log.md`
-- [ ] For Cleared with Conditions, use the inline conditions from the one-line summaries to update the OPP entry in `opportunities.md` — no staging file read required
+- [ ] Assemble GRC reviews to canonical folder via Bash:
+  ```bash
+  mkdir -p docs/engagements/<name>/grc
+  mv docs/engagements/<name>/_staging/grc/OPP-*.md docs/engagements/<name>/grc/
+  ```
+  Then generate the index:
+  ```bash
+  echo "| OPP-ID | Status | Conditions |" > docs/engagements/<name>/grc/_index.md
+  echo "|--------|--------|------------|" >> docs/engagements/<name>/grc/_index.md
+  for f in docs/engagements/<name>/grc/OPP-*.md; do
+    id=$(grep "^## GRC Review" "$f" | head -1 | awk '{print $NF}')
+    status=$(grep "^\*\*Status:" "$f" | head -1 | sed 's/\*\*Status:\*\* //')
+    cond=$(grep -c "^[0-9]\+\." "$f" || echo 0)
+    echo "| $id | $status | $cond |" >> docs/engagements/<name>/grc/_index.md
+  done
+  ```
+  Verify: `ls docs/engagements/<name>/grc/OPP-*.md | wc -l`
+- [ ] For Cleared with Conditions, use the inline conditions from the one-line summaries to update the GRC flag line in `opportunities/OPP-NNN.md` — no staging file read required
 - [ ] For Blocked, route the opportunity back to Phase 5 for re-classification or removal
 **Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
 
-- [ ] Update `opportunities.md` with clearance status per OPP
+- [ ] Update GRC flag status in each affected `opportunities/OPP-NNN.md` with clearance outcome
 - [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/grc`
 
 ## Rationalization Table
@@ -70,4 +88,4 @@ This gate cannot be bypassed without an explicit CLAUDE.md override naming the e
 → `ai-process-assessment:scoring-opportunities` (Cleared / Cleared with Conditions)
 → `ai-process-assessment:identifying-opportunities` (Blocked — re-classify or remove)
 
-**Session boundary:** After GRC review is complete and `opportunities.md` is updated, this gate session is complete. Instruct the user to start a fresh Claude Code session and invoke the appropriate next skill: `ai-process-assessment:scoring-opportunities` (Cleared / Cleared with Conditions) or `ai-process-assessment:identifying-opportunities` (Blocked). Do not continue methodology work in this session.
+**Session boundary:** After GRC review is complete and `grc/_index.md` is generated, this gate session is complete. Instruct the user to start a fresh Claude Code session and invoke the appropriate next skill: `ai-process-assessment:scoring-opportunities` (Cleared / Cleared with Conditions) or `ai-process-assessment:identifying-opportunities` (Blocked). Do not continue methodology work in this session.
