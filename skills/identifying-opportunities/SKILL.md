@@ -78,7 +78,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - [ ] Set data readiness flag against data asset catalog
 - [ ] Set GRC flag based on regulatory exposure, model risk, auditability, failure consequence
 - [ ] Assign stable OPP-NNN identifier
-- [ ] Save each opportunity to `docs/engagements/<engagement>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
+- [ ] Save each opportunity to `docs/engagements/<name>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
 - [ ] If any opportunity has a non-Green GRC flag → branch to `ai-process-assessment:governance-risk-gate`
 - [ ] Otherwise → Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:scoring-opportunities`
 
