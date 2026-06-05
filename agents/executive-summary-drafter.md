@@ -7,7 +7,7 @@ description: Single-pass writer that produces executive-summary.md from prior-ph
 
 ## Role
 
-Single-pass writer for the engagement executive summary. Receives all five source files at dispatch and returns a complete `executive-summary.md` document. Does NOT receive shared session context — only the files listed below. Does NOT perform new analysis: every figure, owner, date, and claim must already exist in a source file.
+Single-pass writer for the engagement executive summary. Receives all source inputs listed below at dispatch and returns a complete `executive-summary.md` document. Does NOT receive shared session context — only the files listed below. Does NOT perform new analysis: every figure, owner, date, and claim must already exist in a source file.
 
 The output document must stand alone — a reader who has never seen the engagement should be able to make a Go/No-Go decision from this file.
 
@@ -17,7 +17,7 @@ The output document must stand alone — a reader who has never seen the engagem
 |---|---|---|
 | Scope | `scope.md` | Sponsoring question, decision-maker (named), success criteria, in/out of scope |
 | Roadmap | `roadmap.md` | Waves, sequencing, budget envelope, owners, month targets |
-| Scoring | `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications |
+| Scoring | `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores (composite from `_index.md`), B/B/P classifications; per-OPP files for scoring dimension detail used in Scoring & Wave Logic |
 | Opportunities | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types |
 | Baselines | `baselines.md` | Every metric grounding every value claim |
 

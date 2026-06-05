@@ -32,14 +32,14 @@ Phase 10 produces no new analysis. Every claim traces to a source file from Phas
 
 ## Required source files
 
-The drafter receives all five. If any is missing, the skill halts and reports which file is absent.
+The drafter receives all source inputs listed below. If any is missing, the skill halts and reports which file is absent.
 
 | File | What it provides |
 |---|---|
 | `scope.md` | Decision-maker, sponsoring question, success criteria, in/out of scope |
 | `roadmap.md` | Waves, sequencing, wave scope |
 | `business-case.md` | Wave 1 investment range, value case, ROM assumptions, payback horizon |
-| `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications; read `scores/_index.md` for the full OPP list, then read individual `scores/OPP-NNN.md` files for composite scores and B/B/P detail |
+| `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications; read `scores/_index.md` for the full OPP list and composite scores, then read individual `scores/OPP-NNN.md` files for scoring dimension detail used in Scoring & Wave Logic |
 | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types; read `opportunities/_index.md` for the full OPP list, then read individual `opportunities/OPP-NNN.md` files for value hypotheses and GRC flags |
 | `baselines.md` | Key metrics grounding all value claims |
 
@@ -61,7 +61,7 @@ The summary contains exactly these sections, in this order:
 ## Phase checklist
 
 - [ ] Confirm `deliverable-gate` clearance is recorded in `evidence-log.md`
-- [ ] Confirm all five source files exist
+- [ ] Confirm all required source files exist (`scope.md`, `roadmap.md`, `business-case.md`, `baselines.md`, `scores/_index.md`, `opportunities/_index.md`)
 - [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent.
 - [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 - [ ] Verify every value claim cites a baseline; every owner is named (not a role); every date is concrete
@@ -75,7 +75,7 @@ The summary contains exactly these sections, in this order:
 
 ## Workflow
 
-1. Confirm preconditions: deliverable-gate cleared; all five source files present.
+1. Confirm preconditions: deliverable-gate cleared; all required source files present.
 2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
 3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 4. Save the file. The chain advances to `building-deliverable`.
