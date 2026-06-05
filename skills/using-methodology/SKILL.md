@@ -25,7 +25,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 9 | `ai-process-assessment:building-business-case` | Wave 1 ROM business case | `cost-actuals.md` exists | `business-case.md` |
 | 10 | `ai-process-assessment:building-executive-summary` | Standalone 1–2 page executive summary | `ai-process-assessment:deliverable-gate` cleared | `executive-summary.md` |
 | 11 | `ai-process-assessment:building-deliverable` | Self-contained client-ready HTML deliverable | `executive-summary.md` exists | `deliverable.html` |
-| Gate A | `ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities/_index.md` | `grc/` folder + logged in `evidence-log.md` |
+| Gate A | `ai-process-assessment:governance-risk-gate` | GRC review of flagged opportunities | Any non-Green GRC flag in `opportunities/_index.md` | `grc/` folder (`_index.md` + `OPP-NNN.md` per flagged opportunity) |
 | Gate B | `ai-process-assessment:deliverable-gate` | Final integrity checklist | Before any external sharing | Clearance recorded in `evidence-log.md` |
 
 ## Opportunity Type Taxonomy
@@ -91,9 +91,9 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `process-map.md` — Phase 4
 - `baselines.md` — Phase 4 (load-bearing — see Baseline & Value Hypothesis gate)
 - `opportunities/` — Phase 5 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
+- `grc/` — GRC Gate (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran)
 - `scores/` — Phase 6 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
 - `roadmap.md` — Phase 7
-- `grc/` — GRC Gate (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran)
 - `usecase-briefs/` — Phase 8 (folder: `_index.md` master index + `UC-NNN.md` per opportunity, one file per UC across all three waves)
 - `cost-actuals.md` — Phase 8.5 (labor rates, implementation hours, vendor quotes, IT integration estimates — required before Phase 9)
 - `business-case.md` — Phase 9
