@@ -48,7 +48,7 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
 
 - [ ] Dispatch one `grc-reviewer` agent per flagged opportunity in a SINGLE parallel tool-call batch. Do not dispatch sequentially. Each agent receives: engagement folder path, OPP-ID, and staging file path `<engagement-folder>/_staging/grc/OPP-NNN.md`. The agent reads `opportunities/OPP-NNN.md` directly — do not pass file content. Never pass the full engagement context.
 - [ ] Collect one-line summaries from agents (status + inline conditions list). Full reviews are in staging files — do NOT request them back.
-- [ ] Assign one of: Cleared / Cleared with Conditions / Blocked (from the one-line summaries)
+- [ ] Record the clearance status for each OPP from the one-line summaries (Cleared / Cleared with Conditions / Blocked)
 - [ ] Assemble GRC reviews to canonical folder via Bash:
   ```bash
   mkdir -p docs/engagements/<name>/grc
@@ -61,16 +61,16 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
   for f in docs/engagements/<name>/grc/OPP-*.md; do
     id=$(grep "^## GRC Review" "$f" | head -1 | awk '{print $NF}')
     status=$(grep "^\*\*Status:" "$f" | head -1 | sed 's/\*\*Status:\*\* //')
-    cond=$(grep -c "^[0-9]\+\." "$f" || echo 0)
+    cond=$(grep -c "^[0-9]\+\." "$f" || true)
     echo "| $id | $status | $cond |" >> docs/engagements/<name>/grc/_index.md
   done
   ```
   Verify: `ls docs/engagements/<name>/grc/OPP-*.md | wc -l`
-- [ ] For Cleared with Conditions, use the inline conditions from the one-line summaries to update the GRC flag line in `opportunities/OPP-NNN.md` — no staging file read required
-- [ ] For Blocked, route the opportunity back to Phase 5 for re-classification or removal
-**Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
+- [ ] For Cleared with Conditions, update the GRC flag line in `opportunities/OPP-NNN.md` using the inline conditions from the one-line summary — no staging file read required. Format: `**GRC flag:** Yellow — [original basis] | Cleared with Conditions: (1) <condition>, (2) <condition>`
+- [ ] For Blocked, route the opportunity back to Phase 5 for re-classification or removal; do not carry a Blocked OPP into scoring
+- [ ] For Cleared, no update to `opportunities/OPP-NNN.md` is required
 
-- [ ] Update GRC flag status in each affected `opportunities/OPP-NNN.md` with clearance outcome
+**Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
 - [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/grc`
 
 ## Rationalization Table
