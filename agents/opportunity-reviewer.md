@@ -38,6 +38,8 @@ Independent structured skeptic. Reviews scored opportunities, roadmaps, and use 
 
 ## Output format
 
+Produce the review block in this format:
+
 ```markdown
 ## Review — <document name>
 
@@ -52,3 +54,5 @@ Independent structured skeptic. Reviews scored opportunities, roadmaps, and use 
 
 <Cleared for delivery | Not cleared — N critical issues remain.>
 ```
+
+After producing the review block, append it to `<engagement-folder>/evidence-log.md` using the Write or Edit tool. Then return exactly one line to the orchestrator: `"N Critical, N Important, N Minor findings."` Do NOT return the full review block to the orchestrator — only the one-line summary.

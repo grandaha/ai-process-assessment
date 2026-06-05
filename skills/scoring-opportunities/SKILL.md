@@ -10,9 +10,9 @@ description: Phase 6 — applies multi-dimensional scoring rubric (6 dimensions,
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
 2. Read `opportunities/_index.md` and confirm it exists.
-3. Check `evidence-log.md` — confirm GRC gate clearance is recorded for any flagged opportunities.
+3. Check `grc/_index.md` — confirm any flagged opportunities are Cleared or Cleared with Conditions (no Blocked entries). If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
 
-Gate condition: `opportunities/_index.md` present; all non-Green GRC flags resolved in `evidence-log.md`.
+Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no Blocked status).
 
 ## Role in the system
 
@@ -140,7 +140,7 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 1. Confirm `opportunities/_index.md` exists and GRC clearance is recorded for all flagged opportunities.
 2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent its OPP entry from `opportunities/OPP-NNN.md`, the relevant sections from the four source files, and its staging file path (`_staging/phase6/OPP-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only — do NOT request the full scored entry back.
 3. After all agents complete, move staged files to `scores/` and generate `scores/_index.md` (see Assembly command). Verify with `ls scores/OPP-*.md | wc -l`. Cleanup `_staging/phase6`. B/B/P is in the individual score files and the index — do not re-derive in main context.
-4. Run the full scored set through the `opportunity-reviewer` subagent. Pass it the document content under review only.
+4. Dispatch the `opportunity-reviewer` subagent. Pass: engagement folder path only. The reviewer reads `scores/_index.md` and individual `scores/OPP-NNN.md` files itself. Do not pass document content.
 5. Resolve all Critical findings. Important findings should be addressed; Minor findings are noted.
 6. Save and chain forward.
 
