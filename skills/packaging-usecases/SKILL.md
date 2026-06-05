@@ -46,7 +46,7 @@ Every Wave 1 brief contains the following 11 fields:
 
 - [ ] Confirm `roadmap.md` saved and reviewer cleared
 - [ ] Create `usecase-briefs/` folder in the engagement run directory
-- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch. Pass: engagement folder path, OPP-ID, and UC-NNN assignment. The agent reads `opportunities/OPP-NNN.md` for Phase 5 data and `grc/OPP-NNN.md` (if it exists) for GRC conditions directly — do not pass file content to the subagent.
+- [ ] Dispatch one `usecase-brief-drafter` agent per Wave 1 opportunity in a single parallel tool-call batch. Pass: engagement folder path, OPP-ID, and UC-NNN assignment. The agent reads `opportunities/OPP-NNN.md`, `scores/OPP-NNN.md`, and `grc/OPP-NNN.md` (if it exists) directly — do not pass file content to the subagent.
 - [ ] Each agent writes its brief directly to `<engagement-folder>/usecase-briefs/UC-NNN.md`. Returns one-line confirmation: "UC-NNN written." Orchestrator collects confirmations only — does NOT receive brief content. After all confirmations received, verify each UC-NNN.md file exists on disk.
 - [ ] Run a consistency pass — read each Wave 1 UC file and patch inconsistencies (voice, terminology, owner naming format, Action field) via Edit on the specific file. Do NOT re-draft briefs.
 - [ ] Write Wave 2 summary briefs in main context — one file per initiative (`usecase-briefs/UC-008.md` onward). Schema: Opportunity reference, type, situation, hypothesis, expected value range, key dependencies.
