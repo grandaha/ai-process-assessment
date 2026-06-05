@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:identifying-opportunities
-description: Phase 5 — applies opportunity type taxonomy to every mapped process. Produces typed opportunity log (OPP-NNN) with hypothesis, value range, feasibility/data/GRC flags. Saves opportunities.md.
+description: Phase 5 — applies opportunity type taxonomy to every mapped process. Produces typed opportunity log (OPP-NNN) with hypothesis, value range, feasibility/data/GRC flags. Saves per-OPP files to opportunities/ folder.
 ---
 
 # Phase 5: Identifying Opportunities
@@ -19,7 +19,7 @@ This phase converts mapped processes into a typed opportunity log. Type — RPA 
 
 ## Gate condition
 
-`process-map.md` and `baselines.md` must both exist. This skill creates `opportunities.md`.
+`process-map.md` and `baselines.md` must both exist. This skill creates the `opportunities/` folder with per-OPP files and `opportunities/_index.md`.
 
 ## OPP-NNN Entry Structure
 
@@ -47,11 +47,24 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
 - **Assembly:** After all agents complete, assemble with Bash:
   ```bash
-  cat docs/engagements/<name>/_staging/phase5/proc-*.md \
-    | awk '/^## TEMP/{printf "## OPP-%03d", ++n; sub(/^## TEMP-[^ ]+/, ""); print; next} {print}' \
-    > docs/engagements/<name>/opportunities.md
+  mkdir -p docs/engagements/<name>/opportunities
+  awk '/^## TEMP/{n++; f=sprintf("docs/engagements/<name>/opportunities/OPP-%03d.md",n); printf "## OPP-%03d",n > f; sub(/^## TEMP-[^ ]+/,""); print > f; next} f{print > f}' docs/engagements/<name>/_staging/phase5/proc-*.md
   ```
-  Verify with: `grep "^## OPP" docs/engagements/<name>/opportunities.md` (returns only headings — trivially small).
+  Then generate the index by reading the per-file headers:
+  ```bash
+  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC |" > docs/engagements/<name>/opportunities/_index.md
+  echo "|--------|---------|------|-------------|----------------|-----|" >> docs/engagements/<name>/opportunities/_index.md
+  for f in docs/engagements/<name>/opportunities/OPP-*.md; do
+    id=$(grep "^## OPP" "$f" | head -1 | awk '{print $2}')
+    proc=$(grep "^\*\*Process:" "$f" | head -1 | sed 's/\*\*Process:\*\* //')
+    type=$(grep "^\*\*Type:" "$f" | head -1 | sed 's/\*\*Type:\*\* //' | cut -d' ' -f1)
+    feas=$(grep "^\*\*Feasibility flag:" "$f" | head -1 | sed 's/\*\*Feasibility flag:\*\* //')
+    data=$(grep "^\*\*Data readiness flag:" "$f" | head -1 | sed 's/\*\*Data readiness flag:\*\* //')
+    grc=$(grep "^\*\*GRC flag:" "$f" | head -1 | sed 's/\*\*GRC flag:\*\* //' | cut -d' ' -f1)
+    echo "| $id | $proc | $type | $feas | $data | $grc |" >> docs/engagements/<name>/opportunities/_index.md
+  done
+  ```
+  Verify with: `ls docs/engagements/<name>/opportunities/OPP-*.md | wc -l`
   Cleanup: `rm -rf docs/engagements/<name>/_staging/phase5`
 - **What stays in main context:** The one-line summaries from each agent (process ID, counts, GRC flags), the OPP headings from the grep verification, the GRC-flag branch decision, and cross-process consistency review of headings only.
 
@@ -65,7 +78,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - [ ] Set data readiness flag against data asset catalog
 - [ ] Set GRC flag based on regulatory exposure, model risk, auditability, failure consequence
 - [ ] Assign stable OPP-NNN identifier
-- [ ] Save to `docs/engagements/<engagement>/opportunities.md`
+- [ ] Save each opportunity to `docs/engagements/<engagement>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
 - [ ] If any opportunity has a non-Green GRC flag → branch to `ai-process-assessment:governance-risk-gate`
 - [ ] Otherwise → Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:scoring-opportunities`
 
@@ -91,7 +104,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 
 ## Handoff Protocol
 
-**Output rule:** Do NOT reproduce the contents of `opportunities.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
+**Output rule:** Do NOT reproduce the contents of `opportunities/OPP-NNN.md` in this response. State the file path only. Present findings as bullets — do not quote or echo file content.
 
 Before invoking the next skill, Janice must surface the phase output to the user:
 
@@ -104,7 +117,7 @@ Before invoking the next skill, Janice must surface the phase output to the user
 
 Key findings to surface for this phase: opportunities identified (count), GRC flag summary (Green/Yellow/Red counts), next routing decision.
 
-**Session boundary:** After the user approves `opportunities.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke either `ai-process-assessment:governance-risk-gate` (if any non-Green GRC flags exist) or `ai-process-assessment:scoring-opportunities` (if all Green). Do not continue methodology work in this session.
+**Session boundary:** After the user approves `opportunities/_index.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke either `ai-process-assessment:governance-risk-gate` (if any non-Green GRC flags exist) or `ai-process-assessment:scoring-opportunities` (if all Green). Do not continue methodology work in this session.
 
 ## Chain to next skill
 
