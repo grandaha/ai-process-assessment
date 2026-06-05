@@ -11,7 +11,7 @@ This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
 2. Read all phase output files for integrity check:
    `scope.md`, `context.md`, `tech-inventory.md`, `process-map.md`, `baselines.md`,
-   `opportunities.md`, `scored-opportunities.md`, `roadmap.md`,
+   `opportunities/_index.md`, `scores/_index.md`, `roadmap.md`,
    `usecase-briefs/_index.md`, `cost-actuals.md`, `business-case.md`
 
 Gate condition: All phase output files must exist before the integrity check can proceed.
