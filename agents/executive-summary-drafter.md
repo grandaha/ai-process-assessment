@@ -17,8 +17,8 @@ The output document must stand alone — a reader who has never seen the engagem
 |---|---|---|
 | Scope | `scope.md` | Sponsoring question, decision-maker (named), success criteria, in/out of scope |
 | Roadmap | `roadmap.md` | Waves, sequencing, budget envelope, owners, month targets |
-| Scoring | `scored-opportunities.md` | Portfolio scores, B/B/P classifications |
-| Opportunities | `opportunities.md` | Value hypotheses, GRC flags, opportunity types |
+| Scoring | `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications |
+| Opportunities | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types |
 | Baselines | `baselines.md` | Every metric grounding every value claim |
 
 If any input is missing, refuse to draft. State which file is absent.
@@ -30,12 +30,12 @@ Produce exactly these sections, in this order. Do not add sections. Do not reord
 1. **Recommendation** — Go / No-Go verdict; named decision-maker; one-sentence rationale
 2. **Pull-quote** — one sentence, ≤25 words; a complete, standalone claim the decision-maker can lift verbatim into a CFO submission, board update, or email. Pattern: "Approve $[X] to fund [N] opportunities that deliver [primary outcome] by [earliest milestone] within the $[Y] FY[year] envelope." Derive all figures from source files. Do not invent.
 3. **Why This, Why Now** — 3–4 sentences; the operational state today (draw from `baselines.md` — cite the 2–3 strongest gap metrics by name and value); what the sponsoring question demands (from `scope.md`); the cost of inaction if the portfolio is not funded. Must be concrete and baseline-cited — no vague language. This is the business case in miniature.
-4. **Scoring & Wave Logic** — one paragraph; explain how many opportunities were evaluated; what criteria drove the composite score (draw from `scored-opportunities.md` — name the actual scoring dimensions if present); what Wave 1 / Wave 2 / Wave 3 means in plain terms (draw from `roadmap.md` sequencing rationale). A reader who has never seen the engagement should understand the wave logic from this paragraph.
+4. **Scoring & Wave Logic** — one paragraph; explain how many opportunities were evaluated; what criteria drove the composite score (draw from `scores/_index.md` and `scores/OPP-NNN.md` — name the actual scoring dimensions if present); what Wave 1 / Wave 2 / Wave 3 means in plain terms (draw from `roadmap.md` sequencing rationale). A reader who has never seen the engagement should understand the wave logic from this paragraph.
 5. **Portfolio at a glance** — single table with every initiative: OPP-NNN | Title | Type | Wave | Composite score | Owner (named) | Month target
 6. **Budget** — total ask vs. envelope; deltas; one sentence on funding posture
 7. **Top risks** — 3–5 entries; each row: Risk | Mitigation | Named owner
-8. **First Proof Point** — identify the highest-scored Wave 1 item by composite score from `scored-opportunities.md`; draw its month target from `roadmap.md`; draw its primary outcome from `opportunities.md`; draw a one-sentence strategic rationale from `scope.md` on why this item matters to the decision-maker. Maximum 3 sentences. Do not invent strategic rationale — it must trace to `scope.md`.
-9. **Assumptions & Limitations** — two labeled sub-groups: **Conditions** (things that must remain true for the recommendation verdict to hold — draw from `scope.md` constraints, confirmed data availability in `baselines.md`, confirmed owner assignments in `roadmap.md`) and **Open Items** (named gaps not yet resolved — missing owners, unconfirmed API scope, unresolved dates — draw from `opportunities.md` and `roadmap.md`). Each open item must be named and attributed (e.g., "[NAME REQUIRED — source: roadmap.md]"). Do not paper over gaps with vague language.
+8. **First Proof Point** — identify the highest-scored Wave 1 item by composite score from `scores/_index.md`; draw its month target from `roadmap.md`; draw its primary outcome from `opportunities/OPP-NNN.md`; draw a one-sentence strategic rationale from `scope.md` on why this item matters to the decision-maker. Maximum 3 sentences. Do not invent strategic rationale — it must trace to `scope.md`.
+9. **Assumptions & Limitations** — two labeled sub-groups: **Conditions** (things that must remain true for the recommendation verdict to hold — draw from `scope.md` constraints, confirmed data availability in `baselines.md`, confirmed owner assignments in `roadmap.md`) and **Open Items** (named gaps not yet resolved — missing owners, unconfirmed API scope, unresolved dates — draw from `opportunities/OPP-NNN.md` and `roadmap.md`). Each open item must be named and attributed (e.g., "[NAME REQUIRED — source: roadmap.md]"). Do not paper over gaps with vague language.
 10. **Immediate next actions** — bulleted list; each item has a named owner and a specific date
 
 ## Output format
@@ -78,7 +78,7 @@ Use this template:
 
 ## Scoring & Wave Logic
 
-[One paragraph. State how many opportunities were evaluated, name the scoring dimensions from scored-opportunities.md, and explain Wave 1 / Wave 2 / Wave 3 sequencing rationale from roadmap.md in plain terms.]
+[One paragraph. State how many opportunities were evaluated, name the scoring dimensions from scores/OPP-NNN.md, and explain Wave 1 / Wave 2 / Wave 3 sequencing rationale from roadmap.md in plain terms.]
 
 ## Portfolio at a glance
 
@@ -102,7 +102,7 @@ Use this template:
 
 ## First Proof Point
 
-[3 sentences maximum. Name the specific OPP-ID of the highest-scored Wave 1 item. State its month target from roadmap.md and its primary outcome from opportunities.md. State in one sentence why this item matters to the decision-maker, drawn directly from scope.md.]
+[3 sentences maximum. Name the specific OPP-ID of the highest-scored Wave 1 item. State its month target from roadmap.md and its primary outcome from opportunities/OPP-NNN.md. State in one sentence why this item matters to the decision-maker, drawn directly from scope.md.]
 
 ## Assumptions & Limitations
 
@@ -122,7 +122,7 @@ Use this template:
 
 ---
 
-*Sources: scope.md, roadmap.md, scored-opportunities.md, opportunities.md, baselines.md*
+*Sources: scope.md, roadmap.md, scores/_index.md + scores/OPP-NNN.md, opportunities/_index.md + opportunities/OPP-NNN.md, baselines.md*
 ```
 
 ## Hard refusals

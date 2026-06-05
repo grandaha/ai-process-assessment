@@ -12,8 +12,8 @@ This skill runs as a standalone session. At session start:
 2. Read the following files and confirm each exists:
    - `business-case.md`
    - `roadmap.md`
-   - `scored-opportunities.md`
-   - `opportunities.md`
+   - `scores/_index.md`
+   - `opportunities/_index.md`
    - `baselines.md`
    - `scope.md`
 3. Check `evidence-log.md` — confirm deliverable-gate clearance is recorded.
@@ -39,8 +39,8 @@ The drafter receives all five. If any is missing, the skill halts and reports wh
 | `scope.md` | Decision-maker, sponsoring question, success criteria, in/out of scope |
 | `roadmap.md` | Waves, sequencing, wave scope |
 | `business-case.md` | Wave 1 investment range, value case, ROM assumptions, payback horizon |
-| `scored-opportunities.md` | Portfolio scores, B/B/P classifications |
-| `opportunities.md` | Value hypotheses, GRC flags |
+| `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications; read `scores/_index.md` for the full OPP list, then read individual `scores/OPP-NNN.md` files for composite scores and B/B/P detail |
+| `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types; read `opportunities/_index.md` for the full OPP list, then read individual `opportunities/OPP-NNN.md` files for value hypotheses and GRC flags |
 | `baselines.md` | Key metrics grounding all value claims |
 
 ## Required content
@@ -50,11 +50,11 @@ The summary contains exactly these sections, in this order:
 1. **Go / No-Go recommendation** — the verdict, with the named decision-maker (from `scope.md`)
 2. **Pull-quote** — one sentence, ≤25 words, all figures traceable to source files
 3. **Why This, Why Now** — 3–4 sentences, citing ≥2 named baseline metrics from `baselines.md`, sponsoring question from `scope.md`, cost of inaction
-4. **Scoring & Wave Logic** — one paragraph explaining evaluation criteria from `scored-opportunities.md` and wave sequencing from `roadmap.md`
+4. **Scoring & Wave Logic** — one paragraph explaining evaluation criteria from `scores/_index.md` + individual `scores/OPP-NNN.md` files and wave sequencing from `roadmap.md`
 5. **Portfolio view** — single table covering every initiative: OPP-NNN, title, type, wave, composite score, named owner, month target
 6. **Budget ask vs. envelope** — total investment range and value range from `business-case.md`; ROM accuracy label (AACE Class 5 ±50%); rough payback horizon; note that a definitive business case requires finance involvement and procurement data
 7. **Top 3–5 risks with mitigations** — each risk has a named owner (no "the team")
-8. **First Proof Point** — names the specific OPP-ID of the highest-scored Wave 1 item; month target from `roadmap.md`; primary outcome from `opportunities.md`; one-sentence strategic rationale traced to `scope.md`
+8. **First Proof Point** — names the specific OPP-ID of the highest-scored Wave 1 item; month target from `roadmap.md`; primary outcome from `opportunities/OPP-NNN.md`; one-sentence strategic rationale traced to `scope.md`
 9. **Assumptions & Limitations** — two labeled sub-groups (Conditions and Open Items); each open item named and attributed; no vague placeholders
 10. **Immediate next actions** — named owners, specific dates (no "Q3" — actual dates)
 
@@ -62,7 +62,7 @@ The summary contains exactly these sections, in this order:
 
 - [ ] Confirm `deliverable-gate` clearance is recorded in `evidence-log.md`
 - [ ] Confirm all five source files exist
-- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all five source files itself: `scope.md`, `roadmap.md`, `scored-opportunities.md`, `opportunities.md`, `baselines.md`. Do not pass file content to the subagent.
+- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent.
 - [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 - [ ] Verify every value claim cites a baseline; every owner is named (not a role); every date is concrete
 - [ ] Confirm `Why This, Why Now` cites ≥2 named baseline metrics
@@ -76,7 +76,7 @@ The summary contains exactly these sections, in this order:
 ## Workflow
 
 1. Confirm preconditions: deliverable-gate cleared; all five source files present.
-2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all five source files itself: `scope.md`, `roadmap.md`, `scored-opportunities.md`, `opportunities.md`, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
+2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
 3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
 4. Save the file. The chain advances to `building-deliverable`.
 
@@ -85,7 +85,7 @@ The summary contains exactly these sections, in this order:
 | Rationalization / Shortcut | Correct Reframe |
 |---|---|
 | "The HTML deliverable already covers this — we don't need a separate summary." | The HTML opens in a browser. The executive summary travels in email, in calendar invites, on phones. They serve different consumption contexts. Skip it and you lose the read-ahead. |
-| "We can re-derive numbers here for clarity." | New analysis in Phase 10 is rework with no review. Every figure must trace to `baselines.md` exactly as it appears in `scored-opportunities.md`. |
+| "We can re-derive numbers here for clarity." | New analysis in Phase 10 is rework with no review. Every figure must trace to `baselines.md` exactly as it appears in `scores/OPP-NNN.md`. |
 | "Owners can be the role — 'Head of Ops' is fine." | Roles change; people own decisions. Name the person. If unknown, that is a Phase 7 gap to fix in roadmap.md, not a Phase 10 problem to paper over. |
 | "Dates can be quarters — 'Q3' is enough." | Q3 is a planning artifact, not a commitment. Use month-X targets from `roadmap.md`. |
 | "Three risks is enough — we don't need five." | Three to five is the rule. Truncating to three when five matter hides risk; padding to five when three matter dilutes signal. Use the count the engagement evidence supports. |
