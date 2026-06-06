@@ -36,6 +36,7 @@ Structure the written content as:
 
 ```markdown
 ## GRC Review — OPP-NNN
+<!-- index: id=OPP-NNN status=Cleared|Cleared-with-Conditions|Blocked conditions=<N> -->
 **Status:** [Cleared | Cleared with Conditions | Blocked]
 **Regulatory exposure:** ...
 **Model risk:** ...
@@ -44,6 +45,8 @@ Structure the written content as:
 **Conditions** (if applicable): [numbered list; write "None" if Cleared]
 **Rationale for status:** ...
 ```
+
+**Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## GRC Review` heading. For `status`, use hyphenated form: `Cleared`, `Cleared-with-Conditions`, or `Blocked`. For `conditions`, set to the count of items in the numbered Conditions list (0 if Cleared or Blocked).
 
 After writing the file, return exactly this one-line summary and nothing else:
 ```

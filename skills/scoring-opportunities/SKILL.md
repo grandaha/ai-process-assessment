@@ -108,10 +108,11 @@ This phase already runs two subagents. This section names the pattern so it read
   echo "| OPP-ID | Composite | Horizon | B/B/P |" > docs/engagements/<name>/scores/_index.md
   echo "|--------|-----------|---------|-------|" >> docs/engagements/<name>/scores/_index.md
   for f in docs/engagements/<name>/scores/OPP-*.md; do
-    id=$(grep "^## OPP" "$f" | head -1 | awk '{print $2}')
-    comp=$(grep "^\*\*Composite:" "$f" | head -1 | sed 's/\*\*Composite:\*\* //' | cut -d' ' -f1)
-    horiz=$(grep "^\*\*Execution Horizon:" "$f" | head -1 | sed 's/\*\*Execution Horizon:\*\* //' | cut -d' ' -f1)
-    bbp=$(grep "^\*\*Build.Buy.Partner:" "$f" | head -1 | sed 's/\*\*Build\/Buy\/Partner:\*\* //' | cut -d' ' -f1)
+    header=$(grep "^<!-- index:" "$f" | head -1)
+    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
+    comp=$(echo "$header" | grep -o 'composite=[^ >]*' | cut -d= -f2)
+    horiz=$(echo "$header" | grep -o 'horizon=[^ >]*' | cut -d= -f2)
+    bbp=$(echo "$header" | grep -o 'bbp=[^ >]*' | cut -d= -f2)
     echo "| $id | $comp | $horiz | $bbp |" >> docs/engagements/<name>/scores/_index.md
   done
   ```
