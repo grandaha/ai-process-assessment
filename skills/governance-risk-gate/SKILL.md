@@ -8,7 +8,7 @@ description: Cross-cutting gate — evaluates GRC-flagged opportunities across r
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Confirm the engagement folder path with the user if not already provided.
+1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `opportunities/_index.md` — confirm it exists and identify all non-Green GRC flagged entries from the GRC column.
 
 Gate condition: At least one non-Green GRC flag must be present to invoke this gate.

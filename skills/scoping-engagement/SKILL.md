@@ -8,10 +8,11 @@ description: Phase 1 — front gate for all analytical work. Elicits sponsoring 
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Confirm the engagement folder path with the user if not already provided.
-2. No predecessor files required — this is Phase 1.
+1. Ask the user for the engagement name. This becomes the folder path `docs/engagements/<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask.
+2. Run `mkdir -p docs/engagements/<name>/` to create the engagement folder before writing any files.
+3. No predecessor files required — this is Phase 1.
 
-Gate condition: None. Proceed directly to scoping.
+Gate condition: None. Proceed directly to scoping once the engagement folder is created.
 
 ## Role in the system
 
@@ -37,6 +38,7 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 
 | Field | Content |
 |---|---|
+| Engagement folder | Canonical path for all phase outputs — `docs/engagements/<resolved-name>/`. Written by Phase 1; all downstream phases read this field. |
 | Sponsoring question | The single question this engagement must answer to enable a decision |
 | Decision-maker | Name, role, and what they will do differently with the output |
 | In-scope domains | Business units, process families, technology layers covered |
@@ -46,14 +48,15 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 
 ## Workflow
 
-1. Read user's engagement prompt.
-2. If sponsoring question is not stated, ask for it explicitly. Do not infer.
-3. Identify the decision-maker. If unnamed, ask. Capture their decision verb.
-4. Walk in-scope and out-of-scope domains. Press for the boundary cases.
-5. Translate "success" into something measurable. Reject "improved efficiency" — demand a metric or decision outcome.
-6. Capture constraints — including the political ones the sponsor may not volunteer.
-7. Apply the scope validity test. If the outcome is a list, return to step 1.
-8. Save `scope.md` and chain forward.
+1. Ask for the engagement name. Create `docs/engagements/<name>/` via `mkdir -p`.
+2. Read user's engagement prompt.
+3. If sponsoring question is not stated, ask for it explicitly. Do not infer.
+4. Identify the decision-maker. If unnamed, ask. Capture their decision verb.
+5. Walk in-scope and out-of-scope domains. Press for the boundary cases.
+6. Translate "success" into something measurable. Reject "improved efficiency" — demand a metric or decision outcome.
+7. Capture constraints — including the political ones the sponsor may not volunteer.
+8. Apply the scope validity test. If the outcome is a list, return to step 2.
+9. Write `scope.md` to `docs/engagements/<name>/scope.md`. The first field in the file is `**Engagement folder:** docs/engagements/<name>/`.
 
 ## Rationalization Table
 
