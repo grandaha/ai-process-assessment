@@ -8,7 +8,7 @@ description: Phase 6 — applies multi-dimensional scoring rubric (6 dimensions,
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Confirm the engagement folder path with the user if not already provided.
+1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `opportunities/_index.md` and confirm it exists.
 3. Check `grc/_index.md` — confirm any flagged opportunities have status `Cleared` or `Cleared-with-Conditions` (no `Blocked` entries). Note: the status column uses the hyphenated extraction form. If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
 

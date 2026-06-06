@@ -9,7 +9,7 @@ updated: 2026-06-03T19:43
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Confirm the engagement folder path with the user if not already provided.
+1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `roadmap.md` and `usecase-briefs/_index.md` — confirm both exist.
 3. Read each Wave 1 UC-NNN.md file listed in `_index.md` to build the collection checklist.
 
