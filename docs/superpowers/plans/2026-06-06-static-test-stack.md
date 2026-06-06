@@ -14,7 +14,7 @@
 
 These are the ground-truth values the tests assert against. They were read directly from the repo while writing this plan; an implementer does not need to re-derive them, but every one is checked by a test so drift is caught.
 
-- **16 skills** in `skills/*/SKILL.md`; **13 agents** in `agents/*.md`.
+- **16 skills** in `skills/*/SKILL.md`; **14 agents** in `agents/*.md` (was 13 — Task 4 surfaced a dangling `process-mapper` dispatch with no agent file and the agent was authored; see "Execution deviations").
 - **Skill frontmatter** `name` is namespaced: `ai-process-assessment:<dir-name>` (e.g. `ai-process-assessment:scoping-engagement`).
 - **Agent frontmatter** `name` is the bare filename stem (e.g. `business-case-analyst`), not namespaced.
 - **Phase Map** has **14 rows**: phases `1 2 3 4 5 6 7 8 8.5 9 10 11` then `Gate A` then `Gate B`.
@@ -22,7 +22,7 @@ These are the ground-truth values the tests assert against. They were read direc
 - **plugin.json** lives at `.claude-plugin/plugin.json`, currently `"version": "2.2.0"`.
 - **INSTALL.md** references the version once, in a JSON snippet: `"version": "2.2.0",` (line ~38).
 - **scope.md self-read marker** present verbatim in all 13 output-producing phase skills (every phase skill *except* `scoping-engagement`): the substring `` extract the `Engagement folder:` field ``.
-- **All 13 agents are referenced** by at least one skill → there are **no orphan agents** today (orphan-agent allow-list is empty).
+- **All 14 agents are referenced** by at least one skill → there are **no orphan agents** today (orphan-agent allow-list is empty).
 - **Chain links** form one connected path: scoping→mapping-context→inventorying-tech-data→discovering-processes→identifying-opportunities→governance-risk-gate→scoring-opportunities→prioritizing-roadmap→packaging-usecases→collecting-cost-actuals→building-business-case→deliverable-gate→building-executive-summary→building-deliverable (**terminal — no `→` arrow**).
 - **Data-arch residual (the one day-one failure):** `scored-opportunities.md` is still referenced in 6 places — `agents/section-renderer-portfolio.md` (lines 3, 11, 17, 19, 108) and `skills/building-deliverable/SKILL.md` (line ~185). Task 7 fixes these so the data-arch guard asserts strict-zero.
 
@@ -502,7 +502,7 @@ import re
 # test_referenced_agents_resolve surfaces a false positive during implementation.
 NON_AGENT_TOKENS: set[str] = set()
 
-# Agents referenced by no skill. Empty today — all 13 agents are referenced.
+# Agents referenced by no skill. Empty today — all 14 agents are referenced.
 ORPHAN_AGENT_ALLOWLIST: set[str] = set()
 
 # Phrasings that unambiguously introduce an agent. Each requires the ENTIRE
@@ -532,7 +532,8 @@ def test_agent_name_matches_filename(methodology):
 
 
 def test_agent_count(methodology):
-    assert len(methodology.agents) == 13
+    # 14 after Task 4 surfaced and fixed the missing process-mapper agent.
+    assert len(methodology.agents) == 14
 
 
 def _referenced_agent_tokens(methodology) -> set[str]:
@@ -1154,7 +1155,7 @@ Co-Authored-By: ai-cockpit-admin <akaraff@gmail.com>"
 ## Acceptance criteria (from spec §11)
 
 - [ ] `pytest` runs from the repo root with no arguments and discovers `tests/`.
-- [ ] The parser reads the keystone Phase Map, all 16 skills, and all 13 agents into one model exposed as the `methodology` fixture.
+- [ ] The parser reads the keystone Phase Map, all 16 skills, and all 14 agents into one model exposed as the `methodology` fixture.
 - [ ] Graph-integrity tests pass: every phase Skill ID resolves to a real skill with valid frontmatter whose `name` matches its directory; every referenced agent exists; every chain link resolves and the chain covers all phase skills ending at Phase 11; declared output tokens are in the convention list; phase order is canonical.
 - [ ] Anti-regression guards pass and would fail if reintroduced: zero retired-monolith references; every output-producing phase skill except `scoping-engagement` carries the scope.md self-read; `deliverable-gate` does not read `executive-summary.md` and Phase 10 is gated on its clearance; the sample sequences Gate B before Phase 10.
 - [ ] `plugin.json` is valid semver and consistent with `INSTALL.md` (both `2.3.0`).
@@ -1174,3 +1175,10 @@ Co-Authored-By: ai-cockpit-admin <akaraff@gmail.com>"
 - **Placeholder scan:** no TBD/TODO; all code blocks and commands are concrete. The renderer subtitle `[N] opportunities` and `[title]`/`[type label]` tokens in Task 7 are intentional *runtime template placeholders inside the agent prose* (the renderer fills them per engagement), not plan placeholders.
 - **Type consistency:** dataclass field names (`phase`, `skill_id`, `gate_condition`, `output_file`, `chain_target`, `convention_files`) and `REPO_ROOT` are used identically across `methodology_model.py`, `conftest.py`, and all test modules. `section()` defined once in the parser; the #8 guard uses a local `_session_start_block` helper (does not depend on the parser's `section()` to keep the guard self-contained).
 - **Day-one expectation:** all tasks green except Task 7's guard, which is red until its remediation step — by design.
+
+## Execution deviations
+
+Surprises found while executing the plan, and how they were resolved. Each is a real residual defect or environment fact the plan did not anticipate (spec §8: a day-one failure surfaces something worth fixing).
+
+- **Task 1 — YAML frontmatter is not strict-parseable.** Several skill/agent `description:` values legitimately contain unquoted colons (`...five constraints: dependency...`, `...section: phase completion chips...`). Claude Code's loader accepts these; `yaml.safe_load` raises. `parse_frontmatter` was given a fallback that recovers the simple `name`/`description` scalars by splitting on the first colon. The descriptions were NOT contorted to satisfy the parser — the parser was made tolerant.
+- **Task 4 — `discovering-processes` dispatched a `process-mapper` subagent with no agent file.** The phrasing matched the four sibling fan-out phases that each have a dedicated agent (`opportunity-typer`, `opportunity-scorer`, etc.), so the agent was clearly intended and simply never authored. Resolution (user-confirmed: "create the agent now"): authored `agents/process-mapper.md` mirroring `opportunity-typer`'s I/O discipline and refusal rules, specialized to Phase 4 per-round synthesis; agent count moved 13 → 14 (reflected in `test_agent_count` and the source-of-truth facts above).
