@@ -10,9 +10,9 @@ description: Phase 6 — applies multi-dimensional scoring rubric (6 dimensions,
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
 2. Read `opportunities/_index.md` and confirm it exists.
-3. Check `grc/_index.md` — confirm any flagged opportunities are Cleared or Cleared with Conditions (no Blocked entries). If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
+3. Check `grc/_index.md` — confirm any flagged opportunities have status `Cleared` or `Cleared-with-Conditions` (no `Blocked` entries). Note: the status column uses the hyphenated extraction form. If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
 
-Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no Blocked status).
+Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no `Blocked` status).
 
 ## Role in the system
 
@@ -108,10 +108,11 @@ This phase already runs two subagents. This section names the pattern so it read
   echo "| OPP-ID | Composite | Horizon | B/B/P |" > docs/engagements/<name>/scores/_index.md
   echo "|--------|-----------|---------|-------|" >> docs/engagements/<name>/scores/_index.md
   for f in docs/engagements/<name>/scores/OPP-*.md; do
-    id=$(grep "^## OPP" "$f" | head -1 | awk '{print $2}')
-    comp=$(grep "^\*\*Composite:" "$f" | head -1 | sed 's/\*\*Composite:\*\* //' | cut -d' ' -f1)
-    horiz=$(grep "^\*\*Execution Horizon:" "$f" | head -1 | sed 's/\*\*Execution Horizon:\*\* //' | cut -d' ' -f1)
-    bbp=$(grep "^\*\*Build.Buy.Partner:" "$f" | head -1 | sed 's/\*\*Build\/Buy\/Partner:\*\* //' | cut -d' ' -f1)
+    header=$(grep "^<!-- index:" "$f" | head -1)
+    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
+    comp=$(echo "$header" | grep -o 'composite=[^ >]*' | cut -d= -f2)
+    horiz=$(echo "$header" | grep -o 'horizon=[^ >]*' | cut -d= -f2)
+    bbp=$(echo "$header" | grep -o 'bbp=[^ >]*' | cut -d= -f2)
     echo "| $id | $comp | $horiz | $bbp |" >> docs/engagements/<name>/scores/_index.md
   done
   ```

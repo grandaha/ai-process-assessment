@@ -54,14 +54,15 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
   mkdir -p docs/engagements/<name>/grc
   mv docs/engagements/<name>/_staging/grc/OPP-*.md docs/engagements/<name>/grc/
   ```
-  Then generate the index:
+  Then generate the index from extraction headers:
   ```bash
   echo "| OPP-ID | Status | Conditions |" > docs/engagements/<name>/grc/_index.md
   echo "|--------|--------|------------|" >> docs/engagements/<name>/grc/_index.md
   for f in docs/engagements/<name>/grc/OPP-*.md; do
-    id=$(grep "^## GRC Review" "$f" | head -1 | awk '{print $NF}')
-    status=$(grep "^\*\*Status:" "$f" | head -1 | sed 's/\*\*Status:\*\* //')
-    cond=$(grep -c "^[0-9]\+\." "$f" || true)
+    header=$(grep "^<!-- index:" "$f" | head -1)
+    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
+    status=$(echo "$header" | grep -o 'status=[^ >]*' | cut -d= -f2)
+    cond=$(echo "$header" | grep -o 'conditions=[^ >]*' | cut -d= -f2)
     echo "| $id | $status | $cond |" >> docs/engagements/<name>/grc/_index.md
   done
   ```

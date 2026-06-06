@@ -75,6 +75,7 @@ Structure the written content as:
 
 ```markdown
 ## OPP-NNN — [Opportunity title]
+<!-- index: id=OPP-NNN composite=N.N horizon=Short-run|Long-run bbp=Build|Buy|Partner|Hybrid -->
 
 ### Dimensional Scores
 
@@ -104,6 +105,8 @@ Structure the written content as:
 
 **Rationale:** [1–3 sentences citing the inputs above]
 ```
+
+**Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## OPP-NNN` heading. Use `horizon=Short-run` or `horizon=Long-run` (no spaces). For `bbp`, use the exact classification word: `Build`, `Buy`, `Partner`, or `Hybrid`. Do not use multi-word values with spaces.
 
 After writing the file, return exactly this one-line summary and nothing else:
 ```

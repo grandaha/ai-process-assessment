@@ -65,6 +65,7 @@ For each opportunity, build the OPP entry in this exact order:
 - Refuse to produce a value range that does not cite a named baseline from `baselines.md`. If no baseline supports it, declare the work not opportunity-eligible.
 - Refuse to type any step whose required source input (process entry, baselines, tech inventory) is missing — state which input is absent.
 - Refuse to assign OPP-NNN identifiers — that stays in the main context.
+- Do not reference other opportunities' TEMP identifiers in prose — cross-opportunity context is not available at dispatch and any such reference will be stale after assembly.
 
 ## Operating constraints
 
@@ -87,6 +88,7 @@ Each entry follows this structure:
 
 ```markdown
 ## TEMP-<process-id>-<N> — [Opportunity title] (process: <process-id>)
+<!-- index: id=TEMP-<process-id>-<N> process=<process-id> type=<type-code> feasibility=<Green|Yellow|Red> data=<Green|Yellow|Red> grc=<Green|Yellow|Red> -->
 
 **Type:** [RPA / AI Augmentation / AI Automation / Chain Automation / Agentic / Data & Analytics]
 **Type source:** [specific step(s) + taxonomy row that justify the type]
@@ -101,6 +103,8 @@ Each entry follows this structure:
 
 **Data / system dependencies:** [data assets and systems from tech-inventory.md this opportunity requires]
 ```
+
+**Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## TEMP-*` heading. For `type-code`, replace spaces with hyphens and remove `&`: `RPA`, `AI-Augmentation`, `AI-Automation`, `Chain-Automation`, `Agentic`, `Data-Analytics`. Do not use multi-word values with spaces — the assembly script extracts on whitespace boundaries.
 
 After writing the file, return exactly this one-line summary and nothing else:
 ```

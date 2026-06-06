@@ -48,19 +48,35 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - **Assembly:** After all agents complete, assemble with Bash:
   ```bash
   mkdir -p docs/engagements/<name>/opportunities
-  awk '/^## TEMP/{n++; f=sprintf("docs/engagements/<name>/opportunities/OPP-%03d.md",n); printf "## OPP-%03d",n > f; sub(/^## TEMP-[^ ]+/,""); print > f; next} f{print > f}' docs/engagements/<name>/_staging/phase5/proc-*.md
+  # Split staging files into per-OPP files, assign canonical OPP-NNN IDs,
+  # and replace temp IDs throughout (heading, extraction header, and prose).
+  # Lines before the first ## TEMP- heading are intentionally discarded (f is unset).
+  awk '/^## TEMP-/{
+    n++
+    opp_id = sprintf("OPP-%03d", n)
+    temp_id = $2
+    f = sprintf("docs/engagements/<name>/opportunities/%s.md", opp_id)
+    sub(/^## TEMP-[^ ]+/, "## " opp_id)
+    print > f
+    next
+  }
+  f {
+    gsub(temp_id, opp_id)
+    print > f
+  }' docs/engagements/<name>/_staging/phase5/proc-*.md
   ```
-  Then generate the index by reading the per-file headers:
+  Then generate the index by reading extraction headers:
   ```bash
   echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC |" > docs/engagements/<name>/opportunities/_index.md
   echo "|--------|---------|------|-------------|----------------|-----|" >> docs/engagements/<name>/opportunities/_index.md
   for f in docs/engagements/<name>/opportunities/OPP-*.md; do
-    id=$(grep "^## OPP" "$f" | head -1 | awk '{print $2}')
-    proc=$(grep "^\*\*Process:" "$f" | head -1 | sed 's/\*\*Process:\*\* //')
-    type=$(grep "^\*\*Type:" "$f" | head -1 | sed 's/\*\*Type:\*\* //' | cut -d' ' -f1)
-    feas=$(grep "^\*\*Feasibility flag:" "$f" | head -1 | sed 's/\*\*Feasibility flag:\*\* //')
-    data=$(grep "^\*\*Data readiness flag:" "$f" | head -1 | sed 's/\*\*Data readiness flag:\*\* //')
-    grc=$(grep "^\*\*GRC flag:" "$f" | head -1 | sed 's/\*\*GRC flag:\*\* //' | cut -d' ' -f1)
+    header=$(grep "^<!-- index:" "$f" | head -1)
+    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
+    proc=$(echo "$header" | grep -o 'process=[^ >]*' | cut -d= -f2)
+    type=$(echo "$header" | grep -o 'type=[^ >]*' | cut -d= -f2)
+    feas=$(echo "$header" | grep -o 'feasibility=[^ >]*' | cut -d= -f2)
+    data=$(echo "$header" | grep -o 'data=[^ >]*' | cut -d= -f2)
+    grc=$(echo "$header" | grep -o 'grc=[^ >]*' | cut -d= -f2)
     echo "| $id | $proc | $type | $feas | $data | $grc |" >> docs/engagements/<name>/opportunities/_index.md
   done
   ```
