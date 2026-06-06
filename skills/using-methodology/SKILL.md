@@ -80,6 +80,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "build the HTML deliverable", "render the client deck", "package the final HTML" | `ai-process-assessment:building-deliverable` |
 | "collect cost data", "get vendor quotes", "what do we need to price this", "gather the estimates" | `ai-process-assessment:collecting-cost-actuals` |
 | "build the business case", "what does Wave 1 cost", "estimate the investment" | `ai-process-assessment:building-business-case` |
+| "run the sample", "test the methodology", "demo engagement", "try it end-to-end" | `ai-process-assessment:running-sample-engagement` |
 
 ## Engagement Folder Convention
 

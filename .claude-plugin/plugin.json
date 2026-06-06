@@ -1,7 +1,7 @@
 {
   "name": "ai-process-assessment",
   "description": "Structured discipline for AI and automation opportunity identification",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": { "name": "Dave Raffaele" },
   "license": "MIT",
   "keywords": ["consulting", "ai", "automation", "use-cases", "opportunity"]
