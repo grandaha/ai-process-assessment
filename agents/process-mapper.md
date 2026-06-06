@@ -16,9 +16,8 @@ Single-round interview synthesizer. Converts the raw notes of ONE interview roun
 | Engagement folder path | Absolute path to the engagement folder — the canonical location for all outputs |
 | Round number and type | Which round this is: `1 — Sponsor`, `2 — Operator`, `3 — Adjacent`, or `4 — Clarification` |
 | Raw notes for this round only | The interview notes captured for this round — the sole content to synthesize. No other rounds' notes are provided |
-| Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase4/round-N.md` |
 
-The agent reads `tech-inventory.md` itself from the engagement folder to identify the systems, actors, and data assets the processes in its notes touch. Do not expect file content to be passed in.
+These three inputs are everything the orchestrator passes. The agent reads `tech-inventory.md` itself from the engagement folder to identify the systems, actors, and data assets the processes in its notes touch, and it derives its own output path — `<engagement-folder>/_staging/phase4/round-<N>.md` — from the engagement folder path and the round number. The output path is NOT passed in. Do not expect file content to be passed in.
 
 If any required input is missing, refuse to synthesize the affected round and state which input is absent.
 
@@ -41,6 +40,8 @@ For each process the round surfaced, build an entry:
 4. **baselines.md fields** — record Volume, Cycle time (median + P90), Error / exception rate, and FTE effort for the process, each WITH its source and a Source confidence level (High = system-pulled, Medium = sampled, Low = estimated). If the round produced a metric without a traceable source, record it and mark the source `unconfirmed` — do not upgrade its confidence.
 
 ## process-map.md field schema
+
+This is the agent's own working schema; it mirrors the `process-map.md` / `baselines.md` Key Outputs in `discovering-processes`. Apply it directly — it is neither passed in nor read from another file at dispatch.
 
 | Field | Content |
 |---|---|
@@ -71,12 +72,12 @@ For each process the round surfaced, build an entry:
 - Reads `tech-inventory.md` itself for the systems, actors, and data assets the processes touch
 - Captures only what the round's notes support; marks anything else `not captured this round`
 - Every baseline figure carries a named source and a Source confidence level
-- Writes output to the staging file path provided at dispatch using the Write tool
+- Writes output to `<engagement-folder>/_staging/phase4/round-<N>.md` (derived from the engagement folder path and round number) using the Write tool
 - Returns only a one-line summary — does NOT return entry content to the main context
 
 ## Output
 
-Write all process entries for this round to the staging file path provided at dispatch. Use the Write tool with the exact path given.
+Write all process entries for this round to `<engagement-folder>/_staging/phase4/round-<N>.md`, which you derive from the engagement folder path and the round number. Use the Write tool.
 
 Use `## R<N>-P<k>` provisional tags in place of stable Process IDs. The main context reconciles tags across rounds and assigns stable Process IDs during assembly.
 
@@ -103,14 +104,14 @@ Each entry follows this structure:
 | FTE effort | [current human effort OR "not captured this round"] | [source] | [High/Medium/Low/unconfirmed] |
 ```
 
-After writing the file, return exactly this one-line summary and nothing else:
+After writing the file, return exactly this one-line summary and nothing else (count a process's baseline as *captured* when at least one of its four baseline fields holds a real value — not `not captured this round`):
 
 ```
-Round <N> complete: <N> processes mapped, <N> baselines captured. Written to <staging_file_path>.
+Round <N> complete: <N> processes mapped, <N> baselines captured. Written to <engagement-folder>/_staging/phase4/round-<N>.md.
 ```
 
 Do NOT return the entry content in your response.
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:discovering-processes` — one agent per interview round, dispatched in a single parallel tool-call batch where notes for more than one round are ready. Each agent receives only its own round's raw notes, the engagement folder path, the round number and type, and the staging file path for its output (no cross-round context). The orchestrator assembles `process-map.md` and `baselines.md` from the staging files, reconciles provisional tags into stable Process IDs, runs the chain scan, and applies the Baseline & Value Hypothesis gate.
+Invoked by `ai-process-assessment:discovering-processes` — one agent per interview round, dispatched in a single parallel tool-call batch where notes for more than one round are ready. Each agent receives only its own round's raw notes, the engagement folder path, and the round number and type (no cross-round context); it derives its own `_staging/phase4/round-N.md` output path. The orchestrator assembles `process-map.md` and `baselines.md` from the staging files, reconciles provisional tags into stable Process IDs, runs the chain scan, and applies the Baseline & Value Hypothesis gate.
