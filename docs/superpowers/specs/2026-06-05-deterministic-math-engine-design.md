@@ -18,7 +18,7 @@ Move **every calculation in the methodology** off the model and into a determini
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Workbook format | **Excel `.xlsx`** via `openpyxl` | No auth, deterministic, portable, ships in the plugin, reproduces offline. Uploads to Google Sheets later if desired. |
+| Workbook format | **Excel `.xlsx`** via `openpyxl` — single authoritative artifact | No auth, deterministic, portable, ships in the plugin, reproduces offline. Must round-trip cleanly into **Google Sheets** and **Apple Numbers** (see §6.4). An optional thin `--to-sheets` converter is in scope; a native Google Sheets *backend* is not (§11). |
 | Math model | **Live cell formulas** | Inputs in cells; results are `=formulas`. Auditable and re-flexable, not just relocated. |
 | Environment | **Code-execution required for any shipped number** | Determinism is the point. Methodology still runs without it but marks numbers "pending engine." |
 | Scope | **Full engagement** — every calculation site | Per the directive: anywhere calculations are being done. |
@@ -96,7 +96,11 @@ Rules baked into the engine, not the LLM: AACE Class 5 (±50%) labels; change-ma
 
 Tabs: **Inputs** · **Value (P5)** · **Scores (P6)** · **Costs (P8.5)** · **Business Case (P9)** · **Wave-1 Aggregate**. Inputs are literal cells; every downstream tab uses `=formulas` referencing the Inputs tab (`=Inputs!B4*Inputs!C4`, `=SUM(...)`, `=investment/annual_value`). Opening the file recalculates; changing an input flows through. `engine/workbook.py` writes formula strings; `engine/compute.py` produces the canonical values for `results.json`; the two must agree (enforced by a test).
 
-**Implementation note:** `openpyxl` writes formula *strings* and does **not** cache computed values — reading a formula cell back yields the string, not the result. The formula-vs-results equality test therefore evaluates the workbook with a formula evaluator (e.g. the `formulas` or `pycel` package) rather than reading cells. That evaluator is a test/CI dependency, not a runtime one. Optionally set the workbook's `calcPr.fullCalcOnLoad` so Excel/Sheets recompute on open.
+**Implementation note:** `openpyxl` writes formula *strings* and does **not** cache computed values — reading a formula cell back yields the string, not the result. The formula-vs-results equality test therefore evaluates the workbook with a formula evaluator (e.g. the `formulas` or `pycel` package) rather than reading cells. That evaluator is a test/CI dependency, not a runtime one.
+
+**Cross-application compatibility (required, not optional).** The author of this engagement does not run Microsoft Excel; the `.xlsx` must open and recompute correctly in **Apple Numbers** (macOS, free) and **Google Sheets** (via import). Two concrete requirements: (1) use only formula functions common to Excel, Sheets, and Numbers — plain arithmetic, `SUM`, cell/sheet references; avoid Excel-only functions, named ranges, and tables; (2) set `workbook.calcPr.fullCalcOnLoad = True` so any of the three apps recalculates on open/import rather than showing stale/blank formula cells. A round-trip smoke check (open in Numbers; import into Sheets) is part of acceptance.
+
+**Optional `--to-sheets` converter.** A thin post-hoc adapter that uploads the canonical `.xlsx` to Google Drive and lets Drive convert it to a native Google Sheet (Drive's `xlsx→Sheets` conversion preserves arithmetic formulas). This is a convenience layer on top of the one authoritative artifact — it is **not** a second formula-writing backend and introduces no second source of truth. Auth (Drive API) is required only for this optional step, never for the core engine.
 
 ## 7. Per-phase integration changes
 
@@ -118,6 +122,8 @@ The engine is **tested code, not generated-per-run** — that is what earns trus
 - **Option A (Claude Code):** full path — Bash runs the engine.
 - **Option B (Claude.ai Projects):** requires the analysis/code tool for numbers; without it, methodology runs but figures render "pending engine."
 - Requires a code-execution environment for any shipped number (accepted decision).
+- **No spreadsheet application is needed to *verify* the engine** — correctness is proven by the headless test suite (§8). Spreadsheet apps are only for *human* audit of the workbook, where Apple Numbers or a Google Sheets import suffice (no Microsoft Excel required).
+- The optional `--to-sheets` converter adds a Drive-API dependency only when explicitly invoked.
 
 ## 10. Build order
 
@@ -126,10 +132,13 @@ The engine is **tested code, not generated-per-run** — that is what earns trus
 3. Wire phases one at a time (P9 first — highest value — then P8.5, P6, P5, P4), validating against the sample after each.
 4. Deliverable-gate determinism check.
 5. `building-deliverable` workbook link + `using-methodology` rule + `INSTALL.md` + version bump.
+6. *(Optional, can defer)* `--to-sheets` converter + its Drive-API setup docs.
+
+After step 2, run the cross-app round-trip smoke check: open `financial-model.xlsx` in Apple Numbers and import it into Google Sheets; confirm formulas recompute in both.
 
 ## 11. Out of scope
 
-- Google Sheets output (Excel only; convert later if needed).
+- A **native Google Sheets backend** (a second formula-writer that targets the Sheets API directly). The `.xlsx` is the single authoritative artifact; Sheets is reached by import or the optional `--to-sheets` converter, not by a parallel writer.
 - NPV / discounted cash-flow modeling — the methodology stays ROM (AACE Class 5); the engine does not become a finance model.
 - Replacing non-numeric extraction headers (`<!-- index -->` for type/flags) — only numeric data moves to the model.
 - Phase 4 normalization (issue #6) — independent; this design works with either Phase-4 structure.
@@ -139,6 +148,7 @@ The engine is **tested code, not generated-per-run** — that is what earns trus
 - No methodology phase instructs the model to perform arithmetic in prose; all numbers trace to `model/*.json` (input) or `results.json` (computed).
 - `engine/` computes value ranges, score composites, cost structures, ROM ranges, Wave-1 aggregate, and payback deterministically, with a passing golden-number suite including the Lattice integration test.
 - A run produces `model/results.json` and `financial-model.xlsx` with live formulas; changing an Inputs cell reflows the downstream tabs.
-- `financial-model.xlsx` formula results equal `results.json` values (tested).
+- `financial-model.xlsx` formula results equal `results.json` values (tested headless, no spreadsheet app).
+- `financial-model.xlsx` opens and recomputes correctly in **Apple Numbers** and after **Google Sheets import** — uses only cross-app formula functions and sets `fullCalcOnLoad`.
 - The deliverable-gate blocks on any markdown figure that does not match `results.json`.
 - Missing inputs render as `PENDING` in both `results.json` and the workbook — never as a fabricated number.
