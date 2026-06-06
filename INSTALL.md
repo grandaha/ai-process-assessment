@@ -174,16 +174,21 @@ At the start of each phase, paste the relevant `SKILL.md` into your context (or 
 
 Every engagement produces files in sequence under `docs/engagements/<name>/`:
 
-| Phase | File created |
+| Phase | Output |
 |---|---|
 | 1 — Scoping | `scope.md` |
 | 2 — Context Mapping | `context.md` |
 | 3 — Tech & Data Inventory | `tech-inventory.md` |
 | 4 — Process Discovery | `process-map.md`, `baselines.md` |
-| 5 — Opportunity Identification | `opportunities.md` |
-| 6 — Opportunity Scoring | `scored-opportunities.md` |
+| 5 — Opportunity Identification | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
+| Gate A — GRC Review | `grc/` (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran) |
+| 6 — Opportunity Scoring | `scores/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
 | 7 — Prioritization & Roadmap | `roadmap.md` |
-| 8 — Use Case Packaging | `usecase-briefs.md` |
+| 8 — Use Case Packaging | `usecase-briefs/` (folder: `_index.md` + `UC-NNN.md` per opportunity) |
+| 8.5 — Cost Actuals | `cost-actuals.md` |
+| 9 — Business Case | `business-case.md` |
+| 10 — Executive Summary | `executive-summary.md` |
+| 11 — Deliverable | `deliverable.html` |
 | Running log | `evidence-log.md` |
 
 Each phase skill checks that its predecessor file exists before producing any output. If a file is missing, the skill halts and tells you what is needed.
