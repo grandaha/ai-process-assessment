@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -60,6 +60,10 @@ Type anything in a new session. The model should acknowledge it is operating ins
 ### 5. Start an engagement
 
 Say: **"scope this engagement"** — the model will invoke `ai-process-assessment:scoping-engagement` and begin Phase 1.
+
+### 6. Try it: the bundled sample engagement
+
+Before a live engagement, run the included demo to see all eleven phases and both gates end-to-end on fictional data. Say: **"run the sample engagement"** — the model invokes `ai-process-assessment:running-sample-engagement`, which feeds the intake files in `samples/pso-delivery-team/intake/` through the methodology and produces a complete run under `docs/engagements/sample-pso-delivery/`, ending in `deliverable.html`. See `samples/pso-delivery-team/README.md`.
 
 ---
 
@@ -96,6 +100,7 @@ Upload the following as Project knowledge files:
 - `skills/building-deliverable/SKILL.md`
 - `skills/governance-risk-gate/SKILL.md`
 - `skills/deliverable-gate/SKILL.md`
+- `skills/running-sample-engagement/SKILL.md`
 
 **Agents** (upload all):
 - `agents/opportunity-typer.md`
@@ -111,6 +116,13 @@ Upload the following as Project knowledge files:
 - `agents/section-renderer-roadmap.md`
 - `agents/section-renderer-evidence.md`
 
+**Sample engagement** (optional — bundled demo run):
+- `samples/pso-delivery-team/README.md`
+- `samples/pso-delivery-team/intake/engagement-request.md`
+- `samples/pso-delivery-team/intake/org-context.md`
+- `samples/pso-delivery-team/intake/systems-and-data.md`
+- `samples/pso-delivery-team/intake/interview-notes.md`
+
 **Engagement context** (optional but recommended):
 - A filled-in `CLAUDE.md` for the specific engagement
 - Intake documents: org charts, system inventories, process lists, prior assessments
@@ -120,6 +132,10 @@ Upload the following as Project knowledge files:
 Every conversation in the Project inherits the keystone automatically.
 
 Say: **"scope this engagement"** to begin Phase 1.
+
+### Try it: the bundled sample engagement
+
+If you uploaded the sample files above, say **"run the sample engagement"** to run the fictional Lattice Consulting demo through all eleven phases and both gates. In Claude.ai, attach the four `samples/pso-delivery-team/intake/` files to the conversation (or keep them in Project knowledge) so the run can read them at Phases 1–4.
 
 ### Updating for a new engagement
 
@@ -169,6 +185,10 @@ Then paste your filled-in `CLAUDE.md` below it.
 ### 4. Reference skills manually
 
 At the start of each phase, paste the relevant `SKILL.md` into your context (or into the system prompt for the session). The skill chain references tell you which one comes next.
+
+### Try it: the bundled sample engagement
+
+To learn the flow first, paste `skills/running-sample-engagement/SKILL.md` and the four `samples/pso-delivery-team/intake/` files into your context, then say **"run the sample engagement."** It walks the fictional Lattice Consulting case through every phase using the intake files in place of live interviews.
 
 ---
 
