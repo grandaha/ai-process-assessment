@@ -104,6 +104,7 @@ Upload the following as Project knowledge files:
 - `agents/opportunity-scorer.md`
 - `agents/usecase-brief-drafter.md`
 - `agents/executive-summary-drafter.md`
+- `agents/executive-summary-reviewer.md`
 - `agents/section-renderer-executive.md`
 - `agents/section-renderer-problem.md`
 - `agents/section-renderer-portfolio.md`

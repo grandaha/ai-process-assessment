@@ -63,13 +63,10 @@ The summary contains exactly these sections, in this order:
 - [ ] Confirm `deliverable-gate` clearance is recorded in `evidence-log.md`
 - [ ] Confirm all required source files exist (`scope.md`, `roadmap.md`, `business-case.md`, `baselines.md`, `scores/_index.md`, `opportunities/_index.md`)
 - [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent.
-- [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
-- [ ] Verify every value claim cites a baseline; every owner is named (not a role); every date is concrete
-- [ ] Confirm `Why This, Why Now` cites ≥2 named baseline metrics
-- [ ] Confirm `Pull-quote` is ≤25 words and all figures are traceable to source files
-- [ ] Confirm `Scoring & Wave Logic` names the wave framing used in `roadmap.md`
-- [ ] Confirm `First Proof Point` names the specific highest-scored Wave 1 OPP-ID
-- [ ] Confirm `Assumptions & Limitations` contains both a Conditions sub-group and an Open Items sub-group, with no vague placeholders
+- [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk. The orchestrator does NOT receive document content.
+- [ ] Dispatch one `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `baselines.md`, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content.
+- [ ] The reviewer appends its findings to `<engagement-folder>/evidence-log.md` directly and returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive the full review block.
+- [ ] Resolve all Critical findings. Important findings must be addressed before delivery. Minor findings are noted.
 - [ ] Save to `docs/engagements/<engagement>/executive-summary.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:building-deliverable`
 
@@ -77,8 +74,10 @@ The summary contains exactly these sections, in this order:
 
 1. Confirm preconditions: deliverable-gate cleared; all required source files present.
 2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
-3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk and spot-checks: Go/No-Go has a named decision-maker, portfolio table is present. The orchestrator does NOT receive document content.
-4. Save the file. The chain advances to `building-deliverable`.
+3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk. The orchestrator does NOT receive document content.
+4. Dispatch the `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `baselines.md`, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content. The reviewer appends findings to `evidence-log.md` and returns one-line summary only.
+5. Resolve all Critical findings. Important findings must be addressed before delivery.
+6. Save the file. The chain advances to `building-deliverable`.
 
 ## Rationalization Table
 
@@ -106,8 +105,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 
 Key findings to surface for this phase: Go/No-Go verdict, named decision-maker, wave portfolio (count of OPPs per wave), total budget ask, quick-win OPP-ID.
 
-**Session boundary:** After the user approves `executive-summary.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:building-deliverable` to begin Phase 11. Do not continue methodology work in this session.
+**Session boundary:** After the user approves `executive-summary.md` and the reviewer clearance is recorded in `evidence-log.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:building-deliverable` to begin Phase 11. Do not continue methodology work in this session.
 
 ## Chain to next skill
 
-→ `ai-process-assessment:building-deliverable` (Phase 11 — produces the HTML deliverable)
+→ `ai-process-assessment:building-deliverable` (Phase 11 — after `executive-summary.md` saved and reviewer cleared)
