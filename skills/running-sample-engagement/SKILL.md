@@ -51,8 +51,8 @@ When you run each phase skill, substitute the live-interview step with reading t
 | 8 — Use Case Briefs | `ai-process-assessment:packaging-usecases` | *(no new input)* |
 | 8.5 — Cost Actuals | `ai-process-assessment:collecting-cost-actuals` | *(no live stakeholders — see note below)* |
 | 9 — Business Case | `ai-process-assessment:building-business-case` | *(no new input)* |
-| 10 — Exec Summary | `ai-process-assessment:building-executive-summary` | *(no new input)* |
-| Gate B — Deliverable | `ai-process-assessment:deliverable-gate` | *(runs normally)* |
+| Gate B — Deliverable | `ai-process-assessment:deliverable-gate` | *(runs before Phase 10; checks the artifacts produced through Phase 9 and records clearance in `evidence-log.md`)* |
+| 10 — Exec Summary | `ai-process-assessment:building-executive-summary` | *(no new input; requires Gate B clearance in `evidence-log.md` before it may begin)* |
 | 11 — Deliverable | `ai-process-assessment:building-deliverable` | *(renders `deliverable.html`)* |
 
 ### Note on Phase 8.5 (Cost Actuals)
@@ -64,7 +64,7 @@ In a real engagement, Phase 8.5 collects cost data from live stakeholders (labor
 1. Confirm setup (above).
 2. Invoke `ai-process-assessment:scoping-engagement`. At the live-interview step, read `intake/engagement-request.md` and scope from it. Use engagement name `sample-pso-delivery`.
 3. At the end of each phase, follow that phase's normal Handoff Protocol: name the files written, summarize key findings, state the next phase, and **wait for the user's explicit approval**. Then honor the **session boundary** — instruct the user to start a fresh session and invoke the next phase skill, substituting the mapped intake file for the live interview.
-4. Continue through Gate A (GRC will fire), scoring, roadmap, briefs, cost actuals, business case, exec summary, the deliverable gate, and finally `building-deliverable`, which renders `deliverable.html`.
+4. Continue through Gate A (GRC will fire), scoring, roadmap, briefs, cost actuals, business case, **then Gate B (the deliverable gate, which runs before Phase 10 and must record clearance in `evidence-log.md`)**, exec summary, and finally `building-deliverable`, which renders `deliverable.html`.
 5. The run is complete when `docs/engagements/sample-pso-delivery/` contains every phase output and `deliverable.html` is rendered.
 
 ## Expected outcome (so you can tell whether the run was faithful)
