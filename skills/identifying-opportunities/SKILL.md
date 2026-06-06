@@ -50,6 +50,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
   mkdir -p docs/engagements/<name>/opportunities
   # Split staging files into per-OPP files, assign canonical OPP-NNN IDs,
   # and replace temp IDs throughout (heading, extraction header, and prose).
+  # Lines before the first ## TEMP- heading are intentionally discarded (f is unset).
   awk '/^## TEMP-/{
     n++
     opp_id = sprintf("OPP-%03d", n)

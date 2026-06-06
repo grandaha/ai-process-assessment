@@ -98,6 +98,7 @@ Upload the following as Project knowledge files:
 - `skills/deliverable-gate/SKILL.md`
 
 **Agents** (upload all):
+- `agents/opportunity-typer.md`
 - `agents/opportunity-reviewer.md`
 - `agents/grc-reviewer.md`
 - `agents/opportunity-scorer.md`

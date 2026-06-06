@@ -10,9 +10,9 @@ description: Phase 6 — applies multi-dimensional scoring rubric (6 dimensions,
 This skill runs as a standalone session. At session start:
 1. Confirm the engagement folder path with the user if not already provided.
 2. Read `opportunities/_index.md` and confirm it exists.
-3. Check `grc/_index.md` — confirm any flagged opportunities are Cleared or Cleared with Conditions (no Blocked entries). If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
+3. Check `grc/_index.md` — confirm any flagged opportunities have status `Cleared` or `Cleared-with-Conditions` (no `Blocked` entries). Note: the status column uses the hyphenated extraction form. If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
 
-Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no Blocked status).
+Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no `Blocked` status).
 
 ## Role in the system
 
