@@ -29,7 +29,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - **Evidence integrity** — every value claim in the deliverable traces to a citation in `baselines.md`. No figure floats free.
 - **Logic integrity** — the chain process → opportunity → score → roadmap → brief has no gaps. A reader can walk from any brief back to the baseline that grounds it.
 - **Completeness** — every in-scope domain from `scope.md` is addressed. Gaps are acknowledged, not hidden.
-- **Communication** — the executive summary leads with the portfolio view (waves, value, sequencing), not with methodology narrative.
+- **Communication readiness** — the portfolio view (waves, value, sequencing) is present and coherent in `roadmap.md` and `scores/_index.md`, so the executive summary (Phase 10) can lead with it rather than with methodology narrative. Gate B runs *before* Phase 10, so `executive-summary.md` does not yet exist and is not inspected here — this dimension confirms the raw material to lead with the portfolio view is in place.
 
 ## Phase checklist
 
@@ -37,7 +37,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - [ ] Run Logic integrity check — pick a Wave 1 brief, trace process → opportunity → score → roadmap → brief
 - [ ] Run Completeness check — cross-reference scoped domains against deliverable coverage
 - [ ] Run Business Case integrity check — confirm `business-case.md` ROM label is present; every figure has a stated assumption; Buy/Partner initiatives flag missing vendor quotes; one-time and recurring costs are separated
-- [ ] Run Communication check — does the executive summary lead with portfolio view?
+- [ ] Run Communication readiness check — confirm the portfolio view (waves, value, sequencing) is present and lead-able from `roadmap.md` + `scores/_index.md` (the executive summary does not exist yet — it is written in Phase 10, after this gate clears)
 - [ ] Dispatch `opportunity-reviewer` subagent for independent integrity review
   Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content. Resolve all Critical findings before recording clearance.
 - [ ] Resolve all Critical findings before clearance
