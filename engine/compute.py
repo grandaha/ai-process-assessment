@@ -63,3 +63,17 @@ def cost_structure(labor_hours, labor_rate, tech_cost, integration_cost,
         contingency=_money(contingency),
         total=_money(total),
     )
+
+
+AACE_CLASS5_LABEL = "ROM estimate, AACE Class 5 (±50%)"
+
+
+def initiative_rom(cost_block):
+    """ROM range for an initiative: total ±50% (AACE Class 5).
+
+    The label travels with the figure in results.json (see run.py).
+    Returns PENDING if the cost block is PENDING.
+    """
+    if cost_block == PENDING:
+        return PENDING
+    return Range(_money(cost_block.total * 0.5), _money(cost_block.total * 1.5))
