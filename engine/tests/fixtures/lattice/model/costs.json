@@ -1,0 +1,4 @@
+[
+  {"opp_id": "OPP-001", "labor_hours": 800, "labor_rate": 200, "tech_cost": 40000, "integration_cost": 30000, "change_mgmt_pct": 0.25, "contingency_pct": 0.15},
+  {"opp_id": "OPP-002", "labor_hours": 400, "labor_rate": 200, "tech_cost": 20000, "integration_cost": 10000, "change_mgmt_pct": 0.20, "contingency_pct": 0.15}
+]
