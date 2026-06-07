@@ -24,12 +24,13 @@ Fires before ANY external sharing of outputs, regardless of phase. The terminal 
 
 Any output (interim or final) is about to be shared with anyone outside the engagement team.
 
-## Four Integrity Dimensions
+## Five Integrity Dimensions
 
 - **Evidence integrity** — every value claim in the deliverable traces to a citation in `baselines.md`. No figure floats free.
 - **Logic integrity** — the chain process → opportunity → score → roadmap → brief has no gaps. A reader can walk from any brief back to the baseline that grounds it.
 - **Completeness** — every in-scope domain from `scope.md` is addressed. Gaps are acknowledged, not hidden.
 - **Communication readiness** — the portfolio view (waves, value, sequencing) is present and coherent in `roadmap.md` and `scores/_index.md`, so the executive summary (Phase 10) can lead with it rather than with methodology narrative. Gate B runs *before* Phase 10, so `executive-summary.md` does not yet exist and is not inspected here — this dimension confirms the raw material to lead with the portfolio view is in place.
+- **Determinism integrity** — every numeric figure in every markdown deliverable equals its source in `model/results.json`. No number is computed in prose. A figure that does not match `results.json` (or that has no `results.json` source) blocks the gate. PENDING values must appear as PENDING, never as an invented number.
 
 ## Phase checklist
 
@@ -38,6 +39,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - [ ] Run Completeness check — cross-reference scoped domains against deliverable coverage
 - [ ] Run Business Case integrity check — confirm `business-case.md` ROM label is present; every figure has a stated assumption; Buy/Partner initiatives flag missing vendor quotes; one-time and recurring costs are separated
 - [ ] Run Communication readiness check — confirm the portfolio view (waves, value, sequencing) is present and lead-able from `roadmap.md` + `scores/_index.md` (the executive summary does not exist yet — it is written in Phase 10, after this gate clears)
+- [ ] Run Determinism integrity check — for each numeric figure in `business-case.md`, `executive-summary.md` (if present), and `roadmap.md`, confirm it equals the corresponding `model/results.json` value; block on any mismatch or unsourced number
 - [ ] Dispatch `opportunity-reviewer` subagent for independent integrity review
   Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content. Resolve all Critical findings before recording clearance.
 - [ ] Resolve all Critical findings before clearance
@@ -51,6 +53,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 | "Spot-checking evidence is enough." | Spot-checks miss the systematic gaps. The gate samples deliberately, including the highest-stakes claims. |
 | "Acknowledged gaps look bad — better to omit them." | Hidden gaps surface in delivery and cost credibility. Acknowledged gaps demonstrate rigor. |
 | "Lead with methodology — they paid for the rigor." | Executives buy the portfolio view. Methodology earns credibility in appendices, not in the lead. |
+| "The model's arithmetic looks right — no need to check results.json." | LLM prose arithmetic is non-deterministic and compounds. The engine is the only source of truth; the gate verifies equality, it does not re-trust the model. |
 
 ## Chain to next skill
 
