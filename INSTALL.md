@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -227,6 +227,22 @@ Two subagents fire automatically at quality gates — no setup required. The pha
 | `grc-reviewer` | Inside the GRC gate, for each flagged opportunity | Regulatory exposure, model risk, auditability, failure consequence |
 
 Both agents operate without shared session context — they receive only the document under review. This is intentional.
+
+---
+
+## Running the tests
+
+The plugin ships a static test suite (Layer 1) that checks the methodology
+graph and guards against known regressions. It is LLM-free and runs in seconds.
+
+```bash
+make install   # pip install -r requirements.txt  (pytest, pyyaml)
+make test      # pytest -q
+```
+
+Or directly: `pytest` from the repo root. The suite parses the keystone Phase
+Map in `skills/using-methodology/SKILL.md` and asserts every skill, agent,
+chain link, and output file conforms to it.
 
 ---
 

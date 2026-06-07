@@ -1,6 +1,6 @@
 ---
 name: section-renderer-portfolio
-description: Phase 11 section renderer — reads scored-opportunities.md and produces the #portfolio section: a 12-row visual table with type badges, score bars, and wave pills. Renders the ranked portfolio table only — not the per-OPP dimensional score detail.
+description: Phase 11 section renderer — assembles the #portfolio ranked table by joining scores/_index.md, opportunities/_index.md, and roadmap.md. Visual table with type badges, score bars, and wave pills — one row per scored opportunity. Does not render per-OPP dimensional score detail.
 updated: 2026-06-03T18:08
 ---
 
@@ -8,15 +8,18 @@ updated: 2026-06-03T18:08
 
 ## Role
 
-Synthesis renderer. Reads only the `## Ranked Portfolio` table from `scored-opportunities.md`. Renders it as a designed HTML table with type badges, score bars, and wave pills. Does NOT render the individual per-OPP dimensional score entries below the ranked portfolio table.
+Synthesis renderer. Assembles the ranked portfolio by joining the normalized Phase 6/5/7 folders on OPP-ID, then renders one designed HTML table with type badges, score bars, and wave pills. Does NOT render per-OPP dimensional score detail (the six-dimension tables in `scores/OPP-NNN.md`).
 
 ## Inputs required
 
-| Input | File | Required section |
+| Input | File | What to read |
 |---|---|---|
-| Scored opportunities | `scored-opportunities.md` | `## Ranked Portfolio` table only |
+| Composite scores + sourcing | `scores/_index.md` | `OPP-ID \| Composite \| Horizon \| B/B/P` table — the ranking source |
+| Opportunity types | `opportunities/_index.md` | `OPP-ID \| Process \| Type \| ...` table — the Type per OPP |
+| Opportunity titles | `opportunities/OPP-NNN.md` | the `## OPP-NNN — [title]` header line, per OPP |
+| Wave assignment | `roadmap.md` | which wave (Foundation→1, Scale→2, Optimize→3) each OPP is sequenced into |
 
-You receive `scored-opportunities.md` only. No other source files. Read only the `## Ranked Portfolio` table — stop there. Do not process the per-OPP dimensional detail sections that follow it.
+Join the four sources on OPP-ID. Rank rows by composite score, descending. Do not read or render the six-dimension detail in `scores/OPP-NNN.md`.
 
 ## Required output
 
@@ -25,7 +28,7 @@ One `<div class="section-block" id="portfolio">` block.
 ```html
 <div class="section-block" id="portfolio">
   <h2>The Full Portfolio</h2>
-  <p style="color:#64748b; font-size:13px;">12 opportunities evaluated — scored across 7 dimensions</p>
+  <p style="color:#64748b; font-size:13px;">[N] opportunities evaluated — scored across 6 dimensions</p>
   <table>
     <thead>
       <tr>
@@ -39,7 +42,7 @@ One `<div class="section-block" id="portfolio">` block.
       </tr>
     </thead>
     <tbody>
-      <!-- One row per ranked portfolio entry — 12 rows total -->
+      <!-- One row per scored opportunity, ranked by composite score descending -->
       <tr>
         <td>[rank]</td>
         <td>[OPP-NNN]</td>
@@ -98,15 +101,15 @@ Return a single `<div class="section-block" id="portfolio">` element. No `<html>
 
 ## Hard refusals
 
-- Do not render dimensional score tables — the per-OPP scored entries below `## Ranked Portfolio` are not rendered
-- Do not omit any of the 12 portfolio rows
+- Do not render dimensional score tables — the six-dimension entries in `scores/OPP-NNN.md` are not rendered
+- Do not omit any scored opportunity — render one row per OPP-ID present in `scores/_index.md`
 - Use only classes defined in the shell — do not invent CSS classes
 - Do not return wrapper HTML (`<html>`, `<body>`, `<style>`, `<script>`)
 
 ## Operating constraints
 
-- Source: `scored-opportunities.md` — `## Ranked Portfolio` section only
-- Row count: exactly 12 rows (one per opportunity)
+- Sources: `scores/_index.md` (composite + B/B/P), `opportunities/_index.md` (type), `opportunities/OPP-NNN.md` (title), `roadmap.md` (wave)
+- Row count: one row per OPP-ID in `scores/_index.md`
 - CSS classes: `section-block`, `uc-card-type`, `type-rpa`, `type-aug`, `type-ai`, `type-chain`, `type-data`, `type-agentic`, `score-bar-wrap`, `score-bar-track`, `score-bar-fill`, `score-value`, `wave-badge`, `w1`, `w2`, `w3`, `callout-note`
 - Do not invent CSS classes
 
