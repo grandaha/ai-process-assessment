@@ -12,3 +12,14 @@ PENDING = "PENDING"
 class Range:
     low: float
     high: float
+
+
+@dataclass(frozen=True)
+class CostBlock:
+    labor: float
+    tech_cost: float
+    integration_cost: float
+    change_mgmt: float
+    subtotal: float
+    contingency: float
+    total: float
