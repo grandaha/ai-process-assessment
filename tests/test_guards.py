@@ -171,3 +171,21 @@ def test_opportunities_index_has_structural_column(methodology):
     body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
     assert "struct=" in body, "Phase 5 index generation must extract struct="
     assert "| Structural |" in body, "opportunities/_index.md must add a Structural column"
+
+
+def test_scorer_references_structural_response(methodology):
+    body = methodology.agents["opportunity-scorer"].body
+    assert "optimizing-around" in body, \
+        "scorer must reference optimizing-around in its alignment rationale"
+    assert "does not change the composite" in body, \
+        "scorer must state the structural label does not change the composite"
+
+
+def test_portfolio_renderer_surfaces_struct(methodology):
+    body = methodology.agents["section-renderer-portfolio"].body
+    assert "Structural" in body, \
+        "portfolio renderer must read the Structural column"
+    assert "optimizing-around" in body, \
+        "portfolio renderer must render the optimizing-around value"
+    assert "not-applicable" in body, \
+        "portfolio renderer must define the not-applicable (empty) branch"
