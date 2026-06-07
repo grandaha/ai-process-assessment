@@ -202,3 +202,9 @@ def test_roadmap_renderer_surfaces_struct(methodology):
     body = methodology.agents["section-renderer-roadmap"].body
     assert "optimizing-around" in body, \
         "roadmap renderer must surface the optimizing-around annotation"
+
+
+def test_keystone_has_structural_challenge_rationalization(methodology):
+    body = methodology.skills["ai-process-assessment:using-methodology"].body
+    assert "faster broken process" in body, \
+        "keystone Master Rationalization Table must carry the structural-challenge row"

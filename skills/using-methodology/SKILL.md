@@ -16,7 +16,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 1 | `ai-process-assessment:scoping-engagement` | Front gate — sponsoring question, decision-maker, scope | New engagement prompt | `scope.md` |
 | 2 | `ai-process-assessment:mapping-context` | Org / strategic / political context | `scope.md` exists | `context.md` |
 | 3 | `ai-process-assessment:inventorying-tech-data` | Systems, APIs, data, enablers | `context.md` exists | `tech-inventory.md` |
-| 4 | `ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
+| 4 | `ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics, challenge hypothesis | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
 | 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
 | 6 | `ai-process-assessment:scoring-opportunities` | 6-dimension rubric + Build/Buy/Partner | `opportunities/_index.md` exists; GRC cleared for any flagged | `scores/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
 | 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scores/_index.md` saved; reviewer cleared | `roadmap.md` |
@@ -49,6 +49,7 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "The client wants AI, not automation." | The client wants outcomes. Type is determined by the work, not the brand. A misclassified RPA opportunity sold as AI fails on cost and reliability. |
 | "We've done this kind of engagement before." | The methodology travels; the answers don't. Reuse the structure, re-derive the content. |
 | "This step doesn't look like an AI candidate — let's skip it." | Evaluate every step in the context of its neighbors, not in isolation. A step where humans have comparative advantage on its own may belong in a chain because appending it eliminates a human verification checkpoint. Step-by-step comparative advantage logic fails when chains are present. |
+| "Map it, find the slow steps, automate them — that's the engagement." | First-order automation of a process whose structure is the real constraint produces a faster broken process. The Phase 4 challenge hypothesis surfaces the second-order question (boundary / actor model / sequence); the addressing-root vs. optimizing-around signal carries it to the client. Surface it; the client decides. |
 
 ## Routing Logic
 
