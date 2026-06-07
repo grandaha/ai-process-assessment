@@ -49,19 +49,23 @@ def cost_structure(labor_hours, labor_rate, tech_cost, integration_cost,
             change_mgmt_pct, contingency_pct)
     if any(a is None for a in args):
         return PENDING
-    labor = labor_hours * labor_rate
-    change_mgmt = labor * change_mgmt_pct
-    subtotal = labor + tech_cost + integration_cost + change_mgmt
-    contingency = subtotal * contingency_pct
-    total = subtotal + contingency
+    # Round at each step from rounded predecessors so the auditable workbook —
+    # whose cells reference other (rounded) cells — reproduces these figures
+    # exactly. Each displayed line is then internally consistent: e.g. contingency
+    # is exactly contingency_pct of the *displayed* subtotal.
+    labor = _money(labor_hours * labor_rate)
+    change_mgmt = _money(labor * change_mgmt_pct)
+    subtotal = _money(labor + tech_cost + integration_cost + change_mgmt)
+    contingency = _money(subtotal * contingency_pct)
+    total = _money(subtotal + contingency)
     return CostBlock(
-        labor=_money(labor),
+        labor=labor,
         tech_cost=_money(tech_cost),
         integration_cost=_money(integration_cost),
-        change_mgmt=_money(change_mgmt),
-        subtotal=_money(subtotal),
-        contingency=_money(contingency),
-        total=_money(total),
+        change_mgmt=change_mgmt,
+        subtotal=subtotal,
+        contingency=contingency,
+        total=total,
     )
 
 
