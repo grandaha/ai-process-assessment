@@ -1,7 +1,7 @@
 import pytest
 
 from engine.compute import value_range
-from engine.model import Range
+from engine.model import PENDING, Range
 
 
 def test_value_range_multiplies_improvement_by_volume_by_rate():
@@ -49,3 +49,20 @@ def test_cost_structure_rolls_up_all_categories():
         change_mgmt=40_000.0, subtotal=270_000.0,
         contingency=40_500.0, total=310_500.0,
     )
+
+
+from engine.compute import AACE_CLASS5_LABEL, initiative_rom
+
+
+def test_initiative_rom_is_plus_minus_fifty_percent_of_total():
+    cb = cost_structure(800, 200, 40_000, 30_000, 0.25, 0.15)  # total 310_500
+    rom = initiative_rom(cb)
+    assert rom == Range(155_250.0, 465_750.0)
+
+
+def test_initiative_rom_passes_pending_through():
+    assert initiative_rom(PENDING) == PENDING
+
+
+def test_aace_label_text():
+    assert AACE_CLASS5_LABEL == "ROM estimate, AACE Class 5 (±50%)"
