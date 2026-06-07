@@ -90,7 +90,7 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `context.md` — Phase 2
 - `tech-inventory.md` — Phase 3
 - `process-map.md` — Phase 4
-- `baselines.md` — Phase 4 (load-bearing — see Baseline & Value Hypothesis gate)
+- `baselines.md` — Phase 4 (load-bearing — see Baseline, Value & Challenge gate)
 - `opportunities/` — Phase 5 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
 - `grc/` — GRC Gate (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran)
 - `scores/` — Phase 6 (folder: `_index.md` + `OPP-NNN.md` per opportunity)

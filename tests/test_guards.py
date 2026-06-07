@@ -115,3 +115,42 @@ def test_process_mapper_captures_sponsor_structural_input(methodology):
     body = methodology.agents["process-mapper"].body
     assert "Sponsor structural input" in body, \
         "process-mapper Round 1 must capture 'Sponsor structural input'"
+
+
+def _all_methodology_md_text() -> str:
+    parts = []
+    for path in _methodology_markdown_files():
+        parts.append(path.read_text(encoding="utf-8"))
+    return "\n".join(parts)
+
+
+def test_phase4_gate_renamed_with_challenge_clause(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "Baseline, Value & Challenge Gate" in body, \
+        "Phase 4 gate must be renamed to 'Baseline, Value & Challenge Gate'"
+    assert "challenge hypothesis unavailable" in body, \
+        "Phase 4 gate must define the 'challenge hypothesis unavailable' remediation"
+
+
+def test_process_map_schema_has_challenge_hypothesis(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "Challenge hypothesis" in body, \
+        "process-map.md Key Outputs must include a Challenge hypothesis field"
+
+
+def _shipped_doc_text() -> str:
+    # The rename-completeness corpus: shipped methodology (skills/ + agents/)
+    # plus the two root-level user-facing docs. Deliberately excludes docs/
+    # (design notes quote the old name in before/after text) and tests/ (this
+    # file quotes the old name as an assertion literal).
+    text = _all_methodology_md_text()
+    for name in ("README.md", "system-prompt.md"):
+        text += "\n" + (REPO_ROOT / name).read_text(encoding="utf-8")
+    return text
+
+
+def test_old_gate_name_fully_renamed():
+    # Regression: the rename must be complete — the old proper-noun gate name
+    # must appear nowhere in the shipped methodology or the user-facing root docs.
+    assert "Baseline & Value Hypothesis" not in _shipped_doc_text(), \
+        "stale 'Baseline & Value Hypothesis' gate name remains after rename"
