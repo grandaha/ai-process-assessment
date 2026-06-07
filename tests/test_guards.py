@@ -246,3 +246,9 @@ def test_phase4_no_prose_volume_math():
     assert "model/baselines.json" in skill
     # No instruction to multiply volumes in prose.
     assert "results.json" in skill
+
+
+def test_deliverable_gate_has_determinism_check():
+    gate = (REPO_ROOT / "skills" / "deliverable-gate" / "SKILL.md").read_text()
+    assert "results.json" in gate
+    assert "determinism" in gate.lower()
