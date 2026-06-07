@@ -35,7 +35,7 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-usecase-methodology",
-    "version": "2.4.0",
+    "version": "2.5.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -227,6 +227,19 @@ Two subagents fire automatically at quality gates — no setup required. The pha
 | `grc-reviewer` | Inside the GRC gate, for each flagged opportunity | Regulatory exposure, model risk, auditability, failure consequence |
 
 Both agents operate without shared session context — they receive only the document under review. This is intentional.
+
+---
+
+### Python math engine (required for any shipped number)
+
+The methodology computes every number with a deterministic Python engine (`engine/`). Set it up once:
+
+```bash
+pip install -r requirements.txt   # openpyxl, pytest, formulas
+python -m pytest engine/tests -q  # verify the golden-number suite passes
+```
+
+Each numeric phase writes structured inputs to the engagement's `model/*.json`, then runs `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`. Without a code-execution environment the methodology still runs, but figures render "pending engine."
 
 ---
 

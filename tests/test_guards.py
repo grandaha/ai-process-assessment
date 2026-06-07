@@ -264,3 +264,14 @@ def test_keystone_states_no_prose_arithmetic_rule():
 def test_deliverable_links_workbook():
     deliv = (REPO_ROOT / "skills" / "building-deliverable" / "SKILL.md").read_text()
     assert "financial-model.xlsx" in deliv
+
+
+def test_pytest_includes_engine_tests():
+    cfg = (REPO_ROOT / "pytest.ini").read_text()
+    assert "engine/tests" in cfg
+
+
+def test_install_has_python_setup_step():
+    install = (REPO_ROOT / "INSTALL.md").read_text()
+    assert "pip install -r requirements.txt" in install
+    assert "engine" in install.lower()
