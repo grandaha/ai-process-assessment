@@ -34,7 +34,7 @@ The deliverable contains exactly 9 sections in this scroll order:
 |---|---|---|---|
 | Verdict | GO/NO-GO verdict, pull-quote, 3 why-now bullets | section-renderer-executive (block 1) | `#verdict` |
 | Problem | 3 oversized stat cards (time-to-fill, Day-1 incompletion, attrition cost) | section-renderer-problem | `#problem` |
-| Portfolio | 12-row visual portfolio table with type badges, score bars, wave pills | section-renderer-portfolio | `#portfolio` |
+| Portfolio | Ranked portfolio table (one row per scored opportunity) with type badges, score bars, wave pills | section-renderer-portfolio | `#portfolio` |
 | Use Cases | 7 compact Wave 1 initiative cards in a grid | section-renderer-roadmap (block 1) | `#usecases` |
 | Roadmap | 3-band wave timeline graphic | section-renderer-roadmap (block 2) | `#roadmap` |
 | Investment | 4 stat cards + ROM note | section-renderer-roadmap (block 3) | `#investment` |
@@ -182,7 +182,7 @@ The static shell includes a sticky nav immediately after `<body>`:
 ## Phase checklist
 
 - [ ] Confirm `executive-summary.md` exists in the engagement folder
-- [ ] Confirm all 5 source files exist: `executive-summary.md`, `baselines.md`, `scored-opportunities.md`, `roadmap.md`, `evidence-log.md`
+- [ ] Confirm all 5 source files exist: `executive-summary.md`, `baselines.md`, `scores/_index.md`, `roadmap.md`, `evidence-log.md`
 - [ ] In a single tool-call batch, dispatch all 5 section-renderer agents in parallel:
   - `section-renderer-executive` ← engagement folder path, section ID: `executive`
   - `section-renderer-problem` ← engagement folder path, section ID: `problem`
