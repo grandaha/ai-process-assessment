@@ -13,6 +13,7 @@ from engine.compute import (
     score_composite, value_range, wave1_aggregate,
 )
 from engine.model import PENDING, Range, load_inputs
+from engine.workbook import write_workbook
 
 
 def _range_out(r):
@@ -76,13 +77,7 @@ def main(argv=None):
     model_dir = engagement / "model"
     results = build_results(model_dir)
     (model_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-
-    # Workbook (wired in Task 12). Import here so Task 11 tests pass before workbook exists.
-    try:
-        from engine.workbook import write_workbook
-        write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
-    except ImportError:
-        pass
+    write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
     return 0
 
 
