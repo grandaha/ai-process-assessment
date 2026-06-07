@@ -275,3 +275,16 @@ def test_install_has_python_setup_step():
     install = (REPO_ROOT / "INSTALL.md").read_text()
     assert "pip install -r requirements.txt" in install
     assert "engine" in install.lower()
+
+
+def test_phase9_has_no_residual_prose_arithmetic():
+    # Defends: #9 final review — the engine-computed Phase 9 sections must not
+    # coexist with leftover compute-by-hand instructions (a self-contradiction
+    # that re-opens the prose-arithmetic the engine was built to eliminate).
+    skill = (REPO_ROOT / "skills" / "building-business-case" / "SKILL.md").read_text()
+    for phrase in ("sum ranges, compute", "compute rough payback",
+                   "compute payback as aggregate"):
+        assert phrase not in skill, f"residual prose arithmetic in skill: {phrase!r}"
+    agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
+    assert "Annual value calculation:** [improvement quantity] ×" not in agent
+    assert "aggregate computation" not in agent

@@ -118,7 +118,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 - **When:** After confirming all five source files exist, dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel tool-call batch.
 - **Pass to each subagent:** engagement folder path and UC-NNN file path for this initiative. The agent reads its own roadmap.md entry, UC-NNN.md, baselines.md rows, opportunities/OPP-NNN.md value hypothesis, scores/OPP-NNN.md B/B/P classification, and cost-actuals.md rows itself. Do not pass file content to the subagent.
 - **Return:** The agent writes its cost structure block and value case block to `<engagement-folder>/_staging/phase9/<initiative-id>.md`. Returns one-line summary: "initiative-id: ROM $X–$Y, value category." The orchestrator assembles `business-case.md` from staging files — it does NOT receive block content from subagents.
-- **What stays in main context:** Assembly of returned blocks, Wave 1 aggregate computation (sum ranges, compute payback), mandatory label verification, and Key Assumptions compilation.
+- **What stays in main context:** Assembly of returned blocks, reading the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` (engine-computed — never summed in prose), mandatory label verification, and Key Assumptions compilation.
 
 **Note:** Dispatch is the primary path. Do not fall back to main context unless dispatch explicitly fails and you cannot recover.
 
@@ -127,9 +127,10 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 - [ ] Confirm `usecase-briefs/_index.md` saved and reviewer cleared
 - [ ] Confirm cost-actuals.md exists in the engagement folder — halt and invoke Phase 8.5 if absent
 - [ ] Confirm all five source files exist
+- [ ] Write `model/{costs,value,initiatives}.json` and run `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
 - [ ] Collect returned cost/value blocks
-- [ ] Assemble Wave 1 aggregate (sum ranges, compute rough payback) in main context
+- [ ] Read the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` — engine-computed, never summed in prose
 - [ ] Verify: every figure has a ROM label; every Buy/Partner initiative flags missing vendor quote; one-time and recurring costs are separated; pilot-to-production warning is present on every cost block
 - [ ] Confirm `Key Assumptions` contains the three cannot-do statements
 - [ ] Confirm `What Would Tighten This Estimate` names specific missing inputs, not vague categories
@@ -141,8 +142,8 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 1. Confirm preconditions: `usecase-briefs/_index.md` exists and reviewer cleared.
 2. Confirm `cost-actuals.md` exists in the engagement folder. If absent: halt. Do not proceed. Invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) and complete it before returning to this phase.
 3. Confirm all five source files present.
-4. For each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data.
-5. Collect returned blocks. In main context: verify mandatory labels, assemble aggregate (sum low/high ranges separately, compute payback as aggregate investment range ÷ annual value range), compile Key Assumptions from all initiative blocks.
+4. Write the structured numeric inputs to `model/costs.json`, `model/value.json`, and `model/initiatives.json` (see the Deterministic math section), then run `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`. Then, for each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data; the agent cites its figures from `model/results.json`.
+5. Collect returned blocks. In main context: verify mandatory labels, read the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` (the engine sums the low/high ranges and computes payback — never compute in prose), compile Key Assumptions from all initiative blocks.
 6. Add the three cannot-do statements to Key Assumptions.
 7. Add What Would Tighten This Estimate — list specific missing inputs (vendor quotes for Buy/Partner initiatives, internal labor rate, integration complexity from IT).
 8. Add ROM Accuracy section: AACE Class 5 ±50% by default.
