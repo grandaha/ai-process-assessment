@@ -18,3 +18,9 @@ _staging/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
