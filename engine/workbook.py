@@ -49,19 +49,39 @@ def write_workbook(inputs, results, out_path) -> Path:
 
     IN = _q("Inputs")
 
+    # --- PENDING predicates (results.json is the source of truth) ---
+    # Missing inputs render as PENDING in both results.json AND the workbook —
+    # never as a fabricated number (spec §12). For a PENDING initiative we write
+    # the literal text "PENDING" into its downstream cells; SUM ignores text, so
+    # aggregates sum over present members only, matching results.json.
+    def _cost_pending(opp) -> bool:
+        return results["costs"].get(opp, {}).get("rom") == "PENDING"
+
+    def _value_pending(opp) -> bool:
+        return results["value"].get(opp, "PENDING") == "PENDING"
+
+    def _score_pending(opp) -> bool:
+        return results["scores"].get(opp, "PENDING") == "PENDING"
+
     # --- Value (P5): improvement × volume × rate ---
     ws_v = wb.create_sheet("Value (P5)")
     ws_v.append(["OPP-ID", "value_low", "value_high"])
     for opp, r in row_of.items():
-        ws_v.append([opp,
-                     f"={IN}!C{r}*{IN}!E{r}*{IN}!F{r}",   # impr_low*volume*rate
-                     f"={IN}!D{r}*{IN}!E{r}*{IN}!F{r}"])  # impr_high*volume*rate
+        if _value_pending(opp):
+            ws_v.append([opp, "PENDING", "PENDING"])
+        else:
+            ws_v.append([opp,
+                         f"={IN}!C{r}*{IN}!E{r}*{IN}!F{r}",   # impr_low*volume*rate
+                         f"={IN}!D{r}*{IN}!E{r}*{IN}!F{r}"])  # impr_high*volume*rate
 
     # --- Scores (P6): mean of 6 dims ---
     ws_s = wb.create_sheet("Scores (P6)")
     ws_s.append(["OPP-ID", "composite"])
     for opp, r in row_of.items():
-        ws_s.append([opp, f"=SUM({IN}!M{r}:R{r})/6"])
+        if _score_pending(opp):
+            ws_s.append([opp, "PENDING"])
+        else:
+            ws_s.append([opp, f"=SUM({IN}!M{r}:R{r})/6"])
 
     # --- Costs (P8.5): roll-up ---
     ws_c = wb.create_sheet("Costs (P8.5)")
@@ -69,17 +89,22 @@ def write_workbook(inputs, results, out_path) -> Path:
                  "total", "rom_low", "rom_high"])
     cost_row = {}
     for i, (opp, r) in enumerate(row_of.items(), start=2):
-        # labor=G*H ; cm=labor*K ; subtotal=labor+I+J+cm ; cont=subtotal*L ; total=subtotal+cont
-        ws_c.append([
-            opp,
-            f"={IN}!G{r}*{IN}!H{r}",                              # B labor
-            f"=B{i}*{IN}!K{r}",                                   # C change_mgmt
-            f"=B{i}+{IN}!I{r}+{IN}!J{r}+C{i}",                    # D subtotal
-            f"=D{i}*{IN}!L{r}",                                   # E contingency
-            f"=D{i}+E{i}",                                        # F total
-            f"=F{i}*0.5",                                         # G rom_low
-            f"=F{i}*1.5",                                         # H rom_high
-        ])
+        if _cost_pending(opp):
+            # 7 PENDINGs: labor, change_mgmt, subtotal, contingency, total, rom_low, rom_high
+            ws_c.append([opp, "PENDING", "PENDING", "PENDING", "PENDING",
+                         "PENDING", "PENDING", "PENDING"])
+        else:
+            # labor=G*H ; cm=labor*K ; subtotal=labor+I+J+cm ; cont=subtotal*L ; total=subtotal+cont
+            ws_c.append([
+                opp,
+                f"={IN}!G{r}*{IN}!H{r}",                              # B labor
+                f"=B{i}*{IN}!K{r}",                                   # C change_mgmt
+                f"=B{i}+{IN}!I{r}+{IN}!J{r}+C{i}",                    # D subtotal
+                f"=D{i}*{IN}!L{r}",                                   # E contingency
+                f"=D{i}+E{i}",                                        # F total
+                f"=F{i}*0.5",                                         # G rom_low
+                f"=F{i}*1.5",                                         # H rom_high
+            ])
         cost_row[opp] = i
 
     # --- Business Case (P9): per-initiative ROM (references Costs tab) ---
