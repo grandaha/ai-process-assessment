@@ -8,6 +8,12 @@ This methodology imposes discipline on use case identification work. It prevents
 
 ---
 
+## Deterministic math engine
+
+The methodology performs no arithmetic in prose. Every number is either a directly-sourced input recorded in the engagement's `model/*.json` files, or a value computed by the deterministic Python engine in `engine/` (`python -m engine.run <engagement-folder>/`) and read back from `model/results.json`. The engine also emits `financial-model.xlsx`, an auditable workbook with live formulas. `model/*.json` is the single source of truth; the deliverable-gate enforces that every figure in the markdown deliverables equals its `results.json` value. A missing input renders as **PENDING**, never a fabricated number. See `INSTALL.md` for setup.
+
+---
+
 ## Option B Setup (Claude.ai Projects)
 
 1. Create a new Claude.ai Project.
