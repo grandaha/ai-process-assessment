@@ -89,3 +89,20 @@ def wave1_aggregate(rom_ranges):
         _money(sum(r.low for r in present)),
         _money(sum(r.high for r in present)),
     )
+
+
+def payback(investment, annual_value):
+    """Payback period as a range of years.
+
+    best  = investment.low  / annual_value.high
+    worst = investment.high / annual_value.low
+    Returns PENDING if either input is PENDING or annual value is non-positive.
+    """
+    if investment == PENDING or annual_value == PENDING:
+        return PENDING
+    if annual_value.low <= 0 or annual_value.high <= 0:
+        return PENDING
+    return Range(
+        round(investment.low / annual_value.high, 2),
+        round(investment.high / annual_value.low, 2),
+    )
