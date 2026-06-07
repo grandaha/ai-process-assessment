@@ -233,3 +233,9 @@ def test_phase6_composite_from_engine():
     agent = (REPO_ROOT / "agents" / "opportunity-scorer.md").read_text()
     assert "model/scores.json" in agent
     assert "composite" in agent.lower()
+
+
+def test_phase5_value_inputs_to_engine():
+    skill = (REPO_ROOT / "skills" / "identifying-opportunities" / "SKILL.md").read_text()
+    assert "model/value.json" in skill
+    assert "results.json" in skill
