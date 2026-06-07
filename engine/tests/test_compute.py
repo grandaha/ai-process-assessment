@@ -80,3 +80,22 @@ def test_wave1_aggregate_skips_pending_members_but_flags_via_empty():
     # PENDING members are excluded from the sum; an all-PENDING list returns PENDING.
     assert wave1_aggregate([PENDING, PENDING]) == PENDING
     assert wave1_aggregate([Range(100, 300), PENDING]) == Range(100.0, 300.0)
+
+
+from engine.compute import payback
+
+
+def test_payback_years_best_and_worst_case():
+    pb = payback(Range(10_000, 30_000), Range(20_000, 40_000))
+    # best  = 10_000/40_000 = 0.25 ; worst = 30_000/20_000 = 1.5
+    assert pb == Range(0.25, 1.5)
+
+
+def test_payback_pending_when_either_input_pending():
+    assert payback(PENDING, Range(1, 2)) == PENDING
+    assert payback(Range(1, 2), PENDING) == PENDING
+
+
+def test_payback_pending_on_zero_value():
+    # No value => payback undefined => PENDING, never division-by-zero.
+    assert payback(Range(10_000, 30_000), Range(0, 0)) == PENDING
