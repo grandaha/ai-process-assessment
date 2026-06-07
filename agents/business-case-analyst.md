@@ -23,18 +23,11 @@ Single-initiative analyst. Receives one Wave 1 initiative's complete data packag
 
 If any required input is missing, refuse to produce that block and state which input is absent.
 
-## Methodology defaults (not field-collected — apply to all initiatives)
+## Source of every number
 
-Two line items use methodology-derived percentages, not stakeholder-provided figures:
+This analyst performs **no arithmetic**. All figures — labor roll-ups, change-management and contingency lines, the initiative ROM range, the Wave-1 aggregate, and payback — are computed by the deterministic engine and read from `model/results.json`. The analyst composes the prose cost-structure and value-case blocks *around* those engine outputs. PENDING discipline now lives in the engine: a `"PENDING"` value in `results.json` is surfaced verbatim with a note on the missing input; it is never replaced with an estimate.
 
-| Line item | Default | Basis |
-|---|---|---|
-| Change management | 20–30% of confirmed implementation labor total | Standard project methodology default |
-| Contingency | 15–20% of subtotal (before change management) | Standard project methodology default |
-
-These apply only when the implementation labor total is confirmed. If implementation labor is PENDING, change management and contingency are also PENDING.
-
-All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — must come from `cost-actuals.md`. If absent or PENDING, render as PENDING.
+The methodology defaults the engine applies (change management 20–30% of confirmed implementation labor; contingency 15–20% of subtotal) are engine parameters, not figures this analyst multiplies. All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — originate in `cost-actuals.md` / `model/costs.json`. If absent or `null`, the engine renders the figure as PENDING.
 
 ## Output format
 
@@ -49,7 +42,7 @@ Return one cost structure block per the format below. Use confirmed figures from
 
 | Cost category | Estimate | Basis |
 |---|---|---|
-| Implementation labor | [confirmed $low–$high OR **PENDING**] | [Hours × rate from cost-actuals.md — name both figures. If PENDING: "Hours estimate required from [owner from usecase-briefs.md] / Rate required from Finance"] |
+| Implementation labor | [read from results.json `costs.<OPP-ID>.labor` OR **PENDING**] | [labor = hours × rate, computed by the engine from `model/costs.json`/cost-actuals.md — name both source figures. If PENDING: "Hours estimate required from [owner from usecase-briefs.md] / Rate required from Finance"] |
 | Technology & licensing | [confirmed one-time: $low–$high; annual: $low–$high OR **PENDING**] | [Source from cost-actuals.md. If Buy/Partner and PENDING: "Vendor quote required — [vendor name] one-time + annual"] |
 | Integration & data engineering | [confirmed $low–$high OR **PENDING**] | [From cost-actuals.md IT integration estimates. If PENDING: "IT estimate required from [enabler owner from roadmap.md]"] |
 | Change management | [20–30% of confirmed labor OR **PENDING** (labor PENDING)] | Methodology default — 20–30% of implementation labor |
@@ -69,7 +62,7 @@ Return one cost structure block per the format below. Use confirmed figures from
 - **Named baseline:** [Exact baseline entry from baselines.md — cite the metric name and figure verbatim. No floating figures.]
 - **Value hypothesis:** [Verbatim from `opportunities/OPP-NNN.md` — do not paraphrase or re-derive.]
 - **Expected improvement:** [Drawn directly from the value hypothesis — state what changes and by how much.]
-- **Annual value calculation:** [improvement quantity] × [volume or frequency, sourced from baselines.md] × [rate or cost, sourced or flagged as benchmark] = **[low]–[high]/year**
+- **Annual value:** read from `model/results.json` `value.<OPP-ID>` = **[low]–[high]/year**. Name the improvement quantity, the volume/frequency (sourced from baselines.md), and the rate/cost (sourced or flagged as benchmark) — the engine multiplies them; do not multiply in prose.
 ```
 
 ## Refusal rules
@@ -87,7 +80,7 @@ Return one cost structure block per the format below. Use confirmed figures from
 
 - Receives only this initiative's data — no cross-initiative context
 - Produces exactly two blocks: cost structure + value case
-- Does not produce Wave 1 aggregate totals — aggregation is done in main context
+- Does not produce Wave 1 aggregate totals — the engine computes the aggregate; main context reads it from `model/results.json`
 - Does not add Key Assumptions — those are assembled in main context from all initiative blocks
 - Does not modify or restate the value hypothesis — verbatim only
 - Renders PENDING for any cost category where cost-actuals.md does not provide a confirmed figure — no estimation, no benchmarks for major cost drivers
@@ -95,4 +88,4 @@ Return one cost structure block per the format below. Use confirmed figures from
 
 ## Dispatch point
 
-Dispatched by `ai-process-assessment:building-business-case` (Phase 9) in a single parallel batch — one agent per Wave 1 initiative. Returns to main context for assembly, aggregate computation, and mandatory label verification.
+Dispatched by `ai-process-assessment:building-business-case` (Phase 9) in a single parallel batch — one agent per Wave 1 initiative. Returns to main context for assembly and mandatory label verification; the Wave 1 aggregate is engine-computed and read from `model/results.json`.

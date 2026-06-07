@@ -226,6 +226,10 @@ Page sections in this order:
 
 Because `section-renderer-executive` returns three blocks and `section-renderer-roadmap` returns three blocks, main context extracts each block by its `id="..."` anchor and places it in the specified page order. Blocks from a single renderer are not necessarily adjacent in the page.
 
+## Financial model artifact
+
+Link `financial-model.xlsx` as a downloadable artifact in the HTML deliverable (e.g. in the investment/roadmap section), and pull all headline figures from `model/results.json` — renderers cite computed results, they never recompute. The workbook lets a skeptical reviewer inspect and flex the math.
+
 ## Rationalization table
 
 | Rationalization / Shortcut | Correct reframe |

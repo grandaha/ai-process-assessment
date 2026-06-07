@@ -39,6 +39,10 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 
 **Categorical rule: Hypothesis statement must be written before value is estimated. This prevents reverse-engineering the hypothesis from a desired outcome.**
 
+## Value range (engine-computed)
+
+The value hypothesis is written *before* the number (hypothesis-before-value discipline is unchanged). The numeric range itself is **not** multiplied in prose. Record `{"opp_id": "...", "improvement_low": x, "improvement_high": y, "volume": v, "rate": r}` to the engagement's `model/value.json`, run `python -m engine.run <engagement-folder>/`, and cite the resulting `results.json` `value.<OPP-ID>` range in `opportunities/OPP-NNN.md`. `volume` and `rate` must each trace to a `baselines.md` row.
+
 ## Subagent Dispatch
 
 Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.

@@ -50,6 +50,13 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "We've done this kind of engagement before." | The methodology travels; the answers don't. Reuse the structure, re-derive the content. |
 | "This step doesn't look like an AI candidate — let's skip it." | Evaluate every step in the context of its neighbors, not in isolation. A step where humans have comparative advantage on its own may belong in a chain because appending it eliminates a human verification checkpoint. Step-by-step comparative advantage logic fails when chains are present. |
 | "Map it, find the slow steps, automate them — that's the engagement." | First-order automation of a process whose structure is the real constraint produces a faster broken process. The Phase 4 challenge hypothesis surfaces the second-order question (boundary / actor model / sequence); the addressing-root vs. optimizing-around signal carries it to the client. Surface it; the client decides. |
+| "I'll just compute this one figure inline — it's simple." | No number is computed in prose, ever. Even a one-line multiply is non-deterministic across runs and breaks auditability. Record the input in `model/*.json` and read the result from `results.json`. |
+
+## Deterministic Math Rule
+
+> **The model performs no arithmetic in prose, in any phase.** Every number is either a directly-sourced input recorded in `model/*.json`, or a value computed by the deterministic engine (`python -m engine.run <engagement>/`) and read back from `model/results.json`. A figure that is neither is a defect the deliverable-gate must catch.
+
+`model/*.json` is the single source of truth for every number; `results.json` and `financial-model.xlsx` are both derived from it. The deliverable-gate enforces markdown ↔ `results.json` equality. A missing input renders as **PENDING**, never a fabricated number.
 
 ## Routing Logic
 
@@ -99,6 +106,8 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `usecase-briefs/` — Phase 8 (folder: `_index.md` master index + `UC-NNN.md` per opportunity, one file per UC across all three waves)
 - `cost-actuals.md` — Phase 8.5 (labor rates, implementation hours, vendor quotes, IT integration estimates — required before Phase 9)
 - `business-case.md` — Phase 9
+- `model/` — structured numeric inputs (`value.json`, `scores.json`, `costs.json`, `baselines.json`, `initiatives.json`) and the engine output `results.json`
+- `financial-model.xlsx` — auditable workbook with live formulas (Apple Numbers / Google Sheets compatible)
 - `evidence-log.md` — running log of subagent reviews and gate clearances
 - `executive-summary.md` — Phase 10 (standalone 1–2 page exec brief; produced after deliverable-gate clearance)
 - `deliverable.html` — Phase 11 (self-contained client-ready HTML deliverable)
