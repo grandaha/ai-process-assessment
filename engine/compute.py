@@ -77,3 +77,15 @@ def initiative_rom(cost_block):
     if cost_block == PENDING:
         return PENDING
     return Range(_money(cost_block.total * 0.5), _money(cost_block.total * 1.5))
+
+
+def wave1_aggregate(rom_ranges):
+    """Aggregate Wave-1 range = sum of member ranges. PENDING members are excluded;
+    an all-PENDING (or empty) list returns PENDING."""
+    present = [r for r in rom_ranges if r != PENDING]
+    if not present:
+        return PENDING
+    return Range(
+        _money(sum(r.low for r in present)),
+        _money(sum(r.high for r in present)),
+    )
