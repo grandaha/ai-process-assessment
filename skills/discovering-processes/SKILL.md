@@ -38,7 +38,10 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 
 ## Four-Round Interview Sequence
 
-1. **Sponsor — strategic framing.** What does this process exist to achieve? What would success look like to the business?
+1. **Sponsor — strategic framing + structural challenge.** What does this process exist to achieve? What would success look like to the business? Then ask the three **structural challenge** questions, once per process the engagement will map. Ask the sponsor, not the operator — the operator will defend the current structure:
+   - **Is the process boundary right?** Does the process exist because of a legacy constraint (system limitation, org structure, manual handoff) that AI could eliminate entirely — making the process *unnecessary* rather than faster?
+   - **Is the actor model right?** Does the current allocation of steps to roles reflect what those roles should own, or what they were forced to own by capability limits that no longer apply?
+   - **Is the sequence right?** Does the order of steps reflect a logical dependency, or a historical artifact of how information used to flow?
 2. **Operator — actual execution.** Walk through the process as it actually runs. Capture the workarounds, the exceptions, the "we always have to..." moments.
 3. **Adjacent — upstream and downstream.** Talk to the people who feed this process and the people who consume its output. Their pain often defines the real opportunity.
 4. **Clarification — resolve conflicts.** Where rounds 1–3 disagree, return with specific questions and reconcile. Document the resolved version AND the disagreement.
