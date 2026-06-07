@@ -29,3 +29,23 @@ def test_score_composite_rounds_to_two_decimals():
 def test_score_composite_requires_exactly_six_dimensions():
     with pytest.raises(ValueError):
         score_composite([3, 4, 5])
+
+
+from engine.compute import cost_structure
+from engine.model import CostBlock
+
+
+def test_cost_structure_rolls_up_all_categories():
+    # labor = 800*200 = 160_000 ; cm = 160_000*0.25 = 40_000
+    # subtotal = 160_000 + 40_000(tech) + 30_000(integ) + 40_000(cm) = 270_000
+    # contingency = 270_000*0.15 = 40_500 ; total = 310_500
+    cb = cost_structure(
+        labor_hours=800, labor_rate=200,
+        tech_cost=40_000, integration_cost=30_000,
+        change_mgmt_pct=0.25, contingency_pct=0.15,
+    )
+    assert cb == CostBlock(
+        labor=160_000.0, tech_cost=40_000.0, integration_cost=30_000.0,
+        change_mgmt=40_000.0, subtotal=270_000.0,
+        contingency=40_500.0, total=310_500.0,
+    )

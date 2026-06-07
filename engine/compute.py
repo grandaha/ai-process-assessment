@@ -5,7 +5,7 @@ required input returns PENDING (never a fabricated number).
 """
 from __future__ import annotations
 
-from engine.model import PENDING, Range
+from engine.model import CostBlock, PENDING, Range
 
 _MONEY_DP = 2
 
@@ -34,3 +34,32 @@ def score_composite(dimensions):
     if len(dimensions) != 6:
         raise ValueError(f"expected 6 dimensions, got {len(dimensions)}")
     return round(sum(dimensions) / 6, 2)
+
+
+def cost_structure(labor_hours, labor_rate, tech_cost, integration_cost,
+                   change_mgmt_pct, contingency_pct):
+    """Cost roll-up for an initiative (P8.5/P9).
+
+    labor = hours*rate ; change_mgmt = labor*pct ;
+    subtotal = labor + tech + integration + change_mgmt ;
+    contingency = subtotal*pct ; total = subtotal + contingency.
+    Returns PENDING if any input is None.
+    """
+    args = (labor_hours, labor_rate, tech_cost, integration_cost,
+            change_mgmt_pct, contingency_pct)
+    if any(a is None for a in args):
+        return PENDING
+    labor = labor_hours * labor_rate
+    change_mgmt = labor * change_mgmt_pct
+    subtotal = labor + tech_cost + integration_cost + change_mgmt
+    contingency = subtotal * contingency_pct
+    total = subtotal + contingency
+    return CostBlock(
+        labor=_money(labor),
+        tech_cost=_money(tech_cost),
+        integration_cost=_money(integration_cost),
+        change_mgmt=_money(change_mgmt),
+        subtotal=_money(subtotal),
+        contingency=_money(contingency),
+        total=_money(total),
+    )
