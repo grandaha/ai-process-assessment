@@ -81,6 +81,8 @@ Seven compact `.uc-card` elements in a `.uc-grid`, ordered by score descending p
 - B/B/P: from the initiative's Sourcing section
 - Score bar: fill width = `round(score / 5 * 100)%`
 
+**Structural annotation (when present in `roadmap.md`):** If a Wave-1 initiative card carries a `Structural: optimizing-around` annotation in `roadmap.md`, render it as a footnote line within `uc-card-body` using a semantic `<em>` tag: `<em>optimizing-around — speeds a process flagged for redesign</em>`. Render nothing when the annotation is absent. Do not invent the annotation — surface it only when it is present in `roadmap.md`. `<em>` is an inline HTML element, not a CSS class — this complies with the no-invent-classes refusal; do not add a new CSS class for this.
+
 ---
 
 ### Block 2 — `#roadmap`
