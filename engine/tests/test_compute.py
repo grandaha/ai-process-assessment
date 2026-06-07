@@ -66,3 +66,17 @@ def test_initiative_rom_passes_pending_through():
 
 def test_aace_label_text():
     assert AACE_CLASS5_LABEL == "ROM estimate, AACE Class 5 (±50%)"
+
+
+from engine.compute import wave1_aggregate
+
+
+def test_wave1_aggregate_sums_lows_and_highs():
+    agg = wave1_aggregate([Range(100, 300), Range(200, 600)])
+    assert agg == Range(300.0, 900.0)
+
+
+def test_wave1_aggregate_skips_pending_members_but_flags_via_empty():
+    # PENDING members are excluded from the sum; an all-PENDING list returns PENDING.
+    assert wave1_aggregate([PENDING, PENDING]) == PENDING
+    assert wave1_aggregate([Range(100, 300), PENDING]) == Range(100.0, 300.0)
