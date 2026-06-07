@@ -25,3 +25,12 @@ def value_range(improvement_low, improvement_high, volume, rate):
         _money(improvement_low * volume * rate),
         _money(improvement_high * volume * rate),
     )
+
+
+def score_composite(dimensions):
+    """Composite score = mean of exactly six dimensions, rounded to 2 dp (P6)."""
+    if dimensions is None or any(d is None for d in dimensions):
+        return PENDING
+    if len(dimensions) != 6:
+        raise ValueError(f"expected 6 dimensions, got {len(dimensions)}")
+    return round(sum(dimensions) / 6, 2)
