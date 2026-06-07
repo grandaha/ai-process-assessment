@@ -39,6 +39,8 @@ Score each dimension 1–5. Every score requires a source citation. Refuse to sc
 
 **Categorical rule:** Cite the source document AND the specific field or figure that supports each score. "Based on context.md" is not a citation — name the specific content.
 
+**Structural response (read-through, no score change).** The opportunity carries a `Structural response` from Phase 5 (`addressing-root` / `optimizing-around` / `not-applicable`). When it is `optimizing-around`, note that fact in the Strategic Alignment rationale so the score's reasoning is honest about what the opportunity does and does not resolve. This is a read-through annotation only: it does not change the Strategic Alignment score and does not change the composite. The methodology surfaces the trade-off; it does not penalize it.
+
 ## Build/Buy/Partner Classification
 
 Required for every scored opportunity. Evaluate four inputs, then output one of: Build / Buy / Partner / Hybrid.

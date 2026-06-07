@@ -95,3 +95,116 @@ def test_sample_sequences_gate_b_before_phase10(methodology):
     assert phase10_idx is not None, "sample table has no Phase 10 row"
     assert gate_b_idx < phase10_idx, \
         "sample sequences Gate B after Phase 10 (#8 regression)"
+
+# --- #10 structural-challenge gate (defends: first-order-only methodology, issue #10) ---
+# The Phase 4 gate gains a third clause (challenge hypothesis); Phase 5 emits a
+# struct= signal that threads to the portfolio and roadmap views. Annotation only.
+
+
+def test_phase4_sponsor_round_has_structural_challenge(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    for marker in (
+        "Is the process boundary right?",
+        "Is the actor model right?",
+        "Is the sequence right?",
+    ):
+        assert marker in body, f"Phase 4 Round 1 missing challenge question: {marker!r}"
+
+
+def test_process_mapper_captures_sponsor_structural_input(methodology):
+    body = methodology.agents["process-mapper"].body
+    assert "Sponsor structural input" in body, \
+        "process-mapper Round 1 must capture 'Sponsor structural input'"
+
+
+def _all_methodology_md_text() -> str:
+    parts = []
+    for path in _methodology_markdown_files():
+        parts.append(path.read_text(encoding="utf-8"))
+    return "\n".join(parts)
+
+
+def test_phase4_gate_renamed_with_challenge_clause(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "Baseline, Value & Challenge Gate" in body, \
+        "Phase 4 gate must be renamed to 'Baseline, Value & Challenge Gate'"
+    assert "challenge hypothesis unavailable" in body, \
+        "Phase 4 gate must define the 'challenge hypothesis unavailable' remediation"
+
+
+def test_process_map_schema_has_challenge_hypothesis(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "Challenge hypothesis" in body, \
+        "process-map.md Key Outputs must include a Challenge hypothesis field"
+
+
+def _shipped_doc_text() -> str:
+    # The rename-completeness corpus: shipped methodology (skills/ + agents/)
+    # plus the two root-level user-facing docs. Deliberately excludes docs/
+    # (design notes quote the old name in before/after text) and tests/ (this
+    # file quotes the old name as an assertion literal).
+    text = _all_methodology_md_text()
+    for name in ("README.md", "system-prompt.md"):
+        text += "\n" + (REPO_ROOT / name).read_text(encoding="utf-8")
+    return text
+
+
+def test_old_gate_name_fully_renamed():
+    # Regression: the rename must be complete — the old proper-noun gate name
+    # must appear nowhere in the shipped methodology or the user-facing root docs.
+    assert "Baseline & Value Hypothesis" not in _shipped_doc_text(), \
+        "stale 'Baseline & Value Hypothesis' gate name remains after rename"
+
+
+STRUCT_VALUES = ("addressing-root", "optimizing-around", "not-applicable")
+
+
+def test_typer_defines_structural_response_token(methodology):
+    body = methodology.agents["opportunity-typer"].body
+    assert "Structural response" in body, "typer missing 'Structural response' field"
+    assert "struct=" in body, "typer missing 'struct=' extraction token"
+    for v in STRUCT_VALUES:
+        assert v in body, f"typer missing struct value {v!r}"
+
+
+def test_opportunities_index_has_structural_column(methodology):
+    body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
+    assert "struct=" in body, "Phase 5 index generation must extract struct="
+    assert "| Structural |" in body, "opportunities/_index.md must add a Structural column"
+
+
+def test_scorer_references_structural_response(methodology):
+    body = methodology.agents["opportunity-scorer"].body
+    assert "optimizing-around" in body, \
+        "scorer must reference optimizing-around in its alignment rationale"
+    assert "does not change the composite" in body, \
+        "scorer must state the structural label does not change the composite"
+
+
+def test_portfolio_renderer_surfaces_struct(methodology):
+    body = methodology.agents["section-renderer-portfolio"].body
+    assert "Structural" in body, \
+        "portfolio renderer must read the Structural column"
+    assert "optimizing-around" in body, \
+        "portfolio renderer must render the optimizing-around value"
+    assert "not-applicable" in body, \
+        "portfolio renderer must define the not-applicable (empty) branch"
+
+
+def test_roadmap_skill_threads_struct(methodology):
+    body = methodology.skills["ai-process-assessment:prioritizing-roadmap"].body
+    assert "struct" in body, "roadmap skill must read the struct signal"
+    assert "optimizing-around" in body, \
+        "roadmap skill must annotate optimizing-around items"
+
+
+def test_roadmap_renderer_surfaces_struct(methodology):
+    body = methodology.agents["section-renderer-roadmap"].body
+    assert "optimizing-around" in body, \
+        "roadmap renderer must surface the optimizing-around annotation"
+
+
+def test_keystone_has_structural_challenge_rationalization(methodology):
+    body = methodology.skills["ai-process-assessment:using-methodology"].body
+    assert "faster broken process" in body, \
+        "keystone Master Rationalization Table must carry the structural-challenge row"

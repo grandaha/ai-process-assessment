@@ -16,6 +16,7 @@ Synthesis renderer. Assembles the ranked portfolio by joining the normalized Pha
 |---|---|---|
 | Composite scores + sourcing | `scores/_index.md` | `OPP-ID \| Composite \| Horizon \| B/B/P` table — the ranking source |
 | Opportunity types | `opportunities/_index.md` | `OPP-ID \| Process \| Type \| ...` table — the Type per OPP |
+| Structural response | `opportunities/_index.md` | `Structural` column — `addressing-root` / `optimizing-around` / `not-applicable` per OPP |
 | Opportunity titles | `opportunities/OPP-NNN.md` | the `## OPP-NNN — [title]` header line, per OPP |
 | Wave assignment | `roadmap.md` | which wave (Foundation→1, Scale→2, Optimize→3) each OPP is sequenced into |
 
@@ -36,6 +37,7 @@ One `<div class="section-block" id="portfolio">` block.
         <th>OPP</th>
         <th>Title</th>
         <th>Type</th>
+        <th>Structural</th>
         <th>Score</th>
         <th>Wave</th>
         <th>B/B/P</th>
@@ -48,6 +50,7 @@ One `<div class="section-block" id="portfolio">` block.
         <td>[OPP-NNN]</td>
         <td>[title]</td>
         <td><span class="uc-card-type type-[modifier]">[type label]</span></td>
+        <td>[Structural value from opportunities/_index.md — three branches: optimizing-around → <em>optimizing-around</em>; addressing-root → plain text addressing-root; not-applicable → leave the cell empty]</td>
         <td>
           <div class="score-bar-wrap">
             <div class="score-bar-track">
@@ -76,6 +79,13 @@ One `<div class="section-block" id="portfolio">` block.
 - Agentic → `type-agentic`
 
 The type label in the span text matches the source value verbatim.
+
+**Structural column — surface the trade-off:**
+- `optimizing-around` → render the value with light emphasis using a semantic `<em>` tag: `<em>optimizing-around</em>` (this opportunity speeds a process the challenge hypothesis flagged for redesign). `<em>` is an inline HTML element, not a CSS class — this complies with the no-invent-classes refusal below.
+- `addressing-root` → render the plain text `addressing-root`
+- `not-applicable` → render nothing — leave the cell empty (process was cleared structurally sound)
+
+Source the value from the `Structural` column of `opportunities/_index.md` via the existing OPP-ID join. Do not change rank or score — this column is informational. Do not introduce a CSS class for this column.
 
 **Score column — score bar calculation:**
 - Score bar fill width = `round(score / 5 * 100)%`
