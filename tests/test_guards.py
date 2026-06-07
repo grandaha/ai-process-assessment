@@ -239,3 +239,10 @@ def test_phase5_value_inputs_to_engine():
     skill = (REPO_ROOT / "skills" / "identifying-opportunities" / "SKILL.md").read_text()
     assert "model/value.json" in skill
     assert "results.json" in skill
+
+
+def test_phase4_no_prose_volume_math():
+    skill = (REPO_ROOT / "skills" / "discovering-processes" / "SKILL.md").read_text()
+    assert "model/baselines.json" in skill
+    # No instruction to multiply volumes in prose.
+    assert "results.json" in skill

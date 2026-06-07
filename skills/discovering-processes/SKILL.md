@@ -38,6 +38,10 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 
 **Challenge clause (second-order check).** For every process mapped, `process-map.md` MUST also carry a **challenge hypothesis** (see Key Outputs). Automate a broken process and you get a faster broken process — this clause forces the question of whether the process structure itself is the constraint before any automation is typed. A process with no challenge hypothesis does not advance to Phase 5: it is logged as "challenge hypothesis unavailable" with a remediation action (return to the sponsor for the three structural questions), identically to a missing baseline. The hypothesis *surfaces* the redesign question; it does not solve it, and the signal it produces downstream annotates — it never blocks opportunity creation.
 
+## Recording baselines for the engine
+
+Capture each baseline as raw, sourced inputs in the engagement's `model/baselines.json` (per process: `volume`, `cycle_time_median`, `cycle_time_p90`, `error_rate`, `fte`, and the source). Any *derived* figure (e.g. a monthly volume that is `per-period × periods`, or an FTE roll-up) is computed by the engine, not multiplied in prose. `baselines.md` remains the human-readable, source-cited narrative; `model/baselines.json` feeds the engine and downstream `results.json` so every derived figure is deterministic and auditable.
+
 ## Four-Round Interview Sequence
 
 1. **Sponsor — strategic framing + structural challenge.** What does this process exist to achieve? What would success look like to the business? Then ask the three **structural challenge** questions, once per process the engagement will map. Ask the sponsor, not the operator — the operator will defend the current structure:
