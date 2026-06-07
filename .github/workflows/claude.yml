@@ -32,7 +32,9 @@ jobs:
           fetch-depth: 0
 
       - name: Run Claude Code
-        uses: anthropics/claude-code-action@v1
+        # Pinned to an explicit release — the moving v1 tag currently hits an
+        # internal "tsconfig fd 4 directory mismatch" bug in the prepare step.
+        uses: anthropics/claude-code-action@v1.0.140
         with:
           # Auth via Claude subscription (no API billing). Generate with
           # `claude setup-token` and store as the CLAUDE_CODE_OAUTH_TOKEN secret.
