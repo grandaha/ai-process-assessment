@@ -13,3 +13,8 @@ docs/engagements/
 
 # Subagent staging area
 _staging/
+
+# Python (test suite artifacts)
+__pycache__/
+*.py[cod]
+.pytest_cache/
