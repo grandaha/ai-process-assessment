@@ -225,3 +225,11 @@ def test_phase85_writes_cost_inputs_for_engine():
     skill = (REPO_ROOT / "skills" / "collecting-cost-actuals" / "SKILL.md").read_text()
     assert "model/costs.json" in skill
     assert "null" in skill  # missing inputs recorded as null -> PENDING
+
+
+def test_phase6_composite_from_engine():
+    skill = (REPO_ROOT / "skills" / "scoring-opportunities" / "SKILL.md").read_text()
+    assert "model/scores.json" in skill
+    agent = (REPO_ROOT / "agents" / "opportunity-scorer.md").read_text()
+    assert "model/scores.json" in agent
+    assert "composite" in agent.lower()

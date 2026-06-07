@@ -84,6 +84,10 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 
 **Execution Horizon is a required field on every scored opportunity entry: Short-run / Long-run with one-sentence rationale. This field is consumed by Phase 7 sequencing.**
 
+## Composite score (engine-computed)
+
+The composite is **not** averaged by the model in prose. Each scorer records its six dimension scores for an OPP-ID into the engagement's `model/scores.json` (`{"opp_id": "...", "dimensions": [d1..d6]}`). After all opportunities are scored, run `python -m engine.run <engagement-folder>/`; the composite for each OPP-ID is read from `results.json` `scores.<OPP-ID>` and stamped into `scores/OPP-NNN.md` and `scores/_index.md`.
+
 ## Build/Buy/Partner Classification
 
 Required for every scored opportunity. Inputs:
