@@ -49,10 +49,8 @@ def cost_structure(labor_hours, labor_rate, tech_cost, integration_cost,
             change_mgmt_pct, contingency_pct)
     if any(a is None for a in args):
         return PENDING
-    # Round at each step from rounded predecessors so the auditable workbook —
-    # whose cells reference other (rounded) cells — reproduces these figures
-    # exactly. Each displayed line is then internally consistent: e.g. contingency
-    # is exactly contingency_pct of the *displayed* subtotal.
+    # Round at each step from rounded predecessors so the workbook (whose cells
+    # reference other rounded cells) reproduces these figures exactly.
     labor = _money(labor_hours * labor_rate)
     change_mgmt = _money(labor * change_mgmt_pct)
     subtotal = _money(labor + tech_cost + integration_cost + change_mgmt)
