@@ -154,3 +154,20 @@ def test_old_gate_name_fully_renamed():
     # must appear nowhere in the shipped methodology or the user-facing root docs.
     assert "Baseline & Value Hypothesis" not in _shipped_doc_text(), \
         "stale 'Baseline & Value Hypothesis' gate name remains after rename"
+
+
+STRUCT_VALUES = ("addressing-root", "optimizing-around", "not-applicable")
+
+
+def test_typer_defines_structural_response_token(methodology):
+    body = methodology.agents["opportunity-typer"].body
+    assert "Structural response" in body, "typer missing 'Structural response' field"
+    assert "struct=" in body, "typer missing 'struct=' extraction token"
+    for v in STRUCT_VALUES:
+        assert v in body, f"typer missing struct value {v!r}"
+
+
+def test_opportunities_index_has_structural_column(methodology):
+    body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
+    assert "struct=" in body, "Phase 5 index generation must extract struct="
+    assert "| Structural |" in body, "opportunities/_index.md must add a Structural column"
