@@ -19,6 +19,18 @@ This skill runs as a standalone session. At session start:
 
 Gate condition: All six files must be present. `cost-actuals.md` must have no unresolved PENDING items for Wave 1 initiatives.
 
+## Deterministic math (engine-computed — no prose arithmetic)
+
+Phase 9 performs **no arithmetic in prose**. Every figure is computed by the engine and read back from `model/results.json`.
+
+1. After confirming inputs from `cost-actuals.md` and the Wave-1 `opportunities/OPP-NNN.md` value hypotheses, write the structured inputs to the engagement's `model/` folder:
+   - `model/costs.json` — one object per Wave-1 OPP-ID: `labor_hours`, `labor_rate`, `tech_cost`, `integration_cost`, `change_mgmt_pct`, `contingency_pct`. A figure not yet available is recorded as `null` (renders PENDING — never invent it).
+   - `model/value.json` — `improvement_low`, `improvement_high`, `volume`, `rate` per OPP-ID (from the verbatim value hypothesis; do not re-derive).
+   - `model/initiatives.json` — `opp_id`, `name`, `wave` per Wave-1 OPP-ID.
+2. Run the engine: `python -m engine.run <engagement-folder>/`. This writes `model/results.json` and `financial-model.xlsx`.
+3. Populate every figure in `business-case.md` by citing `results.json` (per-initiative `costs.*.rom`, `value`, and `wave1_aggregate.investment` / `value` / `payback_years`). The ROM label `AACE Class 5 (±50%)` comes from `results.json` `rom_label`.
+4. Any `results.json` value equal to `"PENDING"` renders as **PENDING** in the business case with a note on what input is missing — never a fabricated number.
+
 ## Role in the system
 
 The business case answers "what does Wave 1 cost and what is it worth?" — sourced entirely from methodology artifacts already produced. It is not a financial model. It is a ROM estimate (AACE Class 5, ±50%) that gives decision-makers a magnitude check before the deliverable gate.
@@ -61,7 +73,7 @@ The file contains exactly these sections, in this order:
 
 ### Per-initiative cost structure format
 
-For each Wave 1 initiative, produce one labeled block:
+For each Wave 1 initiative, produce one labeled block. Each `[range]` and the **Initiative ROM range** are read from `model/results.json` (`costs.<OPP-ID>`), not computed here.
 
 | Cost category | Estimate | Basis |
 |---|---|---|
@@ -85,7 +97,7 @@ For each Wave 1 initiative:
 - **Named baseline:** cite the exact baseline entry from `baselines.md` — no floating figures
 - **Value hypothesis:** verbatim from `opportunities/OPP-NNN.md` — not re-derived or paraphrased
 - **Expected improvement:** drawn from the value hypothesis, not invented
-- **Annual value calculation:** improvement × volume × rate — every component named and sourced
+- **Annual value calculation:** read from `model/results.json` (`value.<OPP-ID>`) — the engine computes improvement × volume × rate; every component is named and sourced in prose but not multiplied here
 
 ## What this skill cannot do
 

@@ -23,18 +23,11 @@ Single-initiative analyst. Receives one Wave 1 initiative's complete data packag
 
 If any required input is missing, refuse to produce that block and state which input is absent.
 
-## Methodology defaults (not field-collected — apply to all initiatives)
+## Source of every number
 
-Two line items use methodology-derived percentages, not stakeholder-provided figures:
+This analyst performs **no arithmetic**. All figures — labor roll-ups, change-management and contingency lines, the initiative ROM range, the Wave-1 aggregate, and payback — are computed by the deterministic engine and read from `model/results.json`. The analyst composes the prose cost-structure and value-case blocks *around* those engine outputs. PENDING discipline now lives in the engine: a `"PENDING"` value in `results.json` is surfaced verbatim with a note on the missing input; it is never replaced with an estimate.
 
-| Line item | Default | Basis |
-|---|---|---|
-| Change management | 20–30% of confirmed implementation labor total | Standard project methodology default |
-| Contingency | 15–20% of subtotal (before change management) | Standard project methodology default |
-
-These apply only when the implementation labor total is confirmed. If implementation labor is PENDING, change management and contingency are also PENDING.
-
-All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — must come from `cost-actuals.md`. If absent or PENDING, render as PENDING.
+The methodology defaults the engine applies (change management 20–30% of confirmed implementation labor; contingency 15–20% of subtotal) are engine parameters, not figures this analyst multiplies. All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — originate in `cost-actuals.md` / `model/costs.json`. If absent or `null`, the engine renders the figure as PENDING.
 
 ## Output format
 
