@@ -1,0 +1,4 @@
+[
+  {"opp_id": "OPP-001", "name": "Status Reporting Assistant", "wave": 1},
+  {"opp_id": "OPP-002", "name": "Time-Entry Anomaly Flagging", "wave": 1}
+]

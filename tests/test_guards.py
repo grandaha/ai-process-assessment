@@ -208,3 +208,83 @@ def test_keystone_has_structural_challenge_rationalization(methodology):
     body = methodology.skills["ai-process-assessment:using-methodology"].body
     assert "faster broken process" in body, \
         "keystone Master Rationalization Table must carry the structural-challenge row"
+
+
+def test_phase9_cites_engine_not_prose_math():
+    skill = (REPO_ROOT / "skills" / "building-business-case" / "SKILL.md").read_text()
+    assert "model/costs.json" in skill
+    assert "python -m engine.run" in skill
+    assert "results.json" in skill
+    agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
+    assert "results.json" in agent
+    # The analyst no longer computes ROM ranges itself.
+    assert "compute" not in agent.lower() or "engine" in agent.lower()
+
+
+def test_phase85_writes_cost_inputs_for_engine():
+    skill = (REPO_ROOT / "skills" / "collecting-cost-actuals" / "SKILL.md").read_text()
+    assert "model/costs.json" in skill
+    assert "null" in skill  # missing inputs recorded as null -> PENDING
+
+
+def test_phase6_composite_from_engine():
+    skill = (REPO_ROOT / "skills" / "scoring-opportunities" / "SKILL.md").read_text()
+    assert "model/scores.json" in skill
+    agent = (REPO_ROOT / "agents" / "opportunity-scorer.md").read_text()
+    assert "model/scores.json" in agent
+    assert "composite" in agent.lower()
+
+
+def test_phase5_value_inputs_to_engine():
+    skill = (REPO_ROOT / "skills" / "identifying-opportunities" / "SKILL.md").read_text()
+    assert "model/value.json" in skill
+    assert "results.json" in skill
+
+
+def test_phase4_no_prose_volume_math():
+    skill = (REPO_ROOT / "skills" / "discovering-processes" / "SKILL.md").read_text()
+    assert "model/baselines.json" in skill
+    # No instruction to multiply volumes in prose.
+    assert "results.json" in skill
+
+
+def test_deliverable_gate_has_determinism_check():
+    gate = (REPO_ROOT / "skills" / "deliverable-gate" / "SKILL.md").read_text()
+    assert "results.json" in gate
+    assert "determinism" in gate.lower()
+
+
+def test_keystone_states_no_prose_arithmetic_rule():
+    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text()
+    assert "no arithmetic in prose" in keystone.lower() or "no prose arithmetic" in keystone.lower()
+    assert "results.json" in keystone
+    assert "model/" in keystone  # engagement folder convention includes model/
+
+
+def test_deliverable_links_workbook():
+    deliv = (REPO_ROOT / "skills" / "building-deliverable" / "SKILL.md").read_text()
+    assert "financial-model.xlsx" in deliv
+
+
+def test_pytest_includes_engine_tests():
+    cfg = (REPO_ROOT / "pytest.ini").read_text()
+    assert "engine/tests" in cfg
+
+
+def test_install_has_python_setup_step():
+    install = (REPO_ROOT / "INSTALL.md").read_text()
+    assert "pip install -r requirements.txt" in install
+    assert "engine" in install.lower()
+
+
+def test_phase9_has_no_residual_prose_arithmetic():
+    # Defends: #9 final review — the engine-computed Phase 9 sections must not
+    # coexist with leftover compute-by-hand instructions (a self-contradiction
+    # that re-opens the prose-arithmetic the engine was built to eliminate).
+    skill = (REPO_ROOT / "skills" / "building-business-case" / "SKILL.md").read_text()
+    for phrase in ("sum ranges, compute", "compute rough payback",
+                   "compute payback as aggregate"):
+        assert phrase not in skill, f"residual prose arithmetic in skill: {phrase!r}"
+    agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
+    assert "Annual value calculation:** [improvement quantity] ×" not in agent
+    assert "aggregate computation" not in agent

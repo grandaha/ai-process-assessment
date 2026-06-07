@@ -1,0 +1,4 @@
+[
+  {"opp_id": "OPP-001", "improvement_low": 0.5, "improvement_high": 0.7, "volume": 8000, "rate": 100},
+  {"opp_id": "OPP-002", "improvement_low": 0.2, "improvement_high": 0.4, "volume": 5000, "rate": 100}
+]
