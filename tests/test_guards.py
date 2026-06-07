@@ -252,3 +252,15 @@ def test_deliverable_gate_has_determinism_check():
     gate = (REPO_ROOT / "skills" / "deliverable-gate" / "SKILL.md").read_text()
     assert "results.json" in gate
     assert "determinism" in gate.lower()
+
+
+def test_keystone_states_no_prose_arithmetic_rule():
+    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text()
+    assert "no arithmetic in prose" in keystone.lower() or "no prose arithmetic" in keystone.lower()
+    assert "results.json" in keystone
+    assert "model/" in keystone  # engagement folder convention includes model/
+
+
+def test_deliverable_links_workbook():
+    deliv = (REPO_ROOT / "skills" / "building-deliverable" / "SKILL.md").read_text()
+    assert "financial-model.xlsx" in deliv
