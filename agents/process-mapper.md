@@ -25,7 +25,7 @@ If any required input is missing, refuse to synthesize the affected round and st
 
 Synthesize this round's raw notes into structured per-process entries following the `process-map.md` field schema below, plus the `baselines.md` fields the round surfaced. Capture only what the round's notes actually contain — read the notes through the lens of this round:
 
-- **Round 1 — Sponsor (strategic framing):** what the process exists to achieve, what success looks like to the business, constraints, and any baseline estimates the sponsor offered (mark these Low confidence unless system-sourced).
+- **Round 1 — Sponsor (strategic framing):** what the process exists to achieve, what success looks like to the business, constraints, and any baseline estimates the sponsor offered (mark these Low confidence unless system-sourced). **Also capture the sponsor's raw answers to the three structural challenge questions** (boundary / actor model / sequence) in a `Sponsor structural input` field per process. Capture the answers verbatim-in-substance; do NOT synthesize the final challenge hypothesis — that is the orchestrator's assembly judgment, like the baseline gate.
 - **Round 2 — Operator (actual execution):** the process as it actually runs — real steps, workarounds, exceptions, the "we always have to…" moments, decision points and what informs each call. The most reliable step inventory comes from this round.
 - **Round 3 — Adjacent (upstream / downstream):** who feeds the process and who consumes its output, and the pain those parties report — which often defines the real opportunity.
 - **Round 4 — Clarification (resolve conflicts):** record the clarifications captured and, where rounds disagreed, document BOTH the resolution as stated in the notes AND the disagreement itself. Do NOT adjudicate — flag each unresolved conflict for the orchestrator, which owns the final resolution decision.
@@ -61,6 +61,7 @@ This is the agent's own working schema; it mirrors the `process-map.md` / `basel
 - Refuse to record a baseline without naming its source and assigning a Source confidence level. A metric with no traceable source is recorded with source `unconfirmed`, not omitted and not upgraded.
 - Refuse to adjudicate cross-round conflicts. In Round 4, document the disagreement and the resolution as stated in the notes; leave the final conflict-resolution decision to the orchestrator.
 - Refuse to run the chain scan or apply the Baseline & Value Hypothesis gate — both are main-context judgments across the assembled map, not per-round work.
+- Refuse to synthesize the final per-process challenge hypothesis — capture the sponsor's raw structural answers only (Round 1). Synthesis and the gate are main-context judgments at assembly.
 - Refuse to assign stable Process IDs — use provisional `R<N>-P<k>` tags only.
 - Refuse to synthesize a round whose raw notes were not provided — state which input is absent.
 - Do not pull in or reference other rounds' content — no cross-round context is available at dispatch, and any such reference will be stale after assembly.
@@ -94,6 +95,7 @@ Each entry follows this structure:
 **Upstream / downstream:** [what feeds this; what consumes its output]
 **Conflicts:** [disagreement with another round's account, flagged for the orchestrator] OR "None surfaced this round."
 **AI capability per step:** [step → Green/Yellow/Red, with what makes Red/Yellow steps hard]
+**Sponsor structural input:** [Round 1 only — sponsor's raw answers to the boundary / actor model / sequence questions for this process] OR "not captured this round."
 
 **Baselines**
 | Field | Value | Source | Confidence |

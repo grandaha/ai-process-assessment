@@ -95,3 +95,23 @@ def test_sample_sequences_gate_b_before_phase10(methodology):
     assert phase10_idx is not None, "sample table has no Phase 10 row"
     assert gate_b_idx < phase10_idx, \
         "sample sequences Gate B after Phase 10 (#8 regression)"
+
+# --- #10 structural-challenge gate (defends: first-order-only methodology, issue #10) ---
+# The Phase 4 gate gains a third clause (challenge hypothesis); Phase 5 emits a
+# struct= signal that threads to the portfolio and roadmap views. Annotation only.
+
+
+def test_phase4_sponsor_round_has_structural_challenge(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    for marker in (
+        "Is the process boundary right?",
+        "Is the actor model right?",
+        "Is the sequence right?",
+    ):
+        assert marker in body, f"Phase 4 Round 1 missing challenge question: {marker!r}"
+
+
+def test_process_mapper_captures_sponsor_structural_input(methodology):
+    body = methodology.agents["process-mapper"].body
+    assert "Sponsor structural input" in body, \
+        "process-mapper Round 1 must capture 'Sponsor structural input'"
