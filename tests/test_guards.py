@@ -208,3 +208,14 @@ def test_keystone_has_structural_challenge_rationalization(methodology):
     body = methodology.skills["ai-process-assessment:using-methodology"].body
     assert "faster broken process" in body, \
         "keystone Master Rationalization Table must carry the structural-challenge row"
+
+
+def test_phase9_cites_engine_not_prose_math():
+    skill = (REPO_ROOT / "skills" / "building-business-case" / "SKILL.md").read_text()
+    assert "model/costs.json" in skill
+    assert "python -m engine.run" in skill
+    assert "results.json" in skill
+    agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
+    assert "results.json" in agent
+    # The analyst no longer computes ROM ranges itself.
+    assert "compute" not in agent.lower() or "engine" in agent.lower()
