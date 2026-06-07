@@ -82,6 +82,10 @@ def test_wave1_aggregate_skips_pending_members_but_flags_via_empty():
     assert wave1_aggregate([Range(100, 300), PENDING]) == Range(100.0, 300.0)
 
 
+def test_wave1_aggregate_empty_list_is_pending():
+    assert wave1_aggregate([]) == PENDING
+
+
 from engine.compute import payback
 
 

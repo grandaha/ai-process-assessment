@@ -81,7 +81,9 @@ def write_workbook(inputs, results, out_path) -> Path:
         if _score_pending(opp):
             ws_s.append([opp, "PENDING"])
         else:
-            ws_s.append([opp, f"=SUM({IN}!M{r}:R{r})/6"])
+            # ROUND to 2dp to match compute.score_composite (round(sum/6, 2)).
+            # ROUND is common to Excel / Google Sheets / Apple Numbers.
+            ws_s.append([opp, f"=ROUND(SUM({IN}!M{r}:R{r})/6, 2)"])
 
     # --- Costs (P8.5): roll-up ---
     ws_c = wb.create_sheet("Costs (P8.5)")
@@ -119,15 +121,32 @@ def write_workbook(inputs, results, out_path) -> Path:
                       f"={VA}!B{i}", f"={VA}!C{i}"])
 
     # --- Wave-1 Aggregate: SUMs + payback ---
+    # When a whole aggregate is PENDING in results.json (every member missing),
+    # write literal "PENDING" rather than a formula — matching results.json and
+    # avoiding a #DIV/0! in payback when the value SUM is 0 (compute.payback
+    # returns PENDING for any non-positive annual value). The payback formula is
+    # therefore only emitted when results gives a real number, so B2/C3 never
+    # divides by zero.
+    agg = results.get("wave1_aggregate", {})
+    inv_pending = agg.get("investment") == "PENDING"
+    val_pending = agg.get("value") == "PENDING"
+    pay_pending = agg.get("payback_years") == "PENDING"
+
     ws_a = wb.create_sheet("Wave-1 Aggregate")
     n = len(row_of)
     last = 1 + n  # rows 2..last in Business Case
     BC = _q("Business Case (P9)")
     ws_a.append(["metric", "low", "high"])
-    ws_a.append(["investment", f"=SUM({BC}!B2:B{last})", f"=SUM({BC}!C2:C{last})"])
-    ws_a.append(["annual_value", f"=SUM({BC}!D2:D{last})", f"=SUM({BC}!E2:E{last})"])
+    ws_a.append(["investment",
+                 "PENDING" if inv_pending else f"=SUM({BC}!B2:B{last})",
+                 "PENDING" if inv_pending else f"=SUM({BC}!C2:C{last})"])
+    ws_a.append(["annual_value",
+                 "PENDING" if val_pending else f"=SUM({BC}!D2:D{last})",
+                 "PENDING" if val_pending else f"=SUM({BC}!E2:E{last})"])
     # payback best = investment.low/value.high ; worst = investment.high/value.low
-    ws_a.append(["payback_years", "=B2/C3", "=C2/B3"])
+    ws_a.append(["payback_years",
+                 "PENDING" if pay_pending else "=B2/C3",
+                 "PENDING" if pay_pending else "=C2/B3"])
 
     wb.save(out_path)
     return out_path
