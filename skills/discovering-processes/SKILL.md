@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:discovering-processes
-description: Phase 4 — evidence-gathering core. Maps processes via four-round interview sequence (sponsor → operator → adjacent → clarification), captures volume/cycle time/error rate/FTE for every process. Enforces Baseline & Value Hypothesis gate. Saves process-map.md and baselines.md.
+description: Phase 4 — evidence-gathering core. Maps processes via four-round interview sequence (sponsor → operator → adjacent → clarification), captures volume/cycle time/error rate/FTE for every process. Enforces the Baseline, Value & Challenge gate. Saves process-map.md and baselines.md.
 ---
 
 # Phase 4: Discovering Processes
@@ -21,7 +21,7 @@ This is the evidence-gathering core of the methodology. Everything downstream �
 
 `tech-inventory.md` must exist. The engagement's `evidence-log.md` should be active and used to record interview rounds. This skill creates `process-map.md` AND `baselines.md`.
 
-## Baseline & Value Hypothesis Gate
+## Baseline, Value & Challenge Gate
 
 This is the single most load-bearing rule in the methodology.
 
@@ -35,6 +35,8 @@ For every process mapped, `baselines.md` MUST contain at minimum:
 **No value claim may be made in any subsequent phase without citing a baseline from this file.**
 
 If a baseline cannot be sourced (estimated by an operator, pulled from a system, sampled), the process does not advance to Phase 5. It is logged as "baseline unavailable" with a remediation action.
+
+**Challenge clause (second-order check).** For every process mapped, `process-map.md` MUST also carry a **challenge hypothesis** (see Key Outputs). Automate a broken process and you get a faster broken process — this clause forces the question of whether the process structure itself is the constraint before any automation is typed. A process with no challenge hypothesis does not advance to Phase 5: it is logged as "challenge hypothesis unavailable" with a remediation action (return to the sponsor for the three structural questions), identically to a missing baseline. The hypothesis *surfaces* the redesign question; it does not solve it, and the signal it produces downstream annotates — it never blocks opportunity creation.
 
 ## Four-Round Interview Sequence
 
@@ -53,7 +55,7 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `process-map.md` content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
 - **Pass to each subagent:** engagement folder path, round number, and the raw notes for that round only. The agent reads `tech-inventory.md` itself to extract relevant sections, and applies the `process-map.md`/`baselines.md` field schemas defined in its own agent spec (which mirror the Key Outputs below). It derives its own `_staging/phase4/round-N.md` output path from the engagement folder path and round number. Do not pass any file content to the subagent.
 - **Return:** Write structured entries to `<engagement-folder>/_staging/phase4/round-N.md`. Return a one-line summary only: "Round N complete: N processes mapped, N baselines captured." The orchestrator assembles `process-map.md` and `baselines.md` from staging files — it does NOT receive entry content from the subagent.
-- **What stays in main context:** The Baseline & Value Hypothesis gate, the chain scan across the assembled map, and the conflict-resolution decision from Round 4. These are cross-round judgments and must not be delegated.
+- **What stays in main context:** The Baseline, Value & Challenge gate, the chain scan across the assembled map, the conflict-resolution decision from Round 4, and **synthesizing the per-process challenge hypothesis** from the Round-1 `Sponsor structural input` (one paragraph per process: structurally sound, or the single surfaced redesign question). These are cross-round judgments and must not be delegated.
 
 ## Phase checklist
 
@@ -65,7 +67,8 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - [ ] For every process, capture volume, cycle time (median + P90), error/exception rate, FTE effort
 - [ ] For every step in each process, assign AI capability flag (Green / Yellow / Red)
 - [ ] Run chain scan — identify consecutive Green runs; record in process-map.md; flag high-fragmentation processes
-- [ ] Apply Baseline & Value Hypothesis gate — flag any process missing baselines
+- [ ] Apply the Baseline, Value & Challenge gate — flag any process missing baselines
+- [ ] For every process, synthesize a challenge hypothesis from the sponsor's structural input; flag any process missing one as "challenge hypothesis unavailable"
 - [ ] Save `process-map.md`
 - [ ] Save `baselines.md`
 - [ ] Confirm `evidence-log.md` stakeholder interview log is complete — one row per session, every participant named
@@ -87,6 +90,7 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 | Conflicts | Where interview rounds disagreed; resolution |
 | AI capability per step | For each step in the sequence: AI-capable (Green), Uncertain (Yellow), or Not AI-capable (Red). Record what makes a step hard for AI (judgment, unstructured input, regulatory requirement, etc.). |
 | Chain scan | Identify every run of consecutive Green steps. Record the run as [step i → step j] and count how many current human verification points the run would eliminate if chained. Flag processes where Green steps are interleaved with Red steps as high-fragmentation. |
+| Challenge hypothesis | One paragraph per process, authored by the orchestrator at assembly from the sponsor's Round-1 structural answers. Either "structurally sound — [why]" or the single surfaced redesign question (boundary / actor model / sequence) with its basis. Surfaces the question; does not solve it. |
 
 ### baselines.md
 
@@ -133,6 +137,7 @@ After each interview round, append rows to the `## Stakeholder Interview Log` se
 | "Two interview rounds is enough." | Two rounds gives you the sponsor's view and the operator's view but no triangulation. Adjacent and clarification rounds catch what the first two miss. |
 | "Recording participant names is administrative overhead — we know who we talked to." | The stakeholder interview log is the only record that survives the engagement. Without it, the deliverable cannot answer "who did you talk to?" — the first question any skeptical executive will ask. Record as you go; reconstructing it from memory at the end is error-prone and often incomplete. |
 | "These AI-capable steps are scattered through the process, but we can still automate each one individually." | Scattered AI-capable steps each require their own human verification checkpoint. Linear step-count aggregation overstates value. Record the fragmentation — it determines achievable chain length and is a direct input to opportunity scoring. |
+| "The process works — we just need to automate the slow steps." | Automate a broken process and you get a faster broken process. The challenge hypothesis forces the second-order question — is the boundary, actor model, or sequence itself the constraint? — before any automation is typed. Surface it; the client decides. |
 
 ## Handoff Protocol
 

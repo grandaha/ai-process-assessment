@@ -14,7 +14,7 @@ The sample subject is **Lattice Consulting Group**, a fictional professional-ser
 ## What it is NOT
 
 - **Not auto-chaining.** You still stop at every phase boundary, surface output, and wait for explicit approval before the next phase.
-- **Not gate-skipping.** The Baseline & Value Hypothesis gate, the GRC gate, the reviewer clearances, and the deliverable gate all run normally.
+- **Not gate-skipping.** The Baseline, Value & Challenge gate, the GRC gate, the reviewer clearances, and the deliverable gate all run normally.
 - **Not a data fabricator.** Phases 1–4 use only what is in the intake files. If something genuinely is not in the intake, log it as a gap exactly as you would in a real engagement — do not invent it. (The intake is built to be sufficient; you should not need to.)
 - **Not a single-session run.** Respect the session boundaries. Each phase instructs you to start a fresh session for the next one.
 
