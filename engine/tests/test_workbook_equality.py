@@ -176,6 +176,9 @@ def test_workbook_equals_results_exactly_with_fractional_inputs(tmp_path):
                 return float(v.value[0, 0])
         raise KeyError(f"{sheet}!{a1}")
 
+    # "Exactly" = same rounded values; pytest.approx (default rel 1e-6) only
+    # absorbs the float-serialization noise of writing/reading the .xlsx, far
+    # tighter than the <0.01 drift this PR removes.
     # OPP-001 is workbook row 2 across all per-initiative tabs.
     cb = res["costs"]["OPP-001"]
     assert cell("Costs (P8.5)", "B2") == pytest.approx(cb["labor"])
