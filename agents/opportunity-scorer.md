@@ -64,10 +64,13 @@ Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `c
 
 - Receives only the inputs listed above — no shared session context
 - Produces one scored entry only — the OPP-NNN specified at dispatch
-- Composite score = arithmetic mean of 6 dimensional scores, rounded to 1 decimal place
-- Dimensional scores are the decision input; composite is a sort key only
+- Dimensional scores are the decision input; the composite is an engine-computed sort key only (see Composite section — the agent does not average in prose)
 - Writes its scored entry to the staging file path provided at dispatch using the Write tool
 - Returns only a one-line summary — does NOT return the scored entry content to main context
+
+## Composite
+
+Record the six dimension scores; do not average them. Write `{"opp_id": "<id>", "dimensions": [d1, d2, d3, d4, d5, d6]}` to `model/scores.json`. The composite is computed by the deterministic engine and read from `results.json` — the agent never performs the mean in prose.
 
 ## Output
 
@@ -90,7 +93,7 @@ Structure the written content as:
 | Strategic Alignment | N/5 | [specific priority from context.md] |
 | Time to Value | N/5 | [specific lead time or step complexity] |
 
-**Composite:** N.N / 5 (mean of 6 dimensions)
+**Composite:** N.N / 5 (engine-computed from the 6 dimensions; read from `results.json`)
 
 **Execution Horizon:** [Short-run / Long-run] — [one-sentence rationale]
 
