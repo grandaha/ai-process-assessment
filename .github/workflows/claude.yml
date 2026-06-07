@@ -30,6 +30,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          # On issue_comment events the default checkout is the default branch
+          # (main), where PR-only files don't exist — the action's per-file
+          # `git hash-object` then fails. Check out the PR head instead.
+          ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.event.pull_request.head.sha || github.ref }}
 
       - name: Run Claude Code
         # Pinned to an explicit release — the moving v1 tag currently hits an
