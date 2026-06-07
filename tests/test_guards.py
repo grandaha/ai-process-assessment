@@ -189,3 +189,16 @@ def test_portfolio_renderer_surfaces_struct(methodology):
         "portfolio renderer must render the optimizing-around value"
     assert "not-applicable" in body, \
         "portfolio renderer must define the not-applicable (empty) branch"
+
+
+def test_roadmap_skill_threads_struct(methodology):
+    body = methodology.skills["ai-process-assessment:prioritizing-roadmap"].body
+    assert "struct" in body, "roadmap skill must read the struct signal"
+    assert "optimizing-around" in body, \
+        "roadmap skill must annotate optimizing-around items"
+
+
+def test_roadmap_renderer_surfaces_struct(methodology):
+    body = methodology.agents["section-renderer-roadmap"].body
+    assert "optimizing-around" in body, \
+        "roadmap renderer must surface the optimizing-around annotation"

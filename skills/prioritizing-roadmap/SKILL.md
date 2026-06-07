@@ -10,7 +10,8 @@ description: Phase 7 — sequences scored opportunities into Foundation/Scale/Op
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `scores/_index.md` — confirm it exists.
-3. Check `evidence-log.md` — confirm opportunity-reviewer clearance from Phase 6.
+3. Read `opportunities/_index.md` — for the `Structural` column. Any Wave-1 opportunity whose Structural value is `optimizing-around` must be annotated in `roadmap.md` (see Workflow).
+4. Check `evidence-log.md` — confirm opportunity-reviewer clearance from Phase 6.
 
 Gate condition: `scores/_index.md` present; reviewer clearance logged in `evidence-log.md`.
 
@@ -64,6 +65,7 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 - [ ] Apply Constraint 4 (Strategic alignment) — break ties only after constraints 1–3 are satisfied
 - [ ] Apply Constraint 5 (Job boundary impact) — flag Long-run opportunities; confirm org design workstream exists before placing in Wave 1
 - [ ] Map enablers and dependencies for every Wave 1 initiative
+- [ ] Annotate every `optimizing-around` Wave-1 item in roadmap.md (Structural read-through; does not change sequencing)
 - [ ] For any Wave 2/3 item with conditional placement, flag it explicitly in the wave summary table row — not only in dependency notes
 - [ ] For every cross-wave dependency (e.g., Wave 2 item depends on Wave 1 item being live), state a minimum operational maturity threshold (e.g., "OPP-NNN must be in stable production for ≥60 days before this item is scoped")
 - [ ] For cascading timelines (Wave 2 start date derived from Wave 1 go-live date), document the slip risk explicitly: if Wave 1 item slips N months, Wave 2 item's earliest start slides by the same N
@@ -81,8 +83,9 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 4. Use Constraint 4 only on remaining ties.
 5. Apply Constraint 5 — check Execution Horizon flag (from `scores/OPP-NNN.md`) on each Wave 1 candidate. Move Long-run items to Wave 2 unless org design dependency is documented and sequenced.
 5. Map enablers for the final Wave 1. Resolve gaps using one of the three options above.
-6. Run `opportunity-reviewer`. Resolve Critical findings.
-7. Save and chain forward.
+6. **Structural annotation.** For every opportunity sequenced into a wave, look up its `Structural` value in `opportunities/_index.md`. For each `optimizing-around` item, add a one-line annotation to its entry in the Wave summary table and its Wave-1 initiative-detail card: `Structural: optimizing-around — speeds a process the Phase 4 challenge hypothesis flagged for redesign.` This is informational; it does not change wave placement. `addressing-root` and `not-applicable` items need no annotation.
+7. Run `opportunity-reviewer`. Resolve Critical findings.
+8. Save and chain forward.
 
 ## Rationalization Table
 
