@@ -23,7 +23,7 @@ This phase converts mapped processes into a typed opportunity log. Type — RPA 
 
 ## OPP-NNN Entry Structure
 
-Every opportunity is logged with a stable identifier `OPP-NNN` and the following seven fields:
+Every opportunity is logged with a stable identifier `OPP-NNN` and the following fields:
 
 | Field | Content |
 |---|---|
@@ -35,6 +35,7 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 | Feasibility flag | Green / Yellow / Red — based on `tech-inventory.md` |
 | Data readiness flag | Green / Yellow / Red — based on data asset catalog |
 | GRC flag | Green / Yellow / Red — regulatory, model risk, auditability, failure consequence |
+| Structural response | `addressing-root` / `optimizing-around` / `not-applicable` — set against the process's challenge hypothesis from `process-map.md`. Annotates only; never blocks. |
 
 **Categorical rule: Hypothesis statement must be written before value is estimated. This prevents reverse-engineering the hypothesis from a desired outcome.**
 
@@ -67,8 +68,8 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
   ```
   Then generate the index by reading extraction headers:
   ```bash
-  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC |" > docs/engagements/<name>/opportunities/_index.md
-  echo "|--------|---------|------|-------------|----------------|-----|" >> docs/engagements/<name>/opportunities/_index.md
+  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |" > docs/engagements/<name>/opportunities/_index.md
+  echo "|--------|---------|------|-------------|----------------|-----|------------|" >> docs/engagements/<name>/opportunities/_index.md
   for f in docs/engagements/<name>/opportunities/OPP-*.md; do
     header=$(grep "^<!-- index:" "$f" | head -1)
     id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
@@ -77,7 +78,8 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
     feas=$(echo "$header" | grep -o 'feasibility=[^ >]*' | cut -d= -f2)
     data=$(echo "$header" | grep -o 'data=[^ >]*' | cut -d= -f2)
     grc=$(echo "$header" | grep -o 'grc=[^ >]*' | cut -d= -f2)
-    echo "| $id | $proc | $type | $feas | $data | $grc |" >> docs/engagements/<name>/opportunities/_index.md
+    struct=$(echo "$header" | grep -o 'struct=[^ >]*' | cut -d= -f2)
+    echo "| $id | $proc | $type | $feas | $data | $grc | $struct |" >> docs/engagements/<name>/opportunities/_index.md
   done
   ```
   Verify with: `ls docs/engagements/<name>/opportunities/OPP-*.md | wc -l`
@@ -93,6 +95,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - [ ] Set feasibility flag against `tech-inventory.md`
 - [ ] Set data readiness flag against data asset catalog
 - [ ] Set GRC flag based on regulatory exposure, model risk, auditability, failure consequence
+- [ ] Set Structural response (addressing-root / optimizing-around / not-applicable) against the process's challenge hypothesis
 - [ ] Assign stable OPP-NNN identifier
 - [ ] Save each opportunity to `docs/engagements/<name>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
 - [ ] If any opportunity has a non-Green GRC flag → branch to `ai-process-assessment:governance-risk-gate`

@@ -85,7 +85,7 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `context.md` — Phase 2
 - `tech-inventory.md` — Phase 3
 - `process-map.md` — Phase 4
-- `baselines.md` — Phase 4 (load-bearing — see Baseline & Value Hypothesis gate)
+- `baselines.md` — Phase 4 (load-bearing — see Baseline, Value & Challenge gate)
 - `opportunities.md` — Phase 5
 - `scored-opportunities.md` — Phase 6
 - `roadmap.md` — Phase 7

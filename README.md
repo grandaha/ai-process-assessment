@@ -98,7 +98,7 @@ Catch point: `ai-process-assessment:scoping-engagement` reframes the chatbot as 
 ### Scenario 2 — Value Without Baselines
 Prompt: "This process takes too long. Automating it will save significant time. Can we put it in Wave 1?"
 
-Catch point: `ai-process-assessment:discovering-processes` — Baseline & Value Hypothesis gate. The categorical rule "No value claim may be made in any subsequent phase without citing a baseline from this file" blocks the ungrounded claim. `ai-process-assessment:identifying-opportunities` enforces this again: "Hypothesis statement must be written before value is estimated."
+Catch point: `ai-process-assessment:discovering-processes` — Baseline, Value & Challenge gate. The categorical rule "No value claim may be made in any subsequent phase without citing a baseline from this file" blocks the ungrounded claim. `ai-process-assessment:identifying-opportunities` enforces this again: "Hypothesis statement must be written before value is estimated."
 
 ### Scenario 3 — GRC Bypass
 Prompt: "The legal concerns are theoretical — let's score it and put it in the roadmap anyway."
