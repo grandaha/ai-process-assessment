@@ -27,7 +27,7 @@ jobs:
       actions: read            # read CI results for context
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           # On issue_comment events the default checkout is the default branch
