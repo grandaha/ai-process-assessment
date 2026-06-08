@@ -1,0 +1,24 @@
+#!/bin/sh
+# Local test gate: block a push if the suite fails. Enable once per clone with
+#   git config core.hooksPath .githooks
+# Substitutes for branch protection on the Free plan (see INSTALL.md).
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+if [ -x ".venv/bin/python" ]; then
+  PY=".venv/bin/python"
+else
+  PY="$(command -v python3 || command -v python)"
+fi
+
+# Don't block on missing tooling — only on actual test failures.
+if [ -z "$PY" ] || ! "$PY" -c "import pytest" >/dev/null 2>&1; then
+  echo "pre-push: pytest unavailable (no .venv?) — skipping local test gate." >&2
+  exit 0
+fi
+
+echo "pre-push: running $PY -m pytest -q ..."
+if ! "$PY" -m pytest -q; then
+  echo "pre-push: tests failed — push aborted. Use 'git push --no-verify' to override." >&2
+  exit 1
+fi
