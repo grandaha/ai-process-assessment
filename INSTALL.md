@@ -257,6 +257,19 @@ Or directly: `pytest` from the repo root. The suite parses the keystone Phase
 Map in `skills/using-methodology/SKILL.md` and asserts every skill, agent,
 chain link, and output file conforms to it.
 
+### Pre-push test gate (optional, recommended)
+
+A tracked git hook (`.githooks/pre-push`) runs the suite before every push and
+aborts the push if it fails — a free stand-in for branch protection. Enable it
+once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It uses `.venv/bin/python` if present, skips gracefully if pytest isn't
+installed, and can be bypassed for a one-off with `git push --no-verify`.
+
 ---
 
 ## Troubleshooting
