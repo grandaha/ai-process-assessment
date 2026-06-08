@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # Keep GitHub Actions pinned-but-current (we got bitten by a moving tag once).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Engine runtime/test deps (openpyxl, formulas, pytest, pyyaml).
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
