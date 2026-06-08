@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Plugin marketplace manifest (`.claude-plugin/marketplace.json`) — the repo is
+  now one-add installable in Claude Code (`/plugin marketplace add ...`) and
+  Claude Cowork (Add marketplace from GitHub repo).
 - CI: `@claude` PR-review workflow (`.github/workflows/claude.yml`), authenticated
   via a Claude subscription OAuth token and pinned to a `claude-code-action`
   release.
@@ -18,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This `CHANGELOG.md`.
 
 ### Changed
+- Docs: refreshed `README.md` and `INSTALL.md` with install instructions for
+  Claude Code, Claude Cowork, and Claude.ai Projects; corrected the phase map
+  (11 phases + 8.5 + two gates), agent list, and repository layout.
+- Regenerated `system-prompt.md` to mirror the current keystone verbatim (a guard
+  test now enforces the sync); fixed the keystone intro phase count.
 - CI: `actions/checkout` bumped to v6 and `actions/setup-python` to v6.
 - Raised `requirements.txt` floors to current releases (`pytest>=9.0.3`,
   `pyyaml>=6.0.3`, `openpyxl>=3.1.5`, `formulas>=1.3.4`).

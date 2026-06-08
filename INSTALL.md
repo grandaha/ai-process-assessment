@@ -1,40 +1,48 @@
 # Install Guide — AI & Automation Use Case Identification Methodology Plugin
 
-Three deployment options. Pick the one that matches your environment.
+Pick the environment that matches you:
+
+- **[Option A — Claude Code](#option-a--claude-code)** (plugin; full feature set incl. the math engine)
+- **[Option B — Claude Cowork](#option-b--claude-cowork)** (plugin; desktop agentic work)
+- **[Option C — Claude.ai Projects](#option-c--claudeai-projects)** (no install; paste system prompt + upload knowledge)
+- **[Option D — Per-engagement CLAUDE.md](#option-d--per-engagement-claudemd-lightest)** (lightest; any Claude interface)
+
+Options A and B install the same plugin and get the deterministic math engine (code execution). Options C and D run the methodology from prompts/knowledge; numeric figures render "pending engine" without a code-execution environment.
 
 ---
 
-## Option A — Claude Code Plugin (Full)
+## Option A — Claude Code
 
 Requires Claude Code 2.0.13 or later.
 
-> **Note:** The `/plugin install` slash command only works in the Claude Code CLI (`claude` in terminal). It is not available in the VSCode extension. If you are using the VSCode extension, follow the manual registration step below instead.
+### 1. Add the marketplace and install (recommended)
 
-### 1. Make the session-start hook executable
+In a Claude Code session, type:
+
+```
+/plugin marketplace add grandaha/ai-process-assessment
+/plugin install ai-process-assessment@onesteplabs
+```
+
+`/plugin marketplace add` reads `.claude-plugin/marketplace.json` from the GitHub repo; `/plugin install` installs the plugin (the `@onesteplabs` suffix is the marketplace name). Refresh later with `/plugin marketplace update onesteplabs`.
+
+> The `/plugin` slash commands run in the Claude Code CLI (`claude` in a terminal). In the VSCode extension, use the manual registration below.
+
+### 2. Manual registration (VSCode extension, or local/unpublished use)
+
+If you cloned the repo and want to run it locally without the marketplace, make the session-start hook executable:
 
 ```bash
 chmod +x hooks/session-start.sh
 ```
 
-### 2a. Install via CLI (Claude Code terminal only)
-
-Open a terminal, `cd` to the project root, run `claude` to start a session, then type:
-
-```
-/plugin install ai-process-assessment@claude-plugins-official
-```
-
-If the plugin is not yet published to the marketplace, use the manual registration path below.
-
-### 2b. Manual registration (VSCode extension or unpublished plugin)
-
-Edit `~/.claude/plugins/installed_plugins.json` and add the following entry inside the `"plugins"` object:
+Then edit `~/.claude/plugins/installed_plugins.json` and add this entry inside the `"plugins"` object:
 
 ```json
 "ai-process-assessment@local": [
   {
     "scope": "local",
-    "installPath": "/absolute/path/to/ai-usecase-methodology",
+    "installPath": "/absolute/path/to/ai-process-assessment",
     "version": "2.5.1",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
@@ -43,50 +51,57 @@ Edit `~/.claude/plugins/installed_plugins.json` and add the following entry insi
 ]
 ```
 
-Replace both paths with the actual absolute paths on your machine. `installPath` points to this plugin folder; `projectPath` is the vault root where the plugin should activate.
+Replace both paths: `installPath` points to this plugin folder; `projectPath` is the working folder where the plugin should activate.
 
-### 3. Restart Claude Code
+### 3. Set up the math engine
 
-Start a new session. The session-start hook fires automatically and injects the keystone skill into context.
+The plugin computes every number with a deterministic Python engine (see [Python math engine](#python-math-engine-required-for-any-shipped-number) below). Run `pip install -r requirements.txt` once.
 
-### 4. Verify
+### 4. Restart, verify, and start
 
-Type anything in a new session. The model should acknowledge it is operating inside the methodology and ask for an engagement prompt. If it does not, check:
-
-- `hooks/hooks.json` is present
-- `hooks/session-start.sh` is executable
-- `skills/using-methodology/SKILL.md` exists
-
-### 5. Start an engagement
-
-Say: **"scope this engagement"** — the model will invoke `ai-process-assessment:scoping-engagement` and begin Phase 1.
-
-### 6. Try it: the bundled sample engagement
-
-Before a live engagement, run the included demo to see all eleven phases and both gates end-to-end on fictional data. Say: **"run the sample engagement"** — the model invokes `ai-process-assessment:running-sample-engagement`, which feeds the intake files in `samples/pso-delivery-team/intake/` through the methodology and produces a complete run under `docs/engagements/sample-pso-delivery/`, ending in `deliverable.html`. See `samples/pso-delivery-team/README.md`.
+Start a new session — the session-start hook injects the keystone. Type anything; the model should acknowledge it is operating inside the methodology and ask for an engagement prompt. If not, check that `hooks/hooks.json` is present, `hooks/session-start.sh` is executable, and `skills/using-methodology/SKILL.md` exists. Then say **"scope this engagement"** to begin Phase 1, or **"run the sample engagement"** for the bundled demo (see [Try the sample](#try-the-bundled-sample-engagement)).
 
 ---
 
-## Option B — Claude.ai Projects (Zero Infrastructure)
+## Option B — Claude Cowork
 
-No Claude Code required. Works in any Claude.ai Project.
+Claude Cowork (the desktop agentic mode) uses the **same plugin format** as Claude Code. Requires the latest Claude desktop app (macOS or Windows) and a paid plan (Pro, Max, Team, or Enterprise).
+
+### 1. Open the Plugins panel
+
+In the Claude desktop app, switch to the **Cowork** tab, then open **Customize → Plugins**.
+
+### 2. Add this repo as a marketplace
+
+Under **Personal plugins**, click **+ → Add marketplace → from a GitHub repository**, and enter:
+
+```
+grandaha/ai-process-assessment
+```
+
+Then click **Install** on the `ai-process-assessment` plugin. (Alternatively, **upload a custom plugin file** if you have a local build, e.g. the release zip.) Plugins you add yourself are saved locally to your computer.
+
+### 3. Use it
+
+Type `/` or click the **+** button in a Cowork (or chat) session to see the methodology's skills. Start with **"scope this engagement"**, or **"run the sample engagement"** for the demo. Because Cowork can execute code and touch local files, the deterministic math engine and the `financial-model.xlsx` workbook work fully here.
+
+---
+
+## Option C — Claude.ai Projects
+
+No install required. Works in any Claude.ai Project.
 
 ### 1. Create a Claude.ai Project
 
-Go to claude.ai → Projects → New Project. Give it a name (e.g., "AI Use Case Assessment").
+claude.ai → Projects → New Project. Name it (e.g., "AI Use Case Assessment").
 
 ### 2. Paste the system prompt
 
-1. Open `system-prompt.md` from this folder
-2. Copy the full contents (everything, including the `<EXTREMELY_IMPORTANT>` wrapper)
-3. In your Project → Settings → System Prompt, paste the contents
-4. Save
+Open `system-prompt.md`, copy its full contents (including the `<EXTREMELY_IMPORTANT>` wrapper), and paste into Project → Settings → System Prompt. Save.
 
 ### 3. Upload knowledge files
 
-Upload the following as Project knowledge files:
-
-**Skills** (upload each SKILL.md):
+**Skills** (upload each `SKILL.md`):
 - `skills/scoping-engagement/SKILL.md`
 - `skills/mapping-context/SKILL.md`
 - `skills/inventorying-tech-data/SKILL.md`
@@ -95,6 +110,7 @@ Upload the following as Project knowledge files:
 - `skills/scoring-opportunities/SKILL.md`
 - `skills/prioritizing-roadmap/SKILL.md`
 - `skills/packaging-usecases/SKILL.md`
+- `skills/collecting-cost-actuals/SKILL.md`
 - `skills/building-business-case/SKILL.md`
 - `skills/building-executive-summary/SKILL.md`
 - `skills/building-deliverable/SKILL.md`
@@ -103,11 +119,13 @@ Upload the following as Project knowledge files:
 - `skills/running-sample-engagement/SKILL.md`
 
 **Agents** (upload all):
+- `agents/process-mapper.md`
 - `agents/opportunity-typer.md`
+- `agents/opportunity-scorer.md`
 - `agents/opportunity-reviewer.md`
 - `agents/grc-reviewer.md`
-- `agents/opportunity-scorer.md`
 - `agents/usecase-brief-drafter.md`
+- `agents/business-case-analyst.md`
 - `agents/executive-summary-drafter.md`
 - `agents/executive-summary-reviewer.md`
 - `agents/section-renderer-executive.md`
@@ -116,79 +134,32 @@ Upload the following as Project knowledge files:
 - `agents/section-renderer-roadmap.md`
 - `agents/section-renderer-evidence.md`
 
-**Sample engagement** (optional — bundled demo run):
-- `samples/pso-delivery-team/README.md`
-- `samples/pso-delivery-team/intake/engagement-request.md`
-- `samples/pso-delivery-team/intake/org-context.md`
-- `samples/pso-delivery-team/intake/systems-and-data.md`
-- `samples/pso-delivery-team/intake/interview-notes.md`
+**Engagement context** (optional but recommended): a filled-in `CLAUDE.md`, plus intake documents (org charts, system inventories, process lists, prior assessments).
 
-**Engagement context** (optional but recommended):
-- A filled-in `CLAUDE.md` for the specific engagement
-- Intake documents: org charts, system inventories, process lists, prior assessments
+> **Numbers:** Claude.ai Projects cannot run the Python engine unless the analysis/code tool is available. Without it, the methodology runs but numeric figures render "pending engine." Enable the analysis tool, or finalize numbers in Claude Code / Cowork.
 
-### 4. Start a new conversation
+### 4. Start a conversation
 
-Every conversation in the Project inherits the keystone automatically.
-
-Say: **"scope this engagement"** to begin Phase 1.
-
-### Try it: the bundled sample engagement
-
-If you uploaded the sample files above, say **"run the sample engagement"** to run the fictional Lattice Consulting demo through all eleven phases and both gates. In Claude.ai, attach the four `samples/pso-delivery-team/intake/` files to the conversation (or keep them in Project knowledge) so the run can read them at Phases 1–4.
-
-### Updating for a new engagement
-
-The system prompt and skill files are static. For each new engagement:
-1. Create a new conversation in the Project
-2. Upload a freshly filled-in `CLAUDE.md` as a knowledge file (or add it to the system prompt's override section)
-3. Optionally upload engagement-specific intake documents
+Every conversation in the Project inherits the keystone via the system prompt. Say **"scope this engagement"** to begin. For a new engagement, start a new conversation and upload a fresh `CLAUDE.md`.
 
 ---
 
-## Option C — Per-Engagement CLAUDE.md (Lightest)
+## Option D — Per-engagement CLAUDE.md (lightest)
 
 No plugin system or Project required. Works with any Claude interface.
 
-### 1. Create an engagement folder
+1. Create an engagement folder `docs/engagements/<client-name>/`.
+2. Fill in `CLAUDE.md` (Client/Initiative, Engagement folder, Sponsor, Decision-maker, Timeline) and document any deliberate overrides in the Overrides table.
+3. Paste the full contents of `skills/using-methodology/SKILL.md` at the top of your system prompt, wrapped in `<EXTREMELY_IMPORTANT>` tags, then paste your filled-in `CLAUDE.md` below it.
+4. At the start of each phase, paste the relevant `SKILL.md` into context. The skill chain references tell you which one comes next.
 
-```
-docs/engagements/<client-name>/
-```
+---
 
-### 2. Fill in CLAUDE.md
+## Try the bundled sample engagement
 
-Open `CLAUDE.md` and fill in the engagement fields:
+Before a live engagement, run the included demo to see all eleven phases and both gates end-to-end on fictional data. Say **"run the sample engagement"** — the model invokes `ai-process-assessment:running-sample-engagement`, which feeds the intake files in `samples/pso-delivery-team/intake/` through the methodology and produces a complete run under `docs/engagements/sample-pso-delivery/`, ending in `deliverable.html`. See `samples/pso-delivery-team/README.md`.
 
-```
-Client / Initiative: <name>
-Engagement folder: docs/engagements/<name>/
-Sponsor: <name, role>
-Decision-maker: <name, role>
-Timeline: <dates>
-```
-
-Document any deliberate methodology overrides in the Overrides table.
-
-### 3. Paste the keystone at the top of your system prompt
-
-Copy the full contents of `skills/using-methodology/SKILL.md` and paste it at the top of your system prompt, wrapped in `<EXTREMELY_IMPORTANT>` tags:
-
-```
-<EXTREMELY_IMPORTANT>
-[paste SKILL.md contents here]
-</EXTREMELY_IMPORTANT>
-```
-
-Then paste your filled-in `CLAUDE.md` below it.
-
-### 4. Reference skills manually
-
-At the start of each phase, paste the relevant `SKILL.md` into your context (or into the system prompt for the session). The skill chain references tell you which one comes next.
-
-### Try it: the bundled sample engagement
-
-To learn the flow first, paste `skills/running-sample-engagement/SKILL.md` and the four `samples/pso-delivery-team/intake/` files into your context, then say **"run the sample engagement."** It walks the fictional Lattice Consulting case through every phase using the intake files in place of live interviews.
+In Claude.ai Projects (Option C) or the lightweight setup (Option D), attach the four `samples/pso-delivery-team/intake/` files to the conversation (or keep them in Project knowledge) so the run can read them at Phases 1–4.
 
 ---
 
@@ -202,35 +173,35 @@ Every engagement produces files in sequence under `docs/engagements/<name>/`:
 | 2 — Context Mapping | `context.md` |
 | 3 — Tech & Data Inventory | `tech-inventory.md` |
 | 4 — Process Discovery | `process-map.md`, `baselines.md` |
-| 5 — Opportunity Identification | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
-| Gate A — GRC Review | `grc/` (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran) |
-| 6 — Opportunity Scoring | `scores/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
+| 5 — Opportunity Identification | `opportunities/` (`_index.md` + `OPP-NNN.md` per opportunity) |
+| Gate A — GRC Review | `grc/` (`_index.md` + `OPP-NNN.md` per flagged opportunity; only when Gate A ran) |
+| 6 — Opportunity Scoring | `scores/` (`_index.md` + `OPP-NNN.md` per opportunity) |
 | 7 — Prioritization & Roadmap | `roadmap.md` |
-| 8 — Use Case Packaging | `usecase-briefs/` (folder: `_index.md` + `UC-NNN.md` per opportunity) |
+| 8 — Use Case Packaging | `usecase-briefs/` (`_index.md` + `UC-NNN.md` per opportunity) |
 | 8.5 — Cost Actuals | `cost-actuals.md` |
-| 9 — Business Case | `business-case.md` |
+| 9 — Business Case | `business-case.md`, `model/` (inputs + `results.json`), `financial-model.xlsx` |
 | 10 — Executive Summary | `executive-summary.md` |
 | 11 — Deliverable | `deliverable.html` |
 | Running log | `evidence-log.md` |
 
-Each phase skill checks that its predecessor file exists before producing any output. If a file is missing, the skill halts and tells you what is needed.
+Each phase skill checks that its predecessor file exists before producing output. If a file is missing, the skill halts and tells you what is needed.
 
 ---
 
 ## Subagent Dispatch
 
-Two subagents fire automatically at quality gates — no setup required. The phase skills dispatch them.
+Subagents fire automatically at quality gates — no setup required; the phase skills dispatch them. Examples:
 
 | Subagent | When it fires | What it checks |
 |---|---|---|
 | `opportunity-reviewer` | After scoring, after roadmap, after packaging | Evidence sourcing, type consistency, brief completeness, Build/Buy/Partner presence |
 | `grc-reviewer` | Inside the GRC gate, for each flagged opportunity | Regulatory exposure, model risk, auditability, failure consequence |
 
-Both agents operate without shared session context — they receive only the document under review. This is intentional.
+Subagents operate without shared session context — they receive only the document under review. This is intentional.
 
 ---
 
-### Python math engine (required for any shipped number)
+## Python math engine (required for any shipped number)
 
 The methodology computes every number with a deterministic Python engine (`engine/`). Set it up once:
 
@@ -249,13 +220,13 @@ The plugin ships a static test suite (Layer 1) that checks the methodology
 graph and guards against known regressions. It is LLM-free and runs in seconds.
 
 ```bash
-make install   # pip install -r requirements.txt  (pytest, pyyaml)
+make install   # pip install -r requirements.txt
 make test      # pytest -q
 ```
 
 Or directly: `pytest` from the repo root. The suite parses the keystone Phase
 Map in `skills/using-methodology/SKILL.md` and asserts every skill, agent,
-chain link, and output file conforms to it.
+chain link, and output file conforms to it — plus the engine's golden-number suite.
 
 ### Pre-push test gate (optional, recommended)
 
@@ -275,16 +246,19 @@ installed, and can be bypassed for a one-off with `git push --no-verify`.
 ## Troubleshooting
 
 **Model skips a phase or ignores the gate condition**
-Check that the keystone (`using-methodology/SKILL.md`) was loaded. In Option A, confirm the session-start hook ran. In Option B, confirm the system prompt contains the full `<EXTREMELY_IMPORTANT>` block.
+Check that the keystone (`using-methodology/SKILL.md`) was loaded. In Claude Code / Cowork, confirm the session-start hook ran. In Claude.ai Projects, confirm the system prompt contains the full `<EXTREMELY_IMPORTANT>` block.
 
-**"I don't see the skill" error in Claude Code**
-Verify the plugin is installed: run `/plugin list` and confirm `ai-process-assessment` appears.
+**"I don't see the skill" in Claude Code**
+Run `/plugin list` and confirm `ai-process-assessment` appears. If you added the marketplace, try `/plugin marketplace update onesteplabs` then reinstall.
+
+**Plugin doesn't appear in Cowork**
+Confirm you're on the latest desktop app and a paid plan, and that the marketplace was added under **Customize → Plugins → Personal plugins**. Type `/` to list available skills.
 
 **Hook does not fire on session start**
 Confirm `async: false` in `hooks/hooks.json` — async hooks can miss the first user turn.
 
 **The model produces output before the predecessor file exists**
-Add an explicit note to the relevant `CLAUDE.md` override, or re-invoke the correct phase skill directly. The gate condition is enforced by the model reading the skill — if the skill wasn't invoked, the gate didn't run.
+Re-invoke the correct phase skill directly, or add a note to the engagement `CLAUDE.md`. The gate condition is enforced by the model reading the skill — if the skill wasn't invoked, the gate didn't run.
 
 **GRC gate fires on an opportunity that doesn't need it**
-Add a CLAUDE.md override entry with rationale. The deliverable gate will audit the override before external sharing.
+Add a `CLAUDE.md` override entry with rationale. The deliverable gate audits the override before external sharing.
