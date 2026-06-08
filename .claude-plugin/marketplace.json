@@ -1,0 +1,18 @@
+{
+  "name": "onesteplabs",
+  "owner": {
+    "name": "Dave Raffaele",
+    "email": "dave@onesteplabs.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-process-assessment",
+      "source": "./",
+      "description": "Structured discipline for AI and automation opportunity identification — an evidence-gated, 11-phase methodology with a deterministic math engine.",
+      "version": "2.5.1",
+      "author": { "name": "Dave Raffaele" },
+      "license": "MIT",
+      "keywords": ["consulting", "ai", "automation", "use-cases", "opportunity"]
+    }
+  ]
+}

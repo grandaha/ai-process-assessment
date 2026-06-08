@@ -288,3 +288,16 @@ def test_phase9_has_no_residual_prose_arithmetic():
     agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
     assert "Annual value calculation:** [improvement quantity] ×" not in agent
     assert "aggregate computation" not in agent
+
+
+def test_system_prompt_mirrors_keystone():
+    # Defends: system-prompt.md (pasted into Claude.ai Projects) is a verbatim
+    # mirror of the keystone. It drifted once (stale 7-dimension rubric, retired
+    # monolithic files, 10-phase map). The keystone body must be embedded as-is.
+    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text()
+    body = keystone.split("---", 2)[-1].strip()  # drop YAML frontmatter
+    system_prompt = (REPO_ROOT / "system-prompt.md").read_text()
+    assert body in system_prompt, "system-prompt.md is out of sync with the keystone — regenerate it"
+    # Stale tokens that must never reappear in the pasteable system prompt.
+    for stale in ("scored-opportunities.md", "7-dimension", "ten sequential phases"):
+        assert stale not in system_prompt, f"stale token in system-prompt.md: {stale!r}"
