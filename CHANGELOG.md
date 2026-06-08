@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- CI: `@claude` PR-review workflow (`.github/workflows/claude.yml`), authenticated
+  via a Claude subscription OAuth token and pinned to a `claude-code-action`
+  release.
+- CI: Dependabot config (`.github/dependabot.yml`) — grouped weekly updates for
+  GitHub Actions and pip dependencies.
+- A tracked pre-push test gate (`.githooks/pre-push`) that runs the suite before
+  every push; enable with `git config core.hooksPath .githooks`.
+- This `CHANGELOG.md`.
+
+### Changed
+- CI: `actions/checkout` bumped to v6 and `actions/setup-python` to v6.
+- Raised `requirements.txt` floors to current releases (`pytest>=9.0.3`,
+  `pyyaml>=6.0.3`, `openpyxl>=3.1.5`, `formulas>=1.3.4`).
+
 ## [2.5.1] — 2026-06-07
 
 ### Fixed
