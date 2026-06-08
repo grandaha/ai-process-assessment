@@ -71,8 +71,8 @@ def write_workbook(inputs, results, out_path) -> Path:
             ws_v.append([opp, "PENDING", "PENDING"])
         else:
             ws_v.append([opp,
-                         f"={IN}!C{r}*{IN}!E{r}*{IN}!F{r}",   # impr_low*volume*rate
-                         f"={IN}!D{r}*{IN}!E{r}*{IN}!F{r}"])  # impr_high*volume*rate
+                         f"=ROUND({IN}!C{r}*{IN}!E{r}*{IN}!F{r}, 2)",   # impr_low*volume*rate
+                         f"=ROUND({IN}!D{r}*{IN}!E{r}*{IN}!F{r}, 2)"])  # impr_high*volume*rate
 
     # --- Scores (P6): mean of 6 dims ---
     ws_s = wb.create_sheet("Scores (P6)")
@@ -97,15 +97,17 @@ def write_workbook(inputs, results, out_path) -> Path:
                          "PENDING", "PENDING", "PENDING"])
         else:
             # labor=G*H ; cm=labor*K ; subtotal=labor+I+J+cm ; cont=subtotal*L ; total=subtotal+cont
+            # Each cell ROUNDs to 2dp from rounded predecessors, mirroring
+            # compute.cost_structure so the workbook == results.json exactly.
             ws_c.append([
                 opp,
-                f"={IN}!G{r}*{IN}!H{r}",                              # B labor
-                f"=B{i}*{IN}!K{r}",                                   # C change_mgmt
-                f"=B{i}+{IN}!I{r}+{IN}!J{r}+C{i}",                    # D subtotal
-                f"=D{i}*{IN}!L{r}",                                   # E contingency
-                f"=D{i}+E{i}",                                        # F total
-                f"=F{i}*0.5",                                         # G rom_low
-                f"=F{i}*1.5",                                         # H rom_high
+                f"=ROUND({IN}!G{r}*{IN}!H{r}, 2)",                    # B labor
+                f"=ROUND(B{i}*{IN}!K{r}, 2)",                         # C change_mgmt
+                f"=ROUND(B{i}+{IN}!I{r}+{IN}!J{r}+C{i}, 2)",          # D subtotal
+                f"=ROUND(D{i}*{IN}!L{r}, 2)",                         # E contingency
+                f"=ROUND(D{i}+E{i}, 2)",                              # F total
+                f"=ROUND(F{i}*0.5, 2)",                               # G rom_low
+                f"=ROUND(F{i}*1.5, 2)",                               # H rom_high
             ])
         cost_row[opp] = i
 
@@ -138,15 +140,16 @@ def write_workbook(inputs, results, out_path) -> Path:
     BC = _q("Business Case (P9)")
     ws_a.append(["metric", "low", "high"])
     ws_a.append(["investment",
-                 "PENDING" if inv_pending else f"=SUM({BC}!B2:B{last})",
-                 "PENDING" if inv_pending else f"=SUM({BC}!C2:C{last})"])
+                 "PENDING" if inv_pending else f"=ROUND(SUM({BC}!B2:B{last}), 2)",
+                 "PENDING" if inv_pending else f"=ROUND(SUM({BC}!C2:C{last}), 2)"])
     ws_a.append(["annual_value",
-                 "PENDING" if val_pending else f"=SUM({BC}!D2:D{last})",
-                 "PENDING" if val_pending else f"=SUM({BC}!E2:E{last})"])
+                 "PENDING" if val_pending else f"=ROUND(SUM({BC}!D2:D{last}), 2)",
+                 "PENDING" if val_pending else f"=ROUND(SUM({BC}!E2:E{last}), 2)"])
     # payback best = investment.low/value.high ; worst = investment.high/value.low
+    # ROUND to 2dp to match compute.payback (round(...,2)).
     ws_a.append(["payback_years",
-                 "PENDING" if pay_pending else "=B2/C3",
-                 "PENDING" if pay_pending else "=C2/B3"])
+                 "PENDING" if pay_pending else "=ROUND(B2/C3, 2)",
+                 "PENDING" if pay_pending else "=ROUND(C2/B3, 2)"])
 
     wb.save(out_path)
     return out_path
