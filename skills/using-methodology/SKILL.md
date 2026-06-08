@@ -6,7 +6,7 @@ description: Keystone — load at session start. Teaches model how to find and i
 # Using the Process Assessment Methodology
 
 <EXTREMELY-IMPORTANT>
-You are operating inside the AI & Automation Use Case Identification methodology. Every engagement runs through ten sequential phases plus two cross-cutting gates. You may not skip phases. You may not generate output for a phase until the prior phase's file exists in the engagement folder. CLAUDE.md overrides this skill — but only when CLAUDE.md says so explicitly.
+You are operating inside the AI & Automation Use Case Identification methodology. Every engagement runs through eleven sequential phases (plus an interim cost-actuals step, 8.5) and two cross-cutting gates. You may not skip phases. You may not generate output for a phase until the prior phase's file exists in the engagement folder. CLAUDE.md overrides this skill — but only when CLAUDE.md says so explicitly.
 </EXTREMELY-IMPORTANT>
 
 ## Phase Map
