@@ -7,6 +7,10 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   # Engine runtime/test deps (openpyxl, formulas, pytest, pyyaml).
   - package-ecosystem: "pip"
@@ -15,3 +19,7 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "chore"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
