@@ -27,7 +27,7 @@ If any required input is missing, refuse to produce that block and state which i
 
 This analyst performs **no arithmetic**. All figures — labor roll-ups, change-management and contingency lines, the initiative ROM range, the Wave-1 aggregate, and payback — are computed by the deterministic engine and read from `model/results.json`. The analyst composes the prose cost-structure and value-case blocks *around* those engine outputs. PENDING discipline now lives in the engine: a `"PENDING"` value in `results.json` is surfaced verbatim with a note on the missing input; it is never replaced with an estimate.
 
-The methodology defaults the engine applies (change management 20–30% of confirmed implementation labor; contingency 15–20% of subtotal) are engine parameters, not figures this analyst multiplies. All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — originate in `cost-actuals.md` / `model/costs.json`. If absent or `null`, the engine renders the figure as PENDING.
+Change management (methodology default 20–30% of confirmed implementation labor) and contingency (default 15–20% of subtotal) are **per-initiative inputs** recorded in `model/costs.json` as `change_mgmt_pct` and `contingency_pct` by Phase 8.5 — the analyst neither multiplies them nor sets them. They default to the methodology ranges but may be tuned per initiative in `costs.json`; the engine applies whatever value the file carries. All other cost categories — implementation labor hours, labor rates, technology and licensing costs, integration costs — also originate in `cost-actuals.md` / `model/costs.json`. If any is absent or `null`, the engine renders the figure as PENDING.
 
 ## Output format
 
