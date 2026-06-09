@@ -31,13 +31,7 @@ At session start:
    If they are missing, halt and tell the user where the plugin's `samples/` folder is expected.
 2. **Fix the engagement name.** This run uses the engagement name **`sample-pso-delivery`**. The Phase 1 skill will create `docs/engagements/sample-pso-delivery/` and write the `Engagement folder:` field into `scope.md`. Do not improvise a different name — downstream the run is expected to live at `docs/engagements/sample-pso-delivery/`.
 3. **Read the scenario README** (`samples/pso-delivery-team/README.md`) so you understand the case before scoping it.
-4. **Write the sample-run marker.** Create the engagement folder and write `.sample-run.md` now, before handing off to Phase 1. This marker persists across session boundaries so every phase skill can detect the sample context without user action.
-
-   ```bash
-   mkdir -p docs/engagements/sample-pso-delivery
-   ```
-
-   Write `docs/engagements/sample-pso-delivery/.sample-run.md` with exactly this content:
+4. **Write the sample-run marker.** Create the engagement folder (`docs/engagements/sample-pso-delivery/`) if it does not already exist, then use the Write tool to create `docs/engagements/sample-pso-delivery/.sample-run.md` with exactly this content:
 
    ```markdown
    ---
@@ -60,6 +54,8 @@ At session start:
    | 3 — Tech & Data | systems-and-data.md |
    | 4 — Discovery | interview-notes.md |
    ```
+
+   This marker persists across session boundaries so every phase skill can detect the sample context without user action.
 
 Then hand off to Phase 1 — do **not** do Phase 1's work in this skill.
 
