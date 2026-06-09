@@ -43,6 +43,26 @@ def test_value_input_keeps_explicit_fraction():
     assert vi.volume_fraction == 0.4
 
 
+def test_value_input_null_fraction_defaults_to_one():
+    # An explicit JSON null must behave like an absent key (default 1.0),
+    # not propagate None into the engine's volume multiplication.
+    vi = ValueInput.from_dict({
+        "opp_id": "OPP-001", "improvement_low": 0.5, "improvement_high": 0.7,
+        "process_id": "PROC-01", "volume_fraction": None, "rate": 100,
+    })
+    assert vi.volume_fraction == 1.0
+
+
+def test_value_input_preserves_zero_fraction():
+    # A literal 0.0 is a real (if degenerate) value — it must survive, not
+    # silently coalesce to 1.0 (which a bare `or 1.0` would do).
+    vi = ValueInput.from_dict({
+        "opp_id": "OPP-001", "improvement_low": 0.5, "improvement_high": 0.7,
+        "process_id": "PROC-01", "volume_fraction": 0.0, "rate": 100,
+    })
+    assert vi.volume_fraction == 0.0
+
+
 def test_score_input_rejects_wrong_dimension_count():
     with pytest.raises(ValueError):
         ScoreInput.from_dict({"opp_id": "OPP-001", "dimensions": [1, 2, 3]})

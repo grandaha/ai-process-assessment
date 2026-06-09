@@ -37,8 +37,13 @@ class ValueInput:
 
     @classmethod
     def from_dict(cls, d):
+        # An absent key OR an explicit JSON null both mean "whole process" (1.0);
+        # a literal 0.0 is preserved. `.get(k, 1.0)` mishandles explicit null,
+        # and `... or 1.0` would wrongly coalesce a valid 0.0.
+        fraction = d.get("volume_fraction")
+        fraction = 1.0 if fraction is None else fraction
         return cls(d["opp_id"], d.get("improvement_low"), d.get("improvement_high"),
-                   d.get("process_id"), d.get("volume_fraction", 1.0), d.get("rate"))
+                   d.get("process_id"), fraction, d.get("rate"))
 
 
 @dataclass(frozen=True)

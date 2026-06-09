@@ -49,6 +49,38 @@ def test_volume_fraction_scales_resolved_volume(tmp_path):
     assert res["value"]["OPP-001"] == {"low": 200_000.0, "high": 280_000.0}
 
 
+def test_volume_fraction_null_resolves_like_default(tmp_path):
+    # Explicit null fraction must compute identically to the 1.0 default —
+    # not raise TypeError in the volume multiplication.
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    value = json.loads((eng / "model" / "value.json").read_text())
+    value[0]["volume_fraction"] = None
+    (eng / "model" / "value.json").write_text(json.dumps(value))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == {"low": 400_000.0, "high": 560_000.0}
+
+
+def test_value_pending_when_process_id_not_in_baselines(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    value = json.loads((eng / "model" / "value.json").read_text())
+    value[0]["process_id"] = "PROC-99"  # no such baseline
+    (eng / "model" / "value.json").write_text(json.dumps(value))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == "PENDING"
+
+
+def test_value_pending_when_baseline_volume_is_null(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    baselines = json.loads((eng / "model" / "baselines.json").read_text())
+    baselines[0]["volume"] = None  # baseline exists, volume not yet captured
+    (eng / "model" / "baselines.json").write_text(json.dumps(baselines))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == "PENDING"
+
+
 def test_main_writes_results_json(tmp_path):
     eng = tmp_path / "engagement"
     shutil.copytree(FIXTURE, eng / "model")
