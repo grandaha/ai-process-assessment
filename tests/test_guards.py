@@ -301,3 +301,31 @@ def test_system_prompt_mirrors_keystone():
     # Stale tokens that must never reappear in the pasteable system prompt.
     for stale in ("scored-opportunities.md", "7-dimension", "ten sequential phases"):
         assert stale not in system_prompt, f"stale token in system-prompt.md: {stale!r}"
+
+# --- #improvement-log guard (defends: undocumented rationalization escapes) ---
+# improvement-log.md must exist at the repo root, carry a schema section, have at
+# least one example entry, and be referenced by the keystone with a write-trigger.
+
+def test_improvement_log_exists():
+    log = REPO_ROOT / "improvement-log.md"
+    assert log.exists(), "improvement-log.md must exist at the repo root"
+
+
+def test_improvement_log_has_schema_section():
+    log = (REPO_ROOT / "improvement-log.md").read_text(encoding="utf-8")
+    assert "## Entry Format" in log, \
+        "improvement-log.md must contain an '## Entry Format' section"
+
+
+def test_improvement_log_has_example_entry():
+    log = (REPO_ROOT / "improvement-log.md").read_text(encoding="utf-8")
+    assert re.search(r"### \d{4}-\d{2}-\d{2}", log), \
+        "improvement-log.md must contain at least one dated entry (### YYYY-MM-DD format)"
+
+
+def test_keystone_references_improvement_log():
+    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text(encoding="utf-8")
+    assert "improvement-log.md" in keystone, \
+        "keystone must reference improvement-log.md"
+    assert "prepend a new entry" in keystone, \
+        "keystone must instruct the agent to prepend a new entry to improvement-log.md"
