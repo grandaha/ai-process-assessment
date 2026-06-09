@@ -99,6 +99,7 @@ ai-process-assessment/
 ├── CLAUDE.md                       ← per-engagement override template
 ├── INSTALL.md                      ← full install guide (Claude Code / Cowork / Claude.ai)
 ├── CHANGELOG.md                    ← version history (Keep a Changelog)
+├── improvement-log.md              ← cross-engagement rationalization escape log
 ├── requirements.txt                ← engine deps (openpyxl, formulas, pytest, pyyaml)
 └── pytest.ini                      ← static test suite config
 ```
