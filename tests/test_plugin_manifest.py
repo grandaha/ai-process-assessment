@@ -14,6 +14,8 @@ import pytest
 
 PLUGIN_JSON = REPO_ROOT / ".claude-plugin" / "plugin.json"
 INSTALL_MD = REPO_ROOT / "INSTALL.md"
+MARKETPLACE_JSON = REPO_ROOT / ".claude-plugin" / "marketplace.json"
+CHANGELOG_MD = REPO_ROOT / "CHANGELOG.md"
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$")
 
 
@@ -62,3 +64,20 @@ def test_version_not_behind_latest_tag():
     latest = max(tags, key=_semver_tuple)
     assert _semver_tuple(_plugin_version()) >= _semver_tuple(latest), \
         f"plugin.json version {_plugin_version()} is behind latest tag {latest}"
+
+
+def test_marketplace_json_version_matches_plugin_json():
+    version = _plugin_version()
+    data = json.loads(MARKETPLACE_JSON.read_text(encoding="utf-8"))
+    plugins = data.get("plugins", [])
+    match = next((p for p in plugins if p.get("name") == "ai-process-assessment"), None)
+    assert match is not None, "ai-process-assessment entry missing from marketplace.json"
+    assert match.get("version") == version, \
+        f"marketplace.json version {match.get('version')} != plugin.json version {version}"
+
+
+def test_changelog_has_section_for_current_version():
+    version = _plugin_version()
+    changelog = CHANGELOG_MD.read_text(encoding="utf-8")
+    assert re.search(r"^## \[" + re.escape(version) + r"\]", changelog, re.MULTILINE), \
+        f"CHANGELOG.md has no '## [{version}]' section"
