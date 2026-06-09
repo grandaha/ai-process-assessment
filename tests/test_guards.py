@@ -329,3 +329,35 @@ def test_keystone_references_improvement_log():
         "keystone must reference improvement-log.md"
     assert "prepend a new entry" in keystone, \
         "keystone must instruct the agent to prepend a new entry to improvement-log.md"
+
+# --- #sample-run-marker guard (defends: sample-run context lost at session boundary) ---
+# running-sample-engagement must write .sample-run.md so fresh sessions can detect the
+# sample context. Every eliciting phase skill (Phases 1–4) must check for that file in
+# its Session Start section before falling through to live elicitation.
+
+SAMPLE_RUN_MARKER = ".sample-run.md"
+ELICITING_PHASE_SKILLS = {
+    "ai-process-assessment:scoping-engagement",
+    "ai-process-assessment:mapping-context",
+    "ai-process-assessment:inventorying-tech-data",
+    "ai-process-assessment:discovering-processes",
+}
+
+
+def test_running_sample_engagement_writes_marker(methodology):
+    body = methodology.skills["ai-process-assessment:running-sample-engagement"].body
+    assert SAMPLE_RUN_MARKER in body, \
+        "running-sample-engagement must write the .sample-run.md marker file in its Setup section"
+
+
+def test_eliciting_phase_skills_check_sample_run_marker(methodology):
+    for sid in sorted(ELICITING_PHASE_SKILLS):
+        body = methodology.skills[sid].body
+        ss_idx = body.find("## Session Start")
+        assert ss_idx != -1, f"{sid} has no Session Start section"
+        ss_block = body[ss_idx:]
+        nxt = re.search(r"\n## ", ss_block[len("## Session Start"):])
+        if nxt:
+            ss_block = ss_block[:len("## Session Start") + nxt.start()]
+        assert SAMPLE_RUN_MARKER in ss_block, \
+            f"{sid} Session Start missing .sample-run.md check"
