@@ -39,6 +39,10 @@ Scoring produces a ranked list. Sequencing produces a roadmap. They are not the 
 | Scale | 6–18 months | Directional — type, scope, expected value range, key dependencies |
 | Optimize | 18–36 months | Strategic intent only — capability area, hypothesis, signal that triggers re-scoping |
 
+## Recording wave assignments for the engine
+
+Wave assignment is a numeric input the engine consumes. As the final wave set is locked, write `model/initiatives.json` — one object per sequenced opportunity: `{"opp_id": "OPP-NNN", "name": "<initiative name>", "wave": N}` where `N` is `1` (Foundation), `2` (Scale), or `3` (Optimize). Include every sequenced opportunity, not only Wave 1 — the engine filters `wave == 1` for the business case itself. `roadmap.md` remains the human-readable narrative; `model/initiatives.json` is the engine's input and the single source of truth for wave membership. Phase 9 reads this file; it does not recreate it. Do not run the engine in Phase 7 — this phase only writes the file.
+
 ## Enabler & Dependency Mapping
 
 Each Wave 1 initiative MUST list its enablers. Unresolved enabler dependencies disqualify Wave 1 placement without documented remediation. If an enabler is missing, either:
@@ -65,6 +69,7 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 - [ ] Apply Constraint 4 (Strategic alignment) — break ties only after constraints 1–3 are satisfied
 - [ ] Apply Constraint 5 (Job boundary impact) — flag Long-run opportunities; confirm org design workstream exists before placing in Wave 1
 - [ ] Map enablers and dependencies for every Wave 1 initiative
+- [ ] Write `model/initiatives.json` — one `{opp_id, name, wave}` per sequenced opportunity (the structured output of wave assignment; engine source of truth for wave membership)
 - [ ] Annotate every `optimizing-around` Wave-1 item in roadmap.md (Structural read-through; does not change sequencing)
 - [ ] For any Wave 2/3 item with conditional placement, flag it explicitly in the wave summary table row — not only in dependency notes
 - [ ] For every cross-wave dependency (e.g., Wave 2 item depends on Wave 1 item being live), state a minimum operational maturity threshold (e.g., "OPP-NNN must be in stable production for ≥60 days before this item is scoped")
@@ -82,10 +87,11 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 3. Apply constraints 1–3 in order. Each may evict or import an item.
 4. Use Constraint 4 only on remaining ties.
 5. Apply Constraint 5 — check Execution Horizon flag (from `scores/OPP-NNN.md`) on each Wave 1 candidate. Move Long-run items to Wave 2 unless org design dependency is documented and sequenced.
-5. Map enablers for the final Wave 1. Resolve gaps using one of the three options above.
-6. **Structural annotation.** For every opportunity sequenced into a wave, look up its `Structural` value in `opportunities/_index.md`. For each `optimizing-around` item, add a one-line annotation to its entry in the Wave summary table and its Wave-1 initiative-detail card: `Structural: optimizing-around — speeds a process the Phase 4 challenge hypothesis flagged for redesign.` This is informational; it does not change wave placement. `addressing-root` and `not-applicable` items need no annotation.
-7. Run `opportunity-reviewer`. Resolve Critical findings.
-8. Save and chain forward.
+6. Map enablers for the final Wave 1. Resolve gaps using one of the three options above.
+7. **Record wave assignments.** Write `model/initiatives.json` with one `{opp_id, name, wave}` object per sequenced opportunity. This is the structured output of the sequencing decision — do not defer it to Phase 9.
+8. **Structural annotation.** For every opportunity sequenced into a wave, look up its `Structural` value in `opportunities/_index.md`. For each `optimizing-around` item, add a one-line annotation to its entry in the Wave summary table and its Wave-1 initiative-detail card: `Structural: optimizing-around — speeds a process the Phase 4 challenge hypothesis flagged for redesign.` This is informational; it does not change wave placement. `addressing-root` and `not-applicable` items need no annotation.
+9. Run `opportunity-reviewer`. Resolve Critical findings.
+10. Save and chain forward.
 
 ## Rationalization Table
 
