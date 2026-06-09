@@ -1,10 +1,12 @@
 # Improvement Log
 
-Append-only. New entries go at the top. Existing entries are never edited.
+Prepend-only. New entries go at the top. Existing entries are never edited.
 
 Each entry records one rationalization escape: a shortcut the methodology did not prevent, which triggered the RED step of the RED-GREEN-REFACTOR loop. The entry is written before the rationalization table row is added, so the escape and the fix are permanently linked.
 
 ## Entry Format
+
+Add entries under `## Entries` below, newest first.
 
 ---
 
