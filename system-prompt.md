@@ -64,7 +64,7 @@ When you identify a rationalization escape — a shortcut that the methodology d
 
 1. **RED:** prepend a new entry to `improvement-log.md` at the repo root, filling every field in the Entry Format.
 2. **GREEN:** add a row to the rationalization table of the relevant `SKILL.md` (and to the master table above if the escape is general).
-3. **REFACTOR:** if the escape is systematic, tighten the gate or checklist step that should have caught it; update `system-prompt.md` if a keystone section changed.
+3. **REFACTOR:** if the escape is systematic, tighten the gate or checklist step that should have caught it; update `system-prompt.md` if a keystone section changed (run `pytest` — the mirror guard enforces the sync).
 
 The entry is written before the table row — so the escape and the fix are permanently linked. Do not edit prior entries.
 
@@ -133,4 +133,5 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 ## Chain to next skill
 
 → `ai-process-assessment:scoping-engagement` (on any new engagement prompt)
+
 </EXTREMELY_IMPORTANT>
