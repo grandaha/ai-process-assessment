@@ -81,14 +81,17 @@ def build_results(model_dir) -> dict:
 
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
-    if not argv:
-        print("usage: python -m engine.run <engagement-folder>/", file=sys.stderr)
+    flags = {a for a in argv if a.startswith("--")}
+    positional = [a for a in argv if not a.startswith("--")]
+    if not positional:
+        print("usage: python -m engine.run <engagement-folder>/ [--no-workbook]", file=sys.stderr)
         return 2
-    engagement = Path(argv[0])
+    engagement = Path(positional[0])
     model_dir = engagement / "model"
     results = build_results(model_dir)
     (model_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-    write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
+    if "--no-workbook" not in flags:
+        write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
     return 0
 
 

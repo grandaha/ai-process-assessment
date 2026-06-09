@@ -65,3 +65,19 @@ def test_missing_cost_input_renders_pending(tmp_path):
     (eng / "model" / "costs.json").write_text(json.dumps(costs))
     res = build_results(eng / "model")
     assert res["costs"]["OPP-001"]["rom"] == "PENDING"
+
+
+def test_no_workbook_flag_skips_xlsx_but_writes_results(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    rc = main([str(eng), "--no-workbook"])
+    assert rc == 0
+    assert (eng / "model" / "results.json").exists()
+    assert not (eng / "financial-model.xlsx").exists()
+
+
+def test_default_run_still_writes_workbook(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    main([str(eng)])
+    assert (eng / "financial-model.xlsx").exists()
