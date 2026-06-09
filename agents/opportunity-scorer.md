@@ -39,6 +39,8 @@ Score each dimension 1–5. Every score requires a source citation. Refuse to sc
 
 **Categorical rule:** Cite the source document AND the specific field or figure that supports each score. "Based on context.md" is not a citation — name the specific content.
 
+**Value Potential — enabler vs. mechanism:** Score a dashboard, alert, or report on the fraction of value it enables, discounted for the human decision step that remains. Do not cite a downstream recovery figure as if this opportunity directly executes it. An opportunity that directly closes a gap scores higher on this dimension than one that surfaces the information for a human to act on.
+
 **Structural response (read-through, no score change).** The opportunity carries a `Structural response` from Phase 5 (`addressing-root` / `optimizing-around` / `not-applicable`). When it is `optimizing-around`, note that fact in the Strategic Alignment rationale so the score's reasoning is honest about what the opportunity does and does not resolve. This is a read-through annotation only: it does not change the Strategic Alignment score and does not change the composite. The methodology surfaces the trade-off; it does not penalize it.
 
 ## Build/Buy/Partner Classification
@@ -54,23 +56,31 @@ Required for every scored opportunity. Evaluate four inputs, then output one of:
 
 Cite `tech-inventory.md` (build/buy posture, shadow IT, system inventory) and `context.md` (funding model, prior initiative outcomes) for each input. Refuse to output a B/B/P classification without citing all four inputs.
 
+**Classification guidance:**
+- **Build** — org builds from scratch using internal skills; no credible commercial product exists or strategic differentiation justifies custom ownership
+- **Buy** — credible vendor product exists; org procures and deploys/configures it with internal resources or minimal vendor professional services
+- **Partner** — credible vendor product exists AND significant configuration, integration, or implementation work is required that the org lacks capacity to deliver; a systems integrator (SI) is the primary delivery mechanism. Use Partner when the question is not "which vendor" but "who implements it." Common for orgs with small IT teams and large Microsoft/Workday tenants requiring substantial configuration.
+- **Hybrid** — meaningful components of two paths; name both and explain why neither alone applies
+
+Calibration check: if the org has a small IT team, a stated aversion to internal builds, and the opportunity requires substantial platform configuration, Partner is likely more accurate than Buy even when the vendor product is clear.
+
 ## Refusal rules
 
 - Refuse to score a dimension if the required source is not provided.
-- Refuse to output a composite score without all 6 dimensional scores.
+- Refuse to write the output file without all 6 dimensional scores present in the table.
 - Refuse to produce a B/B/P classification without citing all four B/B/P inputs.
 
 ## Operating constraints
 
 - Receives only the inputs listed above — no shared session context
 - Produces one scored entry only — the OPP-NNN specified at dispatch
-- Dimensional scores are the decision input; the composite is an engine-computed sort key only (see Composite section — the agent does not average in prose)
+- Dimensional scores are the decision input; composite is a sort key computed by the orchestrator after assembly — the agent writes `PENDING` as a placeholder, never a number
 - Writes its scored entry to the staging file path provided at dispatch using the Write tool
 - Returns only a one-line summary — does NOT return the scored entry content to main context
 
 ## Composite
 
-Record the six dimension scores; do not average them. Write `{"opp_id": "<id>", "dimensions": [d1, d2, d3, d4, d5, d6]}` to `model/scores.json`. The composite is computed by the deterministic engine and read from `results.json` — the agent never performs the mean in prose.
+Do not compute or estimate the composite. Write `PENDING` as the composite placeholder in both the index comment and the body line. The orchestrator extracts dimension integers from the markdown table, computes `round(sum(dimensions) / 6, 2)`, stamps the result into the file, and writes `model/scores.json` — all after all agents complete.
 
 ## Output
 
@@ -80,7 +90,7 @@ Structure the written content as:
 
 ```markdown
 ## OPP-NNN — [Opportunity title]
-<!-- index: id=OPP-NNN composite=N.N horizon=Short-run|Long-run bbp=Build|Buy|Partner|Hybrid -->
+<!-- index: id=OPP-NNN composite=PENDING horizon=Short-run|Long-run bbp=Build|Buy|Partner|Hybrid -->
 
 ### Dimensional Scores
 
@@ -93,7 +103,7 @@ Structure the written content as:
 | Strategic Alignment | N/5 | [specific priority from context.md] |
 | Time to Value | N/5 | [specific lead time or step complexity] |
 
-**Composite:** N.N / 5 (engine-computed from the 6 dimensions; read from `results.json`)
+**Composite:** PENDING (engine-computed)
 
 **Execution Horizon:** [Short-run / Long-run] — [one-sentence rationale]
 
@@ -115,7 +125,7 @@ Structure the written content as:
 
 After writing the file, return exactly this one-line summary and nothing else:
 ```
-<OPP-NNN>: Composite <N.N>. B/B/P: <classification>. Written to <staging_file_path>.
+<OPP-NNN>: Dimensions scored. B/B/P: <classification>. Written to <staging_file_path>.
 ```
 Do NOT return the scored entry content in your response.
 
