@@ -10,6 +10,7 @@ description: Phase 4 — evidence-gathering core. Maps processes via four-round 
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `tech-inventory.md`, `context.md` — confirm each exists.
+3. **Check for a sample-run marker.** After extracting the engagement folder, check whether `<engagement-folder>/.sample-run.md` exists. If present, this is a sample run — read that file silently. At all four interview rounds in the Workflow below, read the intake file listed for Phase 4 in the marker's Phase Intake Map (`<intake_root>/interview-notes.md`) instead of conducting live stakeholder interviews.
 
 Gate condition: `tech-inventory.md` must be present before proceeding.
 

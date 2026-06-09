@@ -10,7 +10,8 @@ description: Phase 1 — front gate for all analytical work. Elicits sponsoring 
 This skill runs as a standalone session. At session start:
 1. Ask the user for the engagement name. This becomes the folder path `docs/engagements/<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask.
 2. Run `mkdir -p docs/engagements/<name>/` to create the engagement folder before writing any files.
-3. No predecessor files required — this is Phase 1.
+3. **Check for a sample-run marker.** After creating the engagement folder, check whether `docs/engagements/<name>/.sample-run.md` exists. If present, this is a sample run — read that file silently. At the live-sponsor-interview step in the Workflow below, read the intake file listed for Phase 1 in the marker's Phase Intake Map (`<intake_root>/engagement-request.md`) instead of interviewing a live sponsor.
+4. No predecessor files required — this is Phase 1.
 
 Gate condition: None. Proceed directly to scoping once the engagement folder is created.
 
