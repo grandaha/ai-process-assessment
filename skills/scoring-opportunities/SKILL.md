@@ -45,6 +45,8 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 - 4 — High value; strong baseline; recovers significant cost or time (>$100K/yr or >1 FTE or meaningful cycle-time compression across high volume)
 - 5 — Very high value; strong baseline; major cost or strategic impact (>$500K/yr, or directly addresses the largest identified cost driver in the engagement)
 
+**Enabler vs. mechanism:** An opportunity that surfaces information for human action (a dashboard, alert, or report) should be scored on its own contribution — the fraction of the downstream value it enables, discounted for the human decision step that remains. Do not assign the full downstream value to an enabler. A mechanism that directly executes the improvement scores higher than an enabler that makes the improvement possible.
+
 **Technical Feasibility**
 - 1 — Not feasible given current stack; requires capabilities that do not exist
 - 2 — Major barriers; significant new capability required beyond the current stack
@@ -84,9 +86,17 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 
 **Execution Horizon is a required field on every scored opportunity entry: Short-run / Long-run with one-sentence rationale. This field is consumed by Phase 7 sequencing.**
 
-## Composite score (engine-computed)
+## Composite score (computed post-assembly)
 
-The composite is **not** averaged by the model in prose. Each scorer records its six dimension scores for an OPP-ID into the engagement's `model/scores.json` (`{"opp_id": "...", "dimensions": [d1..d6]}`). After all opportunities are scored, run `python -m engine.run <engagement-folder>/`; the composite for each OPP-ID is read from `results.json` `scores.<OPP-ID>` and stamped into `scores/OPP-NNN.md` and `scores/_index.md`.
+The composite is **not** computed by the scorer agent. After all agents complete and files are assembled, the orchestrator runs a Python script that:
+1. Extracts dimension integers from the markdown tables in each `scores/OPP-NNN.md`
+2. Computes `round(sum(dimensions) / 6, 2)` — identical to `engine.compute.score_composite`
+3. Stamps the composite back into the file (replacing `PENDING`) in both the index comment and the body line
+4. Writes `model/scores.json` for consumption by the full engine run in Phase 9
+
+The `_index.md` is always generated last — after stamping — so it never contains `PENDING` or agent-estimated values.
+
+Note: `python -m engine.run` is **not** called in Phase 6. The full engine run (which produces `model/results.json` and `financial-model.xlsx`) happens in Phase 9 once value, cost, and initiative inputs are available.
 
 ## Build/Buy/Partner Classification
 
@@ -99,16 +109,54 @@ Required for every scored opportunity. Inputs:
 
 Output one of: **Build / Buy / Partner / Hybrid**, with rationale citing the four inputs.
 
+**Classification guidance:**
+- **Buy** — org procures a vendor product and deploys/configures it internally or with minimal vendor professional services
+- **Partner** — vendor product exists, but significant configuration or implementation requires a systems integrator as the delivery mechanism; use when the org lacks capacity to implement even a commercial solution (e.g., small IT team, large platform configuration scope)
+- **Hybrid** — two paths share meaningful weight; name both components
+
+Calibration: uniform Buy across all opportunities in an engagement with a small IT team is a signal to reconsider. If an SI would realistically be the delivery vehicle, that is Partner.
+
 ## Subagent Dispatch
 
 This phase already runs two subagents. This section names the pattern so it reads consistently with the other phases — the operational detail lives in the Phase checklist and Workflow below, which are authoritative.
 
 - **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives: engagement folder path, OPP-ID, and staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. The agent reads its own OPP entry from `opportunities/OPP-NNN.md` and the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, and `context.md` itself. Do not pass file content to the subagent. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
 - **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scores/` folder draft, for independent cross-OPP calibration and consistency review. Pass to the reviewer: engagement folder path. The reviewer reads the `scores/` folder itself. Do not pass document content. Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary to main context: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
-- **Assembly:** After all scorer agents complete, assemble via Bash:
+- **Assembly:** After all scorer agents complete, run the following sequence in order:
+
+  **Step 1 — Move staged files:**
   ```bash
   mkdir -p docs/engagements/<name>/scores
   mv docs/engagements/<name>/_staging/phase6/OPP-*.md docs/engagements/<name>/scores/
+  ```
+
+  **Step 2 — Compute composites, stamp files, write `model/scores.json`:**
+  ```bash
+  python3 -c "
+  import json, re
+  from pathlib import Path
+  eng = Path('docs/engagements/<name>')
+  eng.joinpath('model').mkdir(exist_ok=True)
+  entries = []
+  for f in sorted(eng.joinpath('scores').glob('OPP-*.md')):
+      text = f.read_text()
+      dims = [int(m) for m in re.findall(r'\| [^\|]+ \| (\d)/5 \|', text)]
+      if len(dims) != 6:
+          print(f'WARNING: {f.name} has {len(dims)} dimension rows, expected 6 — skipped')
+          continue
+      composite = round(sum(dims) / 6, 2)
+      text = re.sub(r'composite=PENDING', f'composite={composite}', text, count=1)
+      text = text.replace('**Composite:** PENDING (engine-computed)', f'**Composite:** {composite} / 5')
+      f.write_text(text)
+      entries.append({'opp_id': f.stem, 'dimensions': dims})
+      print(f'Stamped {f.stem}: {composite}')
+  eng.joinpath('model/scores.json').write_text(json.dumps(entries, indent=2))
+  print(f'Wrote {len(entries)} entries to model/scores.json')
+  "
+  ```
+
+  **Step 3 — Generate `_index.md` from stamped files:**
+  ```bash
   echo "| OPP-ID | Composite | Horizon | B/B/P |" > docs/engagements/<name>/scores/_index.md
   echo "|--------|-----------|---------|-------|" >> docs/engagements/<name>/scores/_index.md
   for f in docs/engagements/<name>/scores/OPP-*.md; do
@@ -120,7 +168,14 @@ This phase already runs two subagents. This section names the pattern so it read
     echo "| $id | $comp | $horiz | $bbp |" >> docs/engagements/<name>/scores/_index.md
   done
   ```
-  Verify with: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`. Cleanup: `rm -rf docs/engagements/<name>/_staging/phase6`.
+
+  Verify with: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`
+  Confirm no PENDING values remain: `grep -l PENDING docs/engagements/<name>/scores/OPP-*.md` (expect no output)
+
+  Cleanup (non-fatal — sandbox may restrict deletion of empty directories):
+  ```bash
+  rm -rf docs/engagements/<name>/_staging/phase6 || echo "Cleanup skipped (sandbox restriction) — directory is empty"
+  ```
 - **What stays in main context:** One-line summaries from each scorer agent (OPP-NNN, composite score, B/B/P), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
 
 See the Phase checklist and Workflow sections for the authoritative step sequence and ordering.
@@ -130,10 +185,8 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 - [ ] Confirm `opportunities/_index.md` exists and GRC gate cleared for flagged items
 - [ ] Dispatch one `opportunity-scorer` agent per opportunity in a single parallel tool-call batch (pass: OPP entry from `opportunities/OPP-NNN.md`, relevant process-map.md sections, baselines.md rows, tech-inventory.md sections, context.md sections)
 - [ ] Collect one-line summaries from scorer agents (OPP-NNN, composite, B/B/P). Full scored entries are in staging files.
-- [ ] Assemble via Bash: move staged files to `scores/`, generate `scores/_index.md` (see Assembly command in Subagent Dispatch)
-- [ ] Verify: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`
-- [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/phase6`
-- [ ] Compute composite score AND retain dimensional scores (composite alone is insufficient)
+- [ ] Assemble via Bash: move staged files → compute composites + stamp + write `model/scores.json` → generate `scores/_index.md` (see Assembly sequence in Subagent Dispatch)
+- [ ] Verify count: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`; confirm no PENDING: `grep -l PENDING docs/engagements/<name>/scores/OPP-*.md` (expect no output)
 - [ ] Dispatch the `opportunity-reviewer` subagent for independent review
 - [ ] Resolve any Critical findings before save
 - [ ] Save each scored entry to `docs/engagements/<name>/scores/OPP-NNN.md`; generate `scores/_index.md` master index
@@ -144,7 +197,7 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 
 1. Confirm `opportunities/_index.md` exists and GRC clearance is recorded for all flagged opportunities.
 2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent its OPP entry from `opportunities/OPP-NNN.md`, the relevant sections from the four source files, and its staging file path (`_staging/phase6/OPP-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only — do NOT request the full scored entry back.
-3. After all agents complete, move staged files to `scores/` and generate `scores/_index.md` (see Assembly command). Verify with `ls scores/OPP-*.md | wc -l`. Cleanup `_staging/phase6`. B/B/P is in the individual score files and the index — do not re-derive in main context.
+3. After all agents complete, run the Assembly sequence (see Assembly in Subagent Dispatch): move staged files → compute composites + stamp files + write `model/scores.json` (single Python script) → generate `scores/_index.md`. Verify count and confirm no PENDING values remain. Cleanup `_staging/phase6` (non-fatal). B/B/P is in the individual score files and the index — do not re-derive in main context.
 4. Dispatch the `opportunity-reviewer` subagent. Pass: engagement folder path only. The reviewer reads `scores/_index.md` and individual `scores/OPP-NNN.md` files itself. Do not pass document content.
 5. Resolve all Critical findings. Important findings should be addressed; Minor findings are noted.
 6. Save and chain forward.
