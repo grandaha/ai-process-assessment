@@ -10,7 +10,7 @@ description: Phase 3 — catalogs systems, APIs, datasets, foundational enablers
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `context.md` and confirm it exists.
-3. **Check for a sample-run marker.** After extracting the engagement folder, check whether `<engagement-folder>/.sample-run.md` exists. If present, this is a sample run — read that file silently. At the live-interview step in the Workflow below, read the intake file listed for Phase 3 in the marker's Phase Intake Map (`<intake_root>/systems-and-data.md`) instead of interviewing a live IT stakeholder.
+3. **Check for a sample-run marker.** After extracting the engagement folder, check whether `<engagement-folder>/.sample-run.md` exists. If present, this is a sample run — read that file silently, extract the `intake_root` field from its YAML frontmatter, and note the Phase Intake Map. At the live-interview step in the Workflow below, read `<intake_root>/systems-and-data.md` instead of interviewing a live IT stakeholder.
 
 Gate condition: `context.md` must be present before proceeding.
 
