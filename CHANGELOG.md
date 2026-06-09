@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] — 2026-06-09
+
 ### Added
 - Plugin marketplace manifest (`.claude-plugin/marketplace.json`) — the repo is
   now one-add installable in Claude Code (`/plugin marketplace add ...`) and
@@ -18,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GitHub Actions and pip dependencies.
 - A tracked pre-push test gate (`.githooks/pre-push`) that runs the suite before
   every push; enable with `git config core.hooksPath .githooks`.
+- Improvement Log (`improvement-log.md`) — structured schema for recording
+  methodology regressions, their causes, and resolutions; documented in keystone
+  and README.
+- `running-sample-engagement` writes a `.sample-run.md` marker file at setup;
+  Phases 1–4 check for this marker and skip live elicitation automatically.
 - This `CHANGELOG.md`.
 
 ### Changed
@@ -29,6 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI: `actions/checkout` bumped to v6 and `actions/setup-python` to v6.
 - Raised `requirements.txt` floors to current releases (`pytest>=9.0.3`,
   `pyyaml>=6.0.3`, `openpyxl>=3.1.5`, `formulas>=1.3.4`).
+
+### Fixed
+- Explicit `intake_root` extraction instruction in all four eliciting phase skills.
+- Step 4 tool instruction clarified; removed bash block inconsistency in
+  `running-sample-engagement`.
 
 ## [2.5.1] — 2026-06-07
 
@@ -93,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Context-bloat fixes: explicit session boundaries, self-read of prior outputs,
   no-echo handoffs, and summarize-on-return between phases.
 
-[Unreleased]: https://github.com/grandaha/ai-process-assessment/compare/v2.5.1...HEAD
+[Unreleased]: https://github.com/grandaha/ai-process-assessment/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/grandaha/ai-process-assessment/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/grandaha/ai-process-assessment/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/grandaha/ai-process-assessment/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/grandaha/ai-process-assessment/compare/v2.3.0...v2.4.0
