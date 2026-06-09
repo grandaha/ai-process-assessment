@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] — 2026-06-09
+
+### Changed
+- **Data architecture convergence** — the deterministic engine is now the single
+  arithmetic executor across every phase, with one structured owning phase, one
+  write site, and a real engine consumer for every numeric input.
+  - **Engine reads `baselines.json` (F1, F5).** Phase 4 baselines are now a live
+    engine input keyed by `process_id`. `value.json` no longer carries a literal
+    `volume`; each entry references a baseline via `process_id` + optional
+    `volume_fraction`, and the engine resolves `volume = baseline.volume ×
+    volume_fraction`. Raw baselines are echoed into `results.json`, making the
+    determinism claim true. Eliminates duplicated, drift-prone volume figures.
+  - **Phase 7 writes `initiatives.json` (F2).** Wave assignment is structured by
+    the phase that decides it, not re-transcribed downstream.
+  - **Phase 9 is read-only (F4).** The business-case phase verifies the four
+    input files exist, runs the engine, and cites results — it never re-writes an
+    input. Single-write ownership of every `model/*.json` is codified in the
+    methodology keystone.
+  - **`--no-workbook` flag (F3).** Phase 5 computes value ranges into
+    `results.json` without emitting a premature CFO workbook.
+  - **Cost percentages are per-initiative inputs (F6).** `change_mgmt_pct` and
+    `contingency_pct` are recorded in `costs.json` by Phase 8.5, not treated as
+    engine constants.
+- Fixed a stale `marketplace.json` (version `2.5.1` → `2.7.0`; license
+  `MIT` → `Apache-2.0`) and a duplicate workflow step number in Phase 7.
+
+### Tests
+- Engine suite 37 → 47 (new baseline-resolution, volume-fraction, baseline-echo,
+  PENDING-on-missing-baseline, and `--no-workbook` coverage).
+
 ## [2.6.0] — 2026-06-09
 
 ### Added
