@@ -19,9 +19,11 @@ jobs:
     steps:
       - name: Resolve tag
         id: tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${INPUT_TAG}" >> "$GITHUB_OUTPUT"
           else
             echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           fi
@@ -35,7 +37,7 @@ jobs:
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
           TAG_VERSION="${TAG#v}"
-          MANIFEST_VERSION="$(python -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
+          MANIFEST_VERSION="$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
           if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
             echo "::error::Tag $TAG (version $TAG_VERSION) != plugin.json version $MANIFEST_VERSION"
             exit 1
@@ -59,7 +61,7 @@ jobs:
       - name: Extract release notes
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
-          python .github/scripts/extract_changelog.py "${TAG#v}" > RELEASE_NOTES.md
+          python3 .github/scripts/extract_changelog.py "${TAG#v}" > RELEASE_NOTES.md
           echo "----- notes -----"; cat RELEASE_NOTES.md
 
       - name: Create or update GitHub Release
@@ -70,7 +72,7 @@ jobs:
           ASSET="ai-process-assessment-${TAG}.zip"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ASSET" --clobber
-            gh release edit "$TAG" --notes-file RELEASE_NOTES.md
+            gh release edit "$TAG" --title "$TAG" --notes-file RELEASE_NOTES.md
           else
             gh release create "$TAG" "$ASSET" --title "$TAG" --notes-file RELEASE_NOTES.md
           fi
