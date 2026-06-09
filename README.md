@@ -122,9 +122,9 @@ A tracked pre-push hook (`.githooks/pre-push`) runs the suite before every push 
 
 When a rationalization is encountered that the methodology did not catch, follow the RED-GREEN-REFACTOR loop:
 
-1. **RED** — document the escape: what shortcut was taken, what it produced, why it wasn't caught.
-2. **GREEN** — add a row to the rationalization table of the relevant `SKILL.md` naming the shortcut and the correct reframe.
-3. **REFACTOR** — if the escape is systematic, tighten the gate or checklist step that should have caught it, and update the keystone (`using-methodology/SKILL.md`) and `system-prompt.md` if a keystone rule changed.
+1. **RED** — prepend a new entry to [`improvement-log.md`](improvement-log.md) at the repo root: what shortcut was taken, what it produced, why it wasn't caught, and which row you're adding. Write the entry before the table row.
+2. **GREEN** — add a row to the rationalization table of the relevant `SKILL.md` naming the shortcut and the correct reframe. If the escape is general, also add it to the master table in `using-methodology/SKILL.md`.
+3. **REFACTOR** — if the escape is systematic, tighten the gate or checklist step that should have caught it, and update the keystone (`using-methodology/SKILL.md`) and `system-prompt.md` if a keystone rule changed (run `pytest` — the mirror guard enforces the sync).
 
 The rationalization tables are the durability mechanism: each real engagement that surfaces a new shortcut makes the methodology more resilient.
 
