@@ -11,6 +11,9 @@
 # Client engagement data
 docs/engagements/
 
+# Internal planning and design docs
+docs/superpowers/
+
 # Subagent staging area
 _staging/
 
