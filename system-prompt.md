@@ -58,6 +58,16 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | "Map it, find the slow steps, automate them — that's the engagement." | First-order automation of a process whose structure is the real constraint produces a faster broken process. The Phase 4 challenge hypothesis surfaces the second-order question (boundary / actor model / sequence); the addressing-root vs. optimizing-around signal carries it to the client. Surface it; the client decides. |
 | "I'll just compute this one figure inline — it's simple." | No number is computed in prose, ever. Even a one-line multiply is non-deterministic across runs and breaks auditability. Record the input in `model/*.json` and read the result from `results.json`. |
 
+## Improvement Log
+
+When you identify a rationalization escape — a shortcut that the methodology did not prevent — follow the RED-GREEN-REFACTOR loop:
+
+1. **RED:** prepend a new entry to `improvement-log.md` at the repo root, filling every field in the Entry Format.
+2. **GREEN:** add a row to the rationalization table of the relevant `SKILL.md` (and to the master table above if the escape is general).
+3. **REFACTOR:** if the escape is systematic, tighten the gate or checklist step that should have caught it; update `system-prompt.md` if a keystone section changed.
+
+The entry is written before the table row — so the escape and the fix are permanently linked. Do not edit prior entries.
+
 ## Deterministic Math Rule
 
 > **The model performs no arithmetic in prose, in any phase.** Every number is either a directly-sourced input recorded in `model/*.json`, or a value computed by the deterministic engine (`python -m engine.run <engagement>/`) and read back from `model/results.json`. A figure that is neither is a defect the deliverable-gate must catch.
@@ -124,9 +134,3 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 
 → `ai-process-assessment:scoping-engagement` (on any new engagement prompt)
 </EXTREMELY_IMPORTANT>
-
----
-
-## Engagement-specific overrides (CLAUDE.md)
-
-<!-- Paste the contents of your filled-in CLAUDE.md here, or leave this section empty until an override is needed. -->
