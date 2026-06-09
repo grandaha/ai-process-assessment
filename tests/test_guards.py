@@ -319,12 +319,12 @@ def test_improvement_log_has_schema_section():
 
 def test_improvement_log_has_example_entry():
     log = (REPO_ROOT / "improvement-log.md").read_text(encoding="utf-8")
-    assert "### 20" in log, \
-        "improvement-log.md must contain at least one dated entry (### YYYY-MM-DD ...)"
+    assert re.search(r"### \d{4}-\d{2}-\d{2}", log), \
+        "improvement-log.md must contain at least one dated entry (### YYYY-MM-DD format)"
 
 
 def test_keystone_references_improvement_log():
-    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text()
+    keystone = (REPO_ROOT / "skills" / "using-methodology" / "SKILL.md").read_text(encoding="utf-8")
     assert "improvement-log.md" in keystone, \
         "keystone must reference improvement-log.md"
     assert "prepend a new entry" in keystone, \
