@@ -41,7 +41,7 @@ If a baseline cannot be sourced (estimated by an operator, pulled from a system,
 
 ## Recording baselines for the engine
 
-Capture each baseline as raw, sourced inputs in the engagement's `model/baselines.json` (per process: `volume`, `cycle_time_median`, `cycle_time_p90`, `error_rate`, `fte`, and the source). Any *derived* figure (e.g. a monthly volume that is `per-period × periods`, or an FTE roll-up) is computed by the engine, not multiplied in prose. `baselines.md` remains the human-readable, source-cited narrative; `model/baselines.json` feeds the engine and downstream `results.json` so every derived figure is deterministic and auditable.
+Capture each baseline as raw, sourced inputs in the engagement's `model/baselines.json` — one object per process, keyed by `process_id`: `volume`, `cycle_time_median`, `cycle_time_p90`, `error_rate`, `fte`, and `source`. Use the same `process_id` values that `process-map.md` assigns, so downstream phases can reference a baseline by id. Do not multiply or annualize any figure in prose — record the raw measured value and its source only. The engine reads `model/baselines.json`, echoes every baseline into `model/results.json` under `baselines.<process_id>`, and resolves the value-hypothesis volume for each opportunity from it (Phase 5). `baselines.md` remains the human-readable, source-cited narrative; every numeric figure it states must equal its `results.json` source, so the figures are deterministic and auditable. A figure that appears only in `baselines.md` with no `baselines.json` source is a defect the deliverable-gate must catch.
 
 ## Four-Round Interview Sequence
 

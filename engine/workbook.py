@@ -15,6 +15,16 @@ def _q(sheet_name: str) -> str:
     return f"'{sheet_name}'"
 
 
+def _resolved_volume(v, baselines):
+    """Volume the engine actually used: baseline.volume * volume_fraction. None -> blank."""
+    if v is None:
+        return None
+    b = baselines.get(v.process_id)
+    if b is None or b.volume is None:
+        return None
+    return b.volume * v.volume_fraction
+
+
 def write_workbook(inputs, results, out_path) -> Path:
     out_path = Path(out_path)
     wb = openpyxl.Workbook()
@@ -39,7 +49,7 @@ def write_workbook(inputs, results, out_path) -> Path:
         ws_in.append([
             opp, init.name,
             getattr(v, "improvement_low", None), getattr(v, "improvement_high", None),
-            getattr(v, "volume", None), getattr(v, "rate", None),
+            _resolved_volume(v, inputs.baselines), getattr(v, "rate", None),
             getattr(c, "labor_hours", None), getattr(c, "labor_rate", None),
             getattr(c, "tech_cost", None), getattr(c, "integration_cost", None),
             getattr(c, "change_mgmt_pct", None), getattr(c, "contingency_pct", None),

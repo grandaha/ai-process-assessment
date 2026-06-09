@@ -26,8 +26,11 @@ def build_results(model_dir) -> dict:
 
     value = {}
     for opp, v in inp.value.items():
+        b = inp.baselines.get(v.process_id)
+        base_vol = b.volume if b is not None else None
+        volume = None if base_vol is None else base_vol * v.volume_fraction
         value[opp] = _range_out(value_range(v.improvement_low, v.improvement_high,
-                                            v.volume, v.rate))
+                                            volume, v.rate))
 
     scores = {opp: score_composite(s.dimensions) for opp, s in inp.scores.items()}
 
@@ -60,6 +63,14 @@ def build_results(model_dir) -> dict:
         "value": value,
         "scores": scores,
         "costs": costs,
+        "baselines": {
+            pid: {
+                "volume": b.volume, "cycle_time_median": b.cycle_time_median,
+                "cycle_time_p90": b.cycle_time_p90, "error_rate": b.error_rate,
+                "fte": b.fte, "source": b.source,
+            }
+            for pid, b in inp.baselines.items()
+        },
         "wave1_aggregate": {
             "investment": _range_out(investment),
             "value": _range_out(annual_value),

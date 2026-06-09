@@ -3,17 +3,44 @@ import json
 import pytest
 
 from engine.model import (
-    CostInput, ScoreInput, ValueInput, load_inputs,
+    BaselineInput, CostInput, ScoreInput, ValueInput, load_inputs,
 )
 
 
-def test_value_input_from_dict():
+def test_baseline_input_from_dict():
+    bi = BaselineInput.from_dict({
+        "process_id": "PROC-01", "volume": 8000, "cycle_time_median": 5,
+        "cycle_time_p90": 12, "error_rate": 0.03, "fte": 2.4,
+        "source": "Ops interview R2",
+    })
+    assert bi.process_id == "PROC-01"
+    assert bi.volume == 8000
+    assert bi.fte == 2.4
+
+
+def test_baseline_input_allows_missing_numeric_as_none():
+    bi = BaselineInput.from_dict({"process_id": "PROC-09", "volume": None})
+    assert bi.volume is None
+    assert bi.source is None
+
+
+def test_value_input_references_baseline_with_default_fraction():
     vi = ValueInput.from_dict({
         "opp_id": "OPP-001", "improvement_low": 0.5,
-        "improvement_high": 0.7, "volume": 8000, "rate": 100,
+        "improvement_high": 0.7, "process_id": "PROC-01", "rate": 100,
     })
     assert vi.opp_id == "OPP-001"
-    assert vi.improvement_high == 0.7
+    assert vi.process_id == "PROC-01"
+    assert vi.volume_fraction == 1.0  # default when omitted
+    assert vi.rate == 100
+
+
+def test_value_input_keeps_explicit_fraction():
+    vi = ValueInput.from_dict({
+        "opp_id": "OPP-007", "improvement_low": 0.3, "improvement_high": 0.5,
+        "process_id": "PROC-04", "volume_fraction": 0.4, "rate": 80,
+    })
+    assert vi.volume_fraction == 0.4
 
 
 def test_score_input_rejects_wrong_dimension_count():
@@ -32,9 +59,13 @@ def test_cost_input_allows_missing_numeric_as_none_for_pending():
 def test_load_inputs_reads_model_folder(tmp_path):
     model = tmp_path / "model"
     model.mkdir()
+    (model / "baselines.json").write_text(json.dumps([{
+        "process_id": "PROC-01", "volume": 1000, "cycle_time_median": 4,
+        "cycle_time_p90": 9, "error_rate": 0.02, "fte": 1.5,
+        "source": "R2"}]))
     (model / "value.json").write_text(json.dumps([{
         "opp_id": "OPP-001", "improvement_low": 0.2, "improvement_high": 0.4,
-        "volume": 1000, "rate": 50}]))
+        "process_id": "PROC-01", "rate": 50}]))
     (model / "scores.json").write_text(json.dumps([{
         "opp_id": "OPP-001", "dimensions": [3, 4, 5, 2, 4, 3]}]))
     (model / "costs.json").write_text(json.dumps([{
@@ -45,6 +76,7 @@ def test_load_inputs_reads_model_folder(tmp_path):
         "opp_id": "OPP-001", "name": "Status Reporting Assistant", "wave": 1}]))
     inp = load_inputs(model)
     assert [i.opp_id for i in inp.initiatives] == ["OPP-001"]
-    assert inp.value["OPP-001"].volume == 1000
+    assert inp.baselines["PROC-01"].volume == 1000
+    assert inp.value["OPP-001"].process_id == "PROC-01"
     assert inp.scores["OPP-001"].dimensions == [3, 4, 5, 2, 4, 3]
     assert inp.costs["OPP-001"].tech_cost == 40000

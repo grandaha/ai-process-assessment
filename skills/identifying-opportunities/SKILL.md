@@ -41,7 +41,9 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 
 ## Value range (engine-computed)
 
-The value hypothesis is written *before* the number (hypothesis-before-value discipline is unchanged). The numeric range itself is **not** multiplied in prose. Record `{"opp_id": "...", "improvement_low": x, "improvement_high": y, "volume": v, "rate": r}` to the engagement's `model/value.json`, run `python -m engine.run <engagement-folder>/`, and cite the resulting `results.json` `value.<OPP-ID>` range in `opportunities/OPP-NNN.md`. `volume` and `rate` must each trace to a `baselines.md` row.
+The value hypothesis is written *before* the number (hypothesis-before-value discipline is unchanged). The numeric range itself is **not** multiplied in prose. Record `{"opp_id": "...", "improvement_low": x, "improvement_high": y, "process_id": "PROC-NN", "volume_fraction": f, "rate": r}` to the engagement's `model/value.json`. Do **not** restate a `volume`: the engine resolves it as `baselines.<process_id>.volume × volume_fraction`, so volume is never hand-copied. Set `volume_fraction` to `1.0` when the opportunity addresses the whole process; use a smaller fraction (with a one-line rationale in `opportunities/OPP-NNN.md`) when it addresses only a slice. `process_id` must name a process that exists in `model/baselines.json`, and `rate` must trace to a sourced figure. Then run `python -m engine.run <engagement-folder>/ --no-workbook` (see Phase-5 note below) and cite the resulting `results.json` `value.<OPP-ID>` range in `opportunities/OPP-NNN.md`.
+
+**Phase-5 note — `--no-workbook`.** Phase 5 runs the engine only to compute the value ranges into `results.json`; it must **not** emit the CFO workbook. Always pass `--no-workbook`: `python -m engine.run <engagement-folder>/ --no-workbook`. `financial-model.xlsx` is a Phase 9 deliverable produced once costs, scores, and wave assignments exist — running the full engine here would write a workbook full of PENDING cost and score cells.
 
 ## Subagent Dispatch
 
