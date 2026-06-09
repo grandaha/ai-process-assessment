@@ -40,8 +40,10 @@ def test_lattice_end_to_end_golden_numbers():
 
 def _value_args(inp, opp):
     v = inp.value[opp]
+    b = inp.baselines.get(v.process_id)
+    volume = None if b is None or b.volume is None else b.volume * v.volume_fraction
     return dict(improvement_low=v.improvement_low, improvement_high=v.improvement_high,
-                volume=v.volume, rate=v.rate)
+                volume=volume, rate=v.rate)
 
 
 def _cost_args(inp, opp):

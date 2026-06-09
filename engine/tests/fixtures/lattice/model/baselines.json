@@ -1,0 +1,4 @@
+[
+  {"process_id": "PROC-01", "volume": 8000, "cycle_time_median": 6, "cycle_time_p90": 14, "error_rate": 0.04, "fte": 2.4, "source": "Lattice ops interview R2"},
+  {"process_id": "PROC-02", "volume": 5000, "cycle_time_median": 3, "cycle_time_p90": 8, "error_rate": 0.02, "fte": 1.1, "source": "Lattice ops interview R2"}
+]

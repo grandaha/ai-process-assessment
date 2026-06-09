@@ -34,3 +34,15 @@ def test_workbook_sets_full_calc_on_load(tmp_path):
     write_workbook(inp, res, out)
     wb = openpyxl.load_workbook(out)
     assert wb.calculation.fullCalcOnLoad is True
+
+
+def test_inputs_tab_writes_resolved_volume(tmp_path):
+    inputs = load_inputs(FIXTURE)
+    results = build_results(FIXTURE)
+    out = tmp_path / "wb.xlsx"
+    write_workbook(inputs, results, out)
+    wb = openpyxl.load_workbook(out)
+    ws = wb["Inputs"]
+    # Header row 1; OPP-001 is row 2; volume is column E (index 5).
+    assert ws.cell(row=2, column=1).value == "OPP-001"
+    assert ws.cell(row=2, column=5).value == 8000  # resolved PROC-01 volume * 1.0

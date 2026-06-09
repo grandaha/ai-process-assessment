@@ -18,6 +18,69 @@ def test_build_results_matches_golden():
     assert res["wave1_aggregate"]["payback_years"] == {"low": 0.30, "high": 1.37}
 
 
+def test_value_resolves_volume_from_baseline():
+    # OPP-001 references PROC-01 (volume 8000), fraction 1.0,
+    # improvement 0.5/0.7, rate 100 -> 0.5*8000*100, 0.7*8000*100
+    res = build_results(FIXTURE)
+    assert res["value"]["OPP-001"] == {"low": 400_000.0, "high": 560_000.0}
+
+
+def test_value_pending_when_baseline_missing(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    # Drop the baselines file entirely -> volume unresolved -> PENDING
+    (eng / "model" / "baselines.json").unlink()
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == "PENDING"
+
+
+def test_results_echo_baselines():
+    res = build_results(FIXTURE)
+    assert res["baselines"]["PROC-01"]["volume"] == 8000
+
+
+def test_volume_fraction_scales_resolved_volume(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    value = json.loads((eng / "model" / "value.json").read_text())
+    value[0]["volume_fraction"] = 0.5  # OPP-001 now addresses half of PROC-01
+    (eng / "model" / "value.json").write_text(json.dumps(value))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == {"low": 200_000.0, "high": 280_000.0}
+
+
+def test_volume_fraction_null_resolves_like_default(tmp_path):
+    # Explicit null fraction must compute identically to the 1.0 default —
+    # not raise TypeError in the volume multiplication.
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    value = json.loads((eng / "model" / "value.json").read_text())
+    value[0]["volume_fraction"] = None
+    (eng / "model" / "value.json").write_text(json.dumps(value))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == {"low": 400_000.0, "high": 560_000.0}
+
+
+def test_value_pending_when_process_id_not_in_baselines(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    value = json.loads((eng / "model" / "value.json").read_text())
+    value[0]["process_id"] = "PROC-99"  # no such baseline
+    (eng / "model" / "value.json").write_text(json.dumps(value))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == "PENDING"
+
+
+def test_value_pending_when_baseline_volume_is_null(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    baselines = json.loads((eng / "model" / "baselines.json").read_text())
+    baselines[0]["volume"] = None  # baseline exists, volume not yet captured
+    (eng / "model" / "baselines.json").write_text(json.dumps(baselines))
+    res = build_results(eng / "model")
+    assert res["value"]["OPP-001"] == "PENDING"
+
+
 def test_main_writes_results_json(tmp_path):
     eng = tmp_path / "engagement"
     shutil.copytree(FIXTURE, eng / "model")
@@ -34,3 +97,19 @@ def test_missing_cost_input_renders_pending(tmp_path):
     (eng / "model" / "costs.json").write_text(json.dumps(costs))
     res = build_results(eng / "model")
     assert res["costs"]["OPP-001"]["rom"] == "PENDING"
+
+
+def test_no_workbook_flag_skips_xlsx_but_writes_results(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    rc = main([str(eng), "--no-workbook"])
+    assert rc == 0
+    assert (eng / "model" / "results.json").exists()
+    assert not (eng / "financial-model.xlsx").exists()
+
+
+def test_default_run_still_writes_workbook(tmp_path):
+    eng = tmp_path / "engagement"
+    shutil.copytree(FIXTURE, eng / "model")
+    main([str(eng)])
+    assert (eng / "financial-model.xlsx").exists()
