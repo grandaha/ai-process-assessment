@@ -29,6 +29,9 @@ Add entries under `## Entries` below, newest first.
 
 ## Entries
 
+<!-- The entry below is illustrative. The rationalization row it references was not
+     added to discovering-processes/SKILL.md — it exists only to demonstrate the format. -->
+
 ### 2026-06-08 — Phase 4 — discovering-processes (example entry)
 
 **Engagement/Round:** Lattice Consulting sample / Round 2 (operator)
