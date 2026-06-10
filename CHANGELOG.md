@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.1] — 2026-06-10
+
+### Fixed
+- **Phase 9 gate now checks `model/scores.json`** — the engine input file written by Phase 6
+  was missing from the "Verify the inputs exist" step in `building-business-case/SKILL.md`.
+  A missing `scores.json` would cause the engine to fail silently rather than halting with a
+  clear gate error pointing back to Phase 6. Closes #32.
+
 ## [2.8.0] — 2026-06-09
 
 ### Changed
