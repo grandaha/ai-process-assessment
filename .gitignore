@@ -27,3 +27,6 @@ __pycache__/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Release build artifacts (zips live on GitHub Releases, never in the repo)
+*.zip
