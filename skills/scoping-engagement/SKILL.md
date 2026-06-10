@@ -8,8 +8,8 @@ description: Phase 1 — front gate for all analytical work. Elicits sponsoring 
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Ask the user for the engagement name. This becomes the folder path `<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask.
-2. Run `mkdir -p <name>/` to create the engagement folder before writing any files.
+1. Ask the user for the engagement name. This becomes the folder path `<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask. Also reject names that collide with existing repo structure: `docs`, `skills`, `templates`, `samples`, `tests`, `agents`, `engine`, `hooks`, `.claude` — these are reserved; halt and re-ask if given.
+2. Run `mkdir -p <name>/` to create the engagement folder, then immediately protect it from accidental commits: `grep -qxF "<name>/" .gitignore || echo "<name>/" >> .gitignore`.
 3. **Check for a sample-run marker.** After creating the engagement folder, check whether `<name>/.sample-run.md` exists. If present, this is a sample run — read that file silently, extract the `intake_root` field from its YAML frontmatter, and note the Phase Intake Map. At the live-sponsor-interview step in the Workflow below, read `<intake_root>/engagement-request.md` instead of interviewing a live sponsor.
 4. No predecessor files required — this is Phase 1.
 
@@ -49,7 +49,7 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 
 ## Workflow
 
-1. Ask for the engagement name. Create `<name>/` via `mkdir -p`.
+1. Ask for the engagement name. Reject reserved names (`docs`, `skills`, `templates`, `samples`, `tests`, `agents`, `engine`, `hooks`, `.claude`) and placeholder strings. Create `<name>/` via `mkdir -p`, then run `grep -qxF "<name>/" .gitignore || echo "<name>/" >> .gitignore` to protect it immediately.
 2. Read user's engagement prompt.
 3. If sponsoring question is not stated, ask for it explicitly. Do not infer.
 4. Identify the decision-maker. If unnamed, ask. Capture their decision verb.
@@ -68,6 +68,7 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 | "Out-of-scope is whatever they didn't mention." | Implicit exclusions become disputes at delivery. Make exclusions explicit and rationale-backed. |
 | "Success means they're happy with the deck." | Stakeholder satisfaction is not a success criterion. A success criterion is a measurable decision or action. |
 | "Constraints will surface as we go." | Constraints discovered late kill credibility. Surface political sensitivities now or pay later. |
+| "The client name is 'docs' or 'templates'." | These names collide with repo structure. Ask for a more specific name (e.g., the client's company name or project codename). |
 
 ## Handoff Protocol
 
