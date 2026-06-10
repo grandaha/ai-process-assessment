@@ -31,7 +31,7 @@ Feasibility scoring and sourcing recommendations are downstream of what actually
 - [ ] Document IT governance posture: change control, security review, deployment gates
 - [ ] Capture build/buy/partner posture for AI/automation
 - [ ] Surface shadow IT — what teams are using outside official sanction
-- [ ] Save to `docs/engagements/<engagement>/tech-inventory.md`
+- [ ] Save to `<engagement>/tech-inventory.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:discovering-processes`
 
 ## Key outputs (saved to tech-inventory.md)

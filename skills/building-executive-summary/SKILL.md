@@ -67,7 +67,7 @@ The summary contains exactly these sections, in this order:
 - [ ] Dispatch one `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `processes/_index.md` + `processes/PROC-NNN.md` files, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content.
 - [ ] The reviewer appends its findings to `<engagement-folder>/evidence-log.md` directly and returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive the full review block.
 - [ ] Resolve all Critical findings. Important findings must be addressed before delivery. Minor findings are noted.
-- [ ] Save to `docs/engagements/<engagement>/executive-summary.md`
+- [ ] Save to `<engagement>/executive-summary.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:building-deliverable`
 
 ## Workflow

@@ -126,8 +126,8 @@ This phase already runs two subagents. This section names the pattern so it read
 
   **Step 1 — Move staged files:**
   ```bash
-  mkdir -p docs/engagements/<name>/scores
-  mv docs/engagements/<name>/_staging/phase6/OPP-*.md docs/engagements/<name>/scores/
+  mkdir -p <name>/scores
+  mv <name>/_staging/phase6/OPP-*.md <name>/scores/
   ```
 
   **Step 2 — Compute composites, stamp files, write `model/scores.json`:**
@@ -135,7 +135,7 @@ This phase already runs two subagents. This section names the pattern so it read
   python3 -c "
   import json, re
   from pathlib import Path
-  eng = Path('docs/engagements/<name>')
+  eng = Path('<name>')
   eng.joinpath('model').mkdir(exist_ok=True)
   entries = []
   for f in sorted(eng.joinpath('scores').glob('OPP-*.md')):
@@ -157,24 +157,24 @@ This phase already runs two subagents. This section names the pattern so it read
 
   **Step 3 — Generate `_index.md` from stamped files:**
   ```bash
-  echo "| OPP-ID | Composite | Horizon | B/B/P |" > docs/engagements/<name>/scores/_index.md
-  echo "|--------|-----------|---------|-------|" >> docs/engagements/<name>/scores/_index.md
-  for f in docs/engagements/<name>/scores/OPP-*.md; do
+  echo "| OPP-ID | Composite | Horizon | B/B/P |" > <name>/scores/_index.md
+  echo "|--------|-----------|---------|-------|" >> <name>/scores/_index.md
+  for f in <name>/scores/OPP-*.md; do
     header=$(grep "^<!-- index:" "$f" | head -1)
     id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
     comp=$(echo "$header" | grep -o 'composite=[^ >]*' | cut -d= -f2)
     horiz=$(echo "$header" | grep -o 'horizon=[^ >]*' | cut -d= -f2)
     bbp=$(echo "$header" | grep -o 'bbp=[^ >]*' | cut -d= -f2)
-    echo "| $id | $comp | $horiz | $bbp |" >> docs/engagements/<name>/scores/_index.md
+    echo "| $id | $comp | $horiz | $bbp |" >> <name>/scores/_index.md
   done
   ```
 
-  Verify with: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`
-  Confirm no PENDING values remain: `grep -l PENDING docs/engagements/<name>/scores/OPP-*.md` (expect no output)
+  Verify with: `ls <name>/scores/OPP-*.md | wc -l`
+  Confirm no PENDING values remain: `grep -l PENDING <name>/scores/OPP-*.md` (expect no output)
 
   Cleanup (non-fatal — sandbox may restrict deletion of empty directories):
   ```bash
-  rm -rf docs/engagements/<name>/_staging/phase6 || echo "Cleanup skipped (sandbox restriction) — directory is empty"
+  rm -rf <name>/_staging/phase6 || echo "Cleanup skipped (sandbox restriction) — directory is empty"
   ```
 - **What stays in main context:** One-line summaries from each scorer agent (OPP-NNN, composite score, B/B/P), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
 
@@ -186,10 +186,10 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 - [ ] Dispatch one `opportunity-scorer` agent per opportunity in a single parallel tool-call batch (pass: OPP-ID, OPP entry path `opportunities/OPP-NNN.md`, process file path `processes/PROC-NNN.md` for the opportunity's process, staging file path; the agent reads all source files itself)
 - [ ] Collect one-line summaries from scorer agents (OPP-NNN, composite, B/B/P). Full scored entries are in staging files.
 - [ ] Assemble via Bash: move staged files → compute composites + stamp + write `model/scores.json` → generate `scores/_index.md` (see Assembly sequence in Subagent Dispatch)
-- [ ] Verify count: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`; confirm no PENDING: `grep -l PENDING docs/engagements/<name>/scores/OPP-*.md` (expect no output)
+- [ ] Verify count: `ls <name>/scores/OPP-*.md | wc -l`; confirm no PENDING: `grep -l PENDING <name>/scores/OPP-*.md` (expect no output)
 - [ ] Dispatch the `opportunity-reviewer` subagent for independent review
 - [ ] Resolve any Critical findings before save
-- [ ] Save each scored entry to `docs/engagements/<name>/scores/OPP-NNN.md`; generate `scores/_index.md` master index
+- [ ] Save each scored entry to `<name>/scores/OPP-NNN.md`; generate `scores/_index.md` master index
 - [ ] Log reviewer clearance in `evidence-log.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:prioritizing-roadmap`
 

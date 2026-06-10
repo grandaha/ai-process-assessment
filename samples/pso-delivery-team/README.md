@@ -31,7 +31,7 @@ Invoke the **`ai-process-assessment:running-sample-engagement`** skill (say some
 2. Has you invoke `ai-process-assessment:scoping-engagement` and proceed through the normal phase chain.
 3. Wherever a phase would interview a live human, you read the corresponding intake file instead.
 4. **Preserves every normal gate and session boundary** — you approve each phase transition and restart sessions exactly as in a real engagement.
-5. Produces a complete engagement under `docs/engagements/sample-pso-delivery/`, terminating in `deliverable.html`.
+5. Produces a complete engagement under `sample-pso-delivery/`, terminating in `deliverable.html`.
 
 There is no answer key and no pre-filled phase output. Phases 1–4 interpret the raw intake into structured outputs; Phases 5–11 do the analysis. The baselines in `interview-notes.md` are constructed to support the value claims the later phases derive — so a faithful run should not produce orphan value hypotheses.
 

@@ -74,7 +74,7 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - [ ] Run chain scan — identify consecutive Green runs; record in `processes/PROC-NNN.md`; flag high-fragmentation processes
 - [ ] Apply the Baseline, Value & Challenge gate — flag any process missing baselines
 - [ ] For every process, synthesize a challenge hypothesis from the sponsor's structural input; flag any process missing one as "challenge hypothesis unavailable"
-- [ ] Save each process to `docs/engagements/<name>/processes/PROC-NNN.md` (process map + baselines + challenge hypothesis + chain scan in one file per process)
+- [ ] Save each process to `<name>/processes/PROC-NNN.md` (process map + baselines + challenge hypothesis + chain scan in one file per process)
 - [ ] Generate `processes/_index.md` via Bash from extraction headers
 - [ ] Confirm all `processes/_index.md` Baseline entries are `Ready` (no `Unavailable` rows advance to Phase 5 unless explicitly scoped out with a documented reason)
 - [ ] Confirm `evidence-log.md` stakeholder interview log is complete — one row per session, every participant named
@@ -127,19 +127,19 @@ One file per process. Contains both process map fields and baseline fields in a 
 
 **Assembly — after all synthesis is complete, generate the index:**
 ```bash
-mkdir -p docs/engagements/<name>/processes
-echo "| PROC-ID | Process Name | Baseline |" > docs/engagements/<name>/processes/_index.md
-echo "|---------|--------------|----------|" >> docs/engagements/<name>/processes/_index.md
-for f in docs/engagements/<name>/processes/PROC-*.md; do
+mkdir -p <name>/processes
+echo "| PROC-ID | Process Name | Baseline |" > <name>/processes/_index.md
+echo "|---------|--------------|----------|" >> <name>/processes/_index.md
+for f in <name>/processes/PROC-*.md; do
   id=$(basename "$f" .md)
   proc_name=$(grep -m1 "^## PROC-" "$f" | sed 's/^## PROC-[0-9][0-9][0-9] — //')
   baseline=$(grep "^<!-- index:" "$f" | grep -o 'baseline=[^ >]*' | cut -d= -f2)
   baseline=${baseline:-Unavailable}
-  echo "| $id | $proc_name | $baseline |" >> docs/engagements/<name>/processes/_index.md
+  echo "| $id | $proc_name | $baseline |" >> <name>/processes/_index.md
 done
 ```
-Verify: `ls docs/engagements/<name>/processes/PROC-*.md | wc -l`
-Cleanup: `rm -rf docs/engagements/<name>/_staging/phase4`
+Verify: `ls <name>/processes/PROC-*.md | wc -l`
+Cleanup: `rm -rf <name>/_staging/phase4`
 
 ## Stakeholder Interview Log
 

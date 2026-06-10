@@ -193,7 +193,7 @@ The static shell includes a sticky nav immediately after `<body>`:
 - [ ] Each renderer writes its section to `<engagement-folder>/_staging/phase11/<section-id>.html`. Returns one-line confirmation: "section <id> written." Orchestrator collects confirmations, then assembles `deliverable.html` from staging files. The orchestrator does NOT receive HTML block content from renderers.
 - [ ] Verify each return: no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
 - [ ] Assemble in main context in the specified page order (see assembly pattern below)
-- [ ] Write `docs/engagements/<engagement>/deliverable.html`
+- [ ] Write `<engagement>/deliverable.html`
 - [ ] Open the file and confirm: scroll works, sticky nav links target correct sections, all 9 anchors present, no missing-class artifacts
 
 ## Assembly pattern

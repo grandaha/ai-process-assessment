@@ -77,7 +77,7 @@ Sequencing is a whole-portfolio judgment and stays in the main context — the f
 - [ ] For Wave 3 re-scoping triggers, verify each trigger is a measurable operational state — not a budget event, procurement approval, or funding decision. If a budget dependency exists, call it a precondition separate from the trigger.
 - [ ] Dispatch `opportunity-reviewer` subagent for sequencing review
 - [ ] Resolve Critical findings
-- [ ] Save to `docs/engagements/<engagement>/roadmap.md`
+- [ ] Save to `<engagement>/roadmap.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:packaging-usecases`
 
 ## Workflow
