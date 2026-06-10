@@ -54,7 +54,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
 - **Assembly:** After all agents complete, assemble with Bash:
   ```bash
-  mkdir -p docs/engagements/<name>/opportunities
+  mkdir -p <name>/opportunities
   # Split staging files into per-OPP files, assign canonical OPP-NNN IDs,
   # and replace temp IDs throughout (heading, extraction header, and prose).
   # Lines before the first ## TEMP- heading are intentionally discarded (f is unset).
@@ -62,7 +62,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
     n++
     opp_id = sprintf("OPP-%03d", n)
     temp_id = $2
-    f = sprintf("docs/engagements/<name>/opportunities/%s.md", opp_id)
+    f = sprintf("<name>/opportunities/%s.md", opp_id)
     sub(/^## TEMP-[^ ]+/, "## " opp_id)
     print > f
     next
@@ -70,13 +70,13 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
   f {
     gsub(temp_id, opp_id)
     print > f
-  }' docs/engagements/<name>/_staging/phase5/proc-*.md
+  }' <name>/_staging/phase5/proc-*.md
   ```
   Then generate the index by reading extraction headers:
   ```bash
-  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |" > docs/engagements/<name>/opportunities/_index.md
-  echo "|--------|---------|------|-------------|----------------|-----|------------|" >> docs/engagements/<name>/opportunities/_index.md
-  for f in docs/engagements/<name>/opportunities/OPP-*.md; do
+  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |" > <name>/opportunities/_index.md
+  echo "|--------|---------|------|-------------|----------------|-----|------------|" >> <name>/opportunities/_index.md
+  for f in <name>/opportunities/OPP-*.md; do
     header=$(grep "^<!-- index:" "$f" | head -1)
     id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
     proc=$(echo "$header" | grep -o 'process=[^ >]*' | cut -d= -f2)
@@ -85,11 +85,11 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
     data=$(echo "$header" | grep -o 'data=[^ >]*' | cut -d= -f2)
     grc=$(echo "$header" | grep -o 'grc=[^ >]*' | cut -d= -f2)
     struct=$(echo "$header" | grep -o 'struct=[^ >]*' | cut -d= -f2)
-    echo "| $id | $proc | $type | $feas | $data | $grc | $struct |" >> docs/engagements/<name>/opportunities/_index.md
+    echo "| $id | $proc | $type | $feas | $data | $grc | $struct |" >> <name>/opportunities/_index.md
   done
   ```
-  Verify with: `ls docs/engagements/<name>/opportunities/OPP-*.md | wc -l`
-  Cleanup: `rm -rf docs/engagements/<name>/_staging/phase5`
+  Verify with: `ls <name>/opportunities/OPP-*.md | wc -l`
+  Cleanup: `rm -rf <name>/_staging/phase5`
 - **What stays in main context:** The one-line summaries from each agent (process ID, counts, GRC flags), the OPP headings from the grep verification, the GRC-flag branch decision, and cross-process consistency review of headings only.
 
 ## Phase checklist
@@ -103,7 +103,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - [ ] Set GRC flag based on regulatory exposure, model risk, auditability, failure consequence
 - [ ] Set Structural response (addressing-root / optimizing-around / not-applicable) against the process's challenge hypothesis
 - [ ] Assign stable OPP-NNN identifier
-- [ ] Save each opportunity to `docs/engagements/<name>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
+- [ ] Save each opportunity to `<name>/opportunities/OPP-NNN.md`; generate `opportunities/_index.md` master index
 - [ ] If any opportunity has a non-Green GRC flag → branch to `ai-process-assessment:governance-risk-gate`
 - [ ] Otherwise → Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:scoring-opportunities`
 

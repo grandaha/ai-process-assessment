@@ -148,7 +148,7 @@ Every conversation in the Project inherits the keystone via the system prompt. S
 
 No plugin system or Project required. Works with any Claude interface.
 
-1. Create an engagement folder `docs/engagements/<client-name>/`.
+1. Create an engagement folder `<client-name>/` at the project root.
 2. Fill in `CLAUDE.md` (Client/Initiative, Engagement folder, Sponsor, Decision-maker, Timeline) and document any deliberate overrides in the Overrides table.
 3. Paste the full contents of `skills/using-methodology/SKILL.md` at the top of your system prompt, wrapped in `<EXTREMELY_IMPORTANT>` tags, then paste your filled-in `CLAUDE.md` below it.
 4. At the start of each phase, paste the relevant `SKILL.md` into context. The skill chain references tell you which one comes next.
@@ -157,7 +157,7 @@ No plugin system or Project required. Works with any Claude interface.
 
 ## Try the bundled sample engagement
 
-Before a live engagement, run the included demo to see all eleven phases and both gates end-to-end on fictional data. Say **"run the sample engagement"** — the model invokes `ai-process-assessment:running-sample-engagement`, which feeds the intake files in `samples/pso-delivery-team/intake/` through the methodology and produces a complete run under `docs/engagements/sample-pso-delivery/`, ending in `deliverable.html`. See `samples/pso-delivery-team/README.md`.
+Before a live engagement, run the included demo to see all eleven phases and both gates end-to-end on fictional data. Say **"run the sample engagement"** — the model invokes `ai-process-assessment:running-sample-engagement`, which feeds the intake files in `samples/pso-delivery-team/intake/` through the methodology and produces a complete run under `sample-pso-delivery/`, ending in `deliverable.html`. See `samples/pso-delivery-team/README.md`.
 
 In Claude.ai Projects (Option C) or the lightweight setup (Option D), attach the four `samples/pso-delivery-team/intake/` files to the conversation (or keep them in Project knowledge) so the run can read them at Phases 1–4.
 
@@ -165,7 +165,7 @@ In Claude.ai Projects (Option C) or the lightweight setup (Option D), attach the
 
 ## Engagement Folder Convention
 
-Every engagement produces files in sequence under `docs/engagements/<name>/`:
+Every engagement produces files in sequence under `<name>/` at the project root:
 
 | Phase | Output |
 |---|---|

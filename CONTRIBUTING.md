@@ -59,4 +59,4 @@ The `release` workflow then verifies the tag matches the manifest, runs the test
 
 ## Engagement data
 
-Never commit client or engagement data. `docs/engagements/` is gitignored — keep it that way.
+Never commit client or engagement data. Engagement folders live at the project root and must be gitignored by name — add each engagement folder to `.gitignore` before committing.

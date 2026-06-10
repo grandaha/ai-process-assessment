@@ -29,9 +29,9 @@ At session start:
    - `samples/pso-delivery-team/intake/interview-notes.md`
    - `samples/pso-delivery-team/README.md`
    If they are missing, halt and tell the user where the plugin's `samples/` folder is expected.
-2. **Fix the engagement name.** This run uses the engagement name **`sample-pso-delivery`**. The Phase 1 skill will create `docs/engagements/sample-pso-delivery/` and write the `Engagement folder:` field into `scope.md`. Do not improvise a different name — downstream the run is expected to live at `docs/engagements/sample-pso-delivery/`.
+2. **Fix the engagement name.** This run uses the engagement name **`sample-pso-delivery`**. The Phase 1 skill will create `sample-pso-delivery/` and write the `Engagement folder:` field into `scope.md`. Do not improvise a different name — downstream the run is expected to live at `sample-pso-delivery/`.
 3. **Read the scenario README** (`samples/pso-delivery-team/README.md`) so you understand the case before scoping it.
-4. **Write the sample-run marker.** Create the engagement folder (`docs/engagements/sample-pso-delivery/`) if it does not already exist, then use the Write tool to create `docs/engagements/sample-pso-delivery/.sample-run.md` with exactly this content:
+4. **Write the sample-run marker.** Create the engagement folder (`sample-pso-delivery/`) if it does not already exist, then use the Write tool to create `sample-pso-delivery/.sample-run.md` with exactly this content:
 
    ```markdown
    ---
@@ -90,11 +90,11 @@ In a real engagement, Phase 8.5 collects cost data from live stakeholders (labor
 2. Invoke `ai-process-assessment:scoping-engagement`. At the live-interview step, read `intake/engagement-request.md` and scope from it. Use engagement name `sample-pso-delivery`.
 3. At the end of each phase, follow that phase's normal Handoff Protocol: name the files written, summarize key findings, state the next phase, and **wait for the user's explicit approval**. Then honor the **session boundary** — instruct the user to start a fresh session and invoke the next phase skill, substituting the mapped intake file for the live interview.
 4. Continue through Gate A (GRC will fire), scoring, roadmap, briefs, cost actuals, business case, **then Gate B (the deliverable gate, which runs before Phase 10 and must record clearance in `evidence-log.md`)**, exec summary, and finally `building-deliverable`, which renders `deliverable.html`.
-5. The run is complete when `docs/engagements/sample-pso-delivery/` contains every phase output and `deliverable.html` is rendered.
+5. The run is complete when `sample-pso-delivery/` contains every phase output and `deliverable.html` is rendered.
 
 ## Expected outcome (so you can tell whether the run was faithful)
 
-- A populated `docs/engagements/sample-pso-delivery/` with every phase's output file present.
+- A populated `sample-pso-delivery/` with every phase's output file present.
 - Seven mapped processes (PROC-01…PROC-07) with baselines; the three intake conflicts reconciled in `processes/PROC-NNN.md` files with both the resolved value and the disagreement recorded.
 - The GRC gate having fired on at least the deliverable-content (QA) and commercial-data (SOW) opportunities.
 - Every value claim in Phases 5–9 citing a baseline from `processes/PROC-NNN.md` — **no orphan value hypotheses**.
@@ -108,7 +108,7 @@ In a real engagement, Phase 8.5 collects cost data from live stakeholders (labor
 | "It's fake data, so I can skip the GRC gate." | The sample is built specifically so the GRC gate fires. Skipping it defeats the demonstration. |
 | "The intake doesn't have a vendor quote — I'll make one up." | Invent nothing. A missing cost input is logged as an open item, which is exactly how the real methodology behaves. |
 | "I'll pre-fill the phase outputs to save time." | There is no answer key on purpose. The phases must interpret the raw intake, or the run proves nothing. |
-| "I can pick a cleaner engagement name." | The run is expected at `docs/engagements/sample-pso-delivery/`. Use that name. |
+| "I can pick a cleaner engagement name." | The run is expected at `sample-pso-delivery/`. Use that name. |
 
 ## Handoff Protocol
 

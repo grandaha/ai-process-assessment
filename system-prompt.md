@@ -120,7 +120,7 @@ The entry is written before the table row — so the escape and the fix are perm
 
 ## Engagement Folder Convention
 
-Every engagement gets its own folder under `docs/engagements/<engagement-name>/`. The engagement name is established in Phase 1 (`scoping-engagement`) and written as `Engagement folder:` in `scope.md`. All subsequent phases read the canonical path from `scope.md` — do not prompt the user for the path in Phases 2–11. The following files are created in sequence:
+Every engagement gets its own folder under `<engagement-name>/` at the project root. The engagement name is established in Phase 1 (`scoping-engagement`) and written as `Engagement folder:` in `scope.md`. All subsequent phases read the canonical path from `scope.md` — do not prompt the user for the path in Phases 2–11. The following files are created in sequence:
 
 - `scope.md` — Phase 1
 - `context.md` — Phase 2

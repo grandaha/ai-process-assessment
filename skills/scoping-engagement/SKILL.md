@@ -8,9 +8,9 @@ description: Phase 1 — front gate for all analytical work. Elicits sponsoring 
 ## Session Start
 
 This skill runs as a standalone session. At session start:
-1. Ask the user for the engagement name. This becomes the folder path `docs/engagements/<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask.
-2. Run `mkdir -p docs/engagements/<name>/` to create the engagement folder before writing any files.
-3. **Check for a sample-run marker.** After creating the engagement folder, check whether `docs/engagements/<name>/.sample-run.md` exists. If present, this is a sample run — read that file silently, extract the `intake_root` field from its YAML frontmatter, and note the Phase Intake Map. At the live-sponsor-interview step in the Workflow below, read `<intake_root>/engagement-request.md` instead of interviewing a live sponsor.
+1. Ask the user for the engagement name. This becomes the folder path `<name>/`. Accept any lowercase, kebab-case, or alphanumeric string. Reject placeholder strings like `<name>`, `<fill in>`, or empty input — halt and re-ask.
+2. Run `mkdir -p <name>/` to create the engagement folder before writing any files.
+3. **Check for a sample-run marker.** After creating the engagement folder, check whether `<name>/.sample-run.md` exists. If present, this is a sample run — read that file silently, extract the `intake_root` field from its YAML frontmatter, and note the Phase Intake Map. At the live-sponsor-interview step in the Workflow below, read `<intake_root>/engagement-request.md` instead of interviewing a live sponsor.
 4. No predecessor files required — this is Phase 1.
 
 Gate condition: None. Proceed directly to scoping once the engagement folder is created.
@@ -32,14 +32,14 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 - [ ] Define observable, measurable success criteria
 - [ ] Capture constraints: budget, timeline, access, political sensitivities
 - [ ] Apply the scope validity test: outcome must be a decision or action, not a list
-- [ ] Save to `docs/engagements/<engagement>/scope.md`
+- [ ] Save to `<engagement>/scope.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:mapping-context`
 
 ## Key outputs (saved to scope.md)
 
 | Field | Content |
 |---|---|
-| Engagement folder | Canonical path for all phase outputs — `docs/engagements/<resolved-name>/`. Written by Phase 1; all downstream phases read this field. |
+| Engagement folder | Canonical path for all phase outputs — `<resolved-name>/`. Written by Phase 1; all downstream phases read this field. |
 | Sponsoring question | The single question this engagement must answer to enable a decision |
 | Decision-maker | Name, role, and what they will do differently with the output |
 | In-scope domains | Business units, process families, technology layers covered |
@@ -49,7 +49,7 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 
 ## Workflow
 
-1. Ask for the engagement name. Create `docs/engagements/<name>/` via `mkdir -p`.
+1. Ask for the engagement name. Create `<name>/` via `mkdir -p`.
 2. Read user's engagement prompt.
 3. If sponsoring question is not stated, ask for it explicitly. Do not infer.
 4. Identify the decision-maker. If unnamed, ask. Capture their decision verb.
@@ -57,7 +57,7 @@ New engagement prompt. No predecessor file required. This skill creates `scope.m
 6. Translate "success" into something measurable. Reject "improved efficiency" — demand a metric or decision outcome.
 7. Capture constraints — including the political ones the sponsor may not volunteer.
 8. Apply the scope validity test. If the outcome is a list, return to step 2.
-9. Write `scope.md` to `docs/engagements/<name>/scope.md`. The first field in the file is `**Engagement folder:** docs/engagements/<name>/`.
+9. Write `scope.md` to `<name>/scope.md`. The first field in the file is `**Engagement folder:** <name>/`.
 
 ## Rationalization Table
 

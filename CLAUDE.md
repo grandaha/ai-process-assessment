@@ -4,7 +4,7 @@ This file establishes engagement-specific overrides for the process-assessment m
 
 ## Engagement
 - **Client / Initiative:** <fill in>
-- **Engagement folder:** `docs/engagements/<name>/`
+- **Engagement folder:** `<name>/`
 - **Sponsor:** <name, role>
 - **Decision-maker:** <name, role>
 

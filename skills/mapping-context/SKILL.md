@@ -31,7 +31,7 @@ Opportunities don't exist in a vacuum. Two organizations with identical processe
 - [ ] Document the funding model: capex/opex split, who pays for transformation
 - [ ] Capture risk posture: regulated, conservative, tolerant; recent incidents
 - [ ] Capture political landscape: who must be aligned, who can veto, who is skeptical
-- [ ] Save to `docs/engagements/<engagement>/context.md`
+- [ ] Save to `<engagement>/context.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:inventorying-tech-data`
 
 ## Key outputs (saved to context.md)

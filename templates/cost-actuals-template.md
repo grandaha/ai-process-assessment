@@ -9,7 +9,7 @@
 
 > **How to use this file**
 >
-> Copy this file to `docs/engagements/<engagement>/cost-actuals.md` before Phase 9 runs.
+> Copy this file to `<engagement>/cost-actuals.md` before Phase 9 runs.
 > Fill in the fields you have. Leave blank any field where you don't have actuals — Phase 9 will use AACE Class 5 benchmark rates for those lines and flag them.
 > Even partial data tightens the estimate. Labor rates alone (Section 1) eliminate the largest single source of ROM variance.
 

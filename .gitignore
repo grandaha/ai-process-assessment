@@ -8,8 +8,10 @@
 # Session handoff / personal logs
 .remember/
 
-# Client engagement data
-docs/engagements/
+# Client engagement data — engagement folders live at the project root.
+# Add each engagement folder by name (e.g. acme-corp/).
+# The bundled sample run lives here:
+sample-pso-delivery/
 
 # Internal planning and design docs
 docs/superpowers/

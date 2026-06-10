@@ -132,7 +132,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 - [ ] Verify: every figure has a ROM label; every Buy/Partner initiative flags missing vendor quote; one-time and recurring costs are separated; pilot-to-production warning is present on every cost block
 - [ ] Confirm `Key Assumptions` contains the three cannot-do statements
 - [ ] Confirm `What Would Tighten This Estimate` names specific missing inputs, not vague categories
-- [ ] Save to `docs/engagements/<engagement>/business-case.md`
+- [ ] Save to `<engagement>/business-case.md`
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:deliverable-gate`
 
 ## Workflow

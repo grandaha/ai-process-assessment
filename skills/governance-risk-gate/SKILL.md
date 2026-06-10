@@ -51,28 +51,28 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
 - [ ] Record the clearance status for each OPP from the one-line summaries (Cleared / Cleared with Conditions / Blocked)
 - [ ] Assemble GRC reviews to canonical folder via Bash:
   ```bash
-  mkdir -p docs/engagements/<name>/grc
-  mv docs/engagements/<name>/_staging/grc/OPP-*.md docs/engagements/<name>/grc/
+  mkdir -p <name>/grc
+  mv <name>/_staging/grc/OPP-*.md <name>/grc/
   ```
   Then generate the index from extraction headers:
   ```bash
-  echo "| OPP-ID | Status | Conditions |" > docs/engagements/<name>/grc/_index.md
-  echo "|--------|--------|------------|" >> docs/engagements/<name>/grc/_index.md
-  for f in docs/engagements/<name>/grc/OPP-*.md; do
+  echo "| OPP-ID | Status | Conditions |" > <name>/grc/_index.md
+  echo "|--------|--------|------------|" >> <name>/grc/_index.md
+  for f in <name>/grc/OPP-*.md; do
     header=$(grep "^<!-- index:" "$f" | head -1)
     id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
     status=$(echo "$header" | grep -o 'status=[^ >]*' | cut -d= -f2)
     cond=$(echo "$header" | grep -o 'conditions=[^ >]*' | cut -d= -f2)
-    echo "| $id | $status | $cond |" >> docs/engagements/<name>/grc/_index.md
+    echo "| $id | $status | $cond |" >> <name>/grc/_index.md
   done
   ```
-  Verify: `ls docs/engagements/<name>/grc/OPP-*.md | wc -l`
+  Verify: `ls <name>/grc/OPP-*.md | wc -l`
 - [ ] For Cleared with Conditions, update the GRC flag line in `opportunities/OPP-NNN.md` using the inline conditions from the one-line summary — no staging file read required. Format: `**GRC flag:** Yellow — [original basis] | Cleared with Conditions: (1) <condition>, (2) <condition>`
 - [ ] For Blocked, route the opportunity back to Phase 5 for re-classification or removal; do not carry a Blocked OPP into scoring
 - [ ] For Cleared, no update to `opportunities/OPP-NNN.md` is required
 
 **Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
-- [ ] Cleanup: `rm -rf docs/engagements/<name>/_staging/grc`
+- [ ] Cleanup: `rm -rf <name>/_staging/grc`
 
 ## Rationalization Table
 
