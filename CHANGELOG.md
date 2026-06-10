@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] — 2026-06-09
+
+### Changed
+- **Phase 4 `processes/` folder model** — replaces the two monolithic `process-map.md` and
+  `baselines.md` outputs with a per-process folder structure, matching the pattern already
+  used by `opportunities/`, `scores/`, and `grc/`.
+  - Each process is now a single `processes/PROC-NNN.md` file containing the process map
+    (steps, actors, decision points, chain scan, challenge hypothesis) AND baseline metrics
+    (volume, cycle time, FTE effort, error rate) in one place.
+  - `processes/_index.md` is machine-generated via Bash from extraction headers
+    (`<!-- index: baseline=Ready -->`), providing a gate-checkable summary of all processes.
+  - Phase 5 gate now checks `processes/_index.md` instead of `process-map.md` + `baselines.md`.
+  - Phase 5 typer and Phase 6 scorer subagents each receive one `processes/PROC-NNN.md` file
+    instead of sections from two separate files, eliminating context bloat that scaled linearly
+    with engagement size.
+  - All downstream phases (7–11) updated to read from `processes/PROC-NNN.md`.
+  - Retirement guard added to `test_guards.py` — any re-introduction of `process-map.md` or
+    `baselines.md` in skills/ or agents/ fails immediately.
+
 ## [2.7.0] — 2026-06-09
 
 ### Changed
