@@ -14,8 +14,7 @@ Single-opportunity scorer. Evaluates one OPP-NNN entry against the six-dimension
 | Input | Source |
 |---|---|
 | OPP-NNN entry | From `opportunities/OPP-NNN.md` — the single opportunity being scored |
-| Process context | Relevant section(s) from `process-map.md` (steps, actors, decision points, exceptions) |
-| Baselines | Relevant rows from `baselines.md` (volume, cycle time, FTE effort, confidence level) |
+| Process context and baselines | From `processes/PROC-NNN.md` — the single process file for this opportunity's process. Contains: steps, actors, decision points, exceptions, chain scan, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level). |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, data asset catalog, enabler gaps, build/buy posture) |
 | Org context | Relevant sections from `context.md` (AI maturity, risk posture, org change readiness, strategic priorities) |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase6/OPP-NNN.md` |
@@ -28,12 +27,12 @@ Score each dimension 1–5. Every score requires a source citation. Refuse to sc
 
 | Dimension | What it measures | Required source |
 |---|---|---|
-| Value Potential | Magnitude of value if realized | `baselines.md` — must cite a specific figure (FTE, volume, cycle time) |
+| Value Potential | Magnitude of value if realized | `processes/PROC-NNN.md` Baselines section — must cite a specific figure (FTE, volume, cycle time) |
 | Technical Feasibility | Buildability given current systems and skills | `tech-inventory.md` — system inventory, API map, enabler gaps |
 | Data Readiness | Whether data needed exists, is accessible, and is fit for purpose | `tech-inventory.md` — data asset catalog (quality, completeness, refresh cadence) |
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` — AI maturity, prior change history, org structure |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` — stated priorities for current and next planning cycle |
-| Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` (IT lead times, integration complexity) + `process-map.md` (step complexity) |
+| Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` (IT lead times, integration complexity) + `processes/PROC-NNN.md` (step complexity) |
 
 **Scale:** 1 = very low / very poor / very slow / very high risk; 5 = very high / excellent / very fast / very low risk.
 
@@ -96,7 +95,7 @@ Structure the written content as:
 
 | Dimension | Score | Source citation |
 |---|---|---|
-| Value Potential | N/5 | [specific figure from baselines.md] |
+| Value Potential | N/5 | [specific figure from processes/PROC-NNN.md Baselines section] |
 | Technical Feasibility | N/5 | [specific system/integration from tech-inventory.md] |
 | Data Readiness | N/5 | [specific data asset and quality rating from tech-inventory.md] |
 | Org Change Readiness | N/5 | [specific maturity or history item from context.md] |
@@ -131,4 +130,4 @@ Do NOT return the scored entry content in your response.
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its own OPP entry and the four source files (no cross-OPP context). Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase6/OPP-NNN.md`.
+Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its OPP entry, `processes/PROC-NNN.md` for the opportunity's process, and three source files (`tech-inventory.md`, `context.md`) (no cross-OPP context). Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase6/OPP-NNN.md`.

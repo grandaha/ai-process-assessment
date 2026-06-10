@@ -182,7 +182,7 @@ The static shell includes a sticky nav immediately after `<body>`:
 ## Phase checklist
 
 - [ ] Confirm `executive-summary.md` exists in the engagement folder
-- [ ] Confirm all 5 source files exist: `executive-summary.md`, `baselines.md`, `scores/_index.md`, `roadmap.md`, `evidence-log.md`
+- [ ] Confirm all 5 source files exist: `executive-summary.md`, `processes/_index.md`, `scores/_index.md`, `roadmap.md`, `evidence-log.md`
 - [ ] In a single tool-call batch, dispatch all 5 section-renderer agents in parallel:
   - `section-renderer-executive` ← engagement folder path, section ID: `executive`
   - `section-renderer-problem` ← engagement folder path, section ID: `problem`

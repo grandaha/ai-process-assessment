@@ -10,7 +10,7 @@ description: Cross-cutting terminal gate — runs four-dimension integrity check
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read all phase output files for integrity check:
-   `scope.md`, `context.md`, `tech-inventory.md`, `process-map.md`, `baselines.md`,
+   `scope.md`, `context.md`, `tech-inventory.md`, `processes/_index.md`,
    `opportunities/_index.md`, `scores/_index.md`, `roadmap.md`,
    `usecase-briefs/_index.md`, `cost-actuals.md`, `business-case.md`
 
@@ -26,7 +26,7 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 
 ## Five Integrity Dimensions
 
-- **Evidence integrity** — every value claim in the deliverable traces to a citation in `baselines.md`. No figure floats free.
+- **Evidence integrity** — every value claim in the deliverable traces to a citation in `processes/PROC-NNN.md` baseline sections. No figure floats free.
 - **Logic integrity** — the chain process → opportunity → score → roadmap → brief has no gaps. A reader can walk from any brief back to the baseline that grounds it.
 - **Completeness** — every in-scope domain from `scope.md` is addressed. Gaps are acknowledged, not hidden.
 - **Communication readiness** — the portfolio view (waves, value, sequencing) is present and coherent in `roadmap.md` and `scores/_index.md`, so the executive summary (Phase 10) can lead with it rather than with methodology narrative. Gate B runs *before* Phase 10, so `executive-summary.md` does not yet exist and is not inspected here — this dimension confirms the raw material to lead with the portfolio view is in place.

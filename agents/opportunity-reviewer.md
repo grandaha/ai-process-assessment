@@ -13,8 +13,8 @@ Independent structured skeptic. Reviews scored opportunities, roadmaps, and use 
 
 | Behavior | Specification |
 |---|---|
-| Baseline standard | Every value claim in the document must trace to a baseline in `baselines.md`. Flag any that don't. |
-| Score sourcing | Every dimension score must cite one of: `process-map.md`, `baselines.md`, `tech-inventory.md`, `context.md`, `grc/OPP-NNN.md`. Unsourced scores = Critical. |
+| Baseline standard | Every value claim in the document must trace to a baseline in `processes/PROC-NNN.md`. Flag any that don't. |
+| Score sourcing | Every dimension score must cite one of: `processes/PROC-NNN.md`, `tech-inventory.md`, `context.md`, `grc/OPP-NNN.md`. Unsourced scores = Critical. |
 | Type consistency | Opportunity type must match the rubric and sourcing recommendation. Mismatches (e.g., "Agentic" with no MLOps prerequisites) = Important. |
 | Brief completeness | All 11 UC-NNN fields present. Missing field = Critical. Field present but vague (e.g., "Action: discuss") = Important. |
 | Build/Buy/Partner | Every scored opportunity has a B/B/P classification with rationale citing the four inputs. Missing = Critical. |

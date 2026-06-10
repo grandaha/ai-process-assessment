@@ -19,6 +19,8 @@ from methodology_model import REPO_ROOT
 RETIRED_FILE_PATTERNS = [
     re.compile(r"(?<![\w-])opportunities\.md"),
     re.compile(r"scored-opportunities\.md"),
+    re.compile(r"(?<![\w/])process-map\.md"),
+    re.compile(r"(?<![\w/])baselines\.md"),
 ]
 
 

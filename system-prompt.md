@@ -22,8 +22,8 @@ You are operating inside the AI & Automation Use Case Identification methodology
 | 1 | `ai-process-assessment:scoping-engagement` | Front gate — sponsoring question, decision-maker, scope | New engagement prompt | `scope.md` |
 | 2 | `ai-process-assessment:mapping-context` | Org / strategic / political context | `scope.md` exists | `context.md` |
 | 3 | `ai-process-assessment:inventorying-tech-data` | Systems, APIs, data, enablers | `context.md` exists | `tech-inventory.md` |
-| 4 | `ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics, challenge hypothesis | `tech-inventory.md` exists | `process-map.md`, `baselines.md` |
-| 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `process-map.md` and `baselines.md` exist | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
+| 4 | `ai-process-assessment:discovering-processes` | Four-round interviews, baseline metrics, challenge hypothesis | `tech-inventory.md` exists | `processes/` (folder: `_index.md` + `PROC-NNN.md` per process) |
+| 5 | `ai-process-assessment:identifying-opportunities` | Typed opportunity log (OPP-NNN) | `processes/_index.md` exists | `opportunities/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
 | 6 | `ai-process-assessment:scoring-opportunities` | 6-dimension rubric + Build/Buy/Partner | `opportunities/_index.md` exists; GRC cleared for any flagged | `scores/` (folder: `_index.md` + `OPP-NNN.md` per opportunity) |
 | 7 | `ai-process-assessment:prioritizing-roadmap` | Foundation/Scale/Optimize sequencing | `scores/_index.md` saved; reviewer cleared | `roadmap.md` |
 | 8 | `ai-process-assessment:packaging-usecases` | UC-NNN briefs (SCRA structure) | `roadmap.md` saved; reviewer cleared | `usecase-briefs/` (folder: `_index.md` + `UC-NNN.md` per opportunity) |
@@ -125,8 +125,7 @@ Every engagement gets its own folder under `docs/engagements/<engagement-name>/`
 - `scope.md` — Phase 1
 - `context.md` — Phase 2
 - `tech-inventory.md` — Phase 3
-- `process-map.md` — Phase 4
-- `baselines.md` — Phase 4 (load-bearing — see Baseline, Value & Challenge gate)
+- `processes/` — Phase 4 (folder: `_index.md` + `PROC-NNN.md` per process; load-bearing — see Baseline, Value & Challenge gate)
 - `opportunities/` — Phase 5 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
 - `grc/` — GRC Gate (folder: `_index.md` + `OPP-NNN.md` per flagged opportunity; only present when Gate A ran)
 - `scores/` — Phase 6 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
@@ -145,5 +144,4 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 ## Chain to next skill
 
 → `ai-process-assessment:scoping-engagement` (on any new engagement prompt)
-
 </EXTREMELY_IMPORTANT>

@@ -30,7 +30,7 @@ Every Wave 1 brief contains the following 11 fields:
 |---|---|
 | Opportunity reference | OPP-NNN from `opportunities/OPP-NNN.md` |
 | Opportunity type | RPA / AI Augmentation / AI Automation / Agentic / Data & Analytics |
-| Situation | Current state — sourced to `process-map.md` and `baselines.md` |
+| Situation | Current state — sourced to `processes/PROC-NNN.md` (process map and baseline fields) |
 | Complication | What changed or what's broken — the reason this is on the roadmap now |
 | Resolution | The proposed intervention; tied to opportunity type |
 | Action | Specific next step with named owner and date |
