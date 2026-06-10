@@ -124,7 +124,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 - [ ] Confirm `usecase-briefs/_index.md` saved and reviewer cleared
 - [ ] Confirm cost-actuals.md exists in the engagement folder — halt and invoke Phase 8.5 if absent
 - [ ] Confirm all five source files exist
-- [ ] Verify `model/{value,costs,initiatives,baselines}.json` exist (do NOT write them — they are owned by Phases 5/8.5/7/4); halt naming the owning phase if any file is missing
+- [ ] Verify `model/{value,costs,initiatives,baselines,scores}.json` exist (do NOT write them — they are owned by Phases 5/8.5/7/4/6); halt naming the owning phase if any file is missing
 - [ ] Run `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
 - [ ] Collect returned cost/value blocks
@@ -140,7 +140,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 1. Confirm preconditions: `usecase-briefs/_index.md` exists and reviewer cleared.
 2. Confirm `cost-actuals.md` exists in the engagement folder. If absent: halt. Do not proceed. Invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) and complete it before returning to this phase.
 3. Confirm all five source files present.
-4. Verify `model/value.json`, `model/costs.json`, `model/initiatives.json`, and `model/baselines.json` exist (owned by Phases 5/8.5/7/4 respectively) — do NOT write or re-write them. If any is missing, halt and name the owning phase. Then run `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`. Then, for each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data; the agent cites its figures from `model/results.json`.
+4. Verify `model/value.json`, `model/costs.json`, `model/initiatives.json`, `model/baselines.json`, and `model/scores.json` exist (owned by Phases 5/8.5/7/4/6 respectively) — do NOT write or re-write them. If any is missing, halt and name the owning phase. Then run `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`. Then, for each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data; the agent cites its figures from `model/results.json`.
 5. Collect returned blocks. In main context: verify mandatory labels, read the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` (the engine sums the low/high ranges and computes payback — never compute in prose), compile Key Assumptions from all initiative blocks.
 6. Add the three cannot-do statements to Key Assumptions.
 7. Add What Would Tighten This Estimate — list specific missing inputs (vendor quotes for Buy/Partner initiatives, internal labor rate, integration complexity from IT).

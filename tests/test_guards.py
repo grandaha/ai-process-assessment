@@ -217,9 +217,12 @@ def test_keystone_has_structural_challenge_rationalization(methodology):
 
 def test_phase9_cites_engine_not_prose_math():
     skill = (REPO_ROOT / "skills" / "building-business-case" / "SKILL.md").read_text()
-    assert "model/costs.json" in skill
     assert "python -m engine.run" in skill
     assert "results.json" in skill
+    # All five engine inputs must appear in the Phase 9 skill — guards against partial omissions.
+    for f in ("model/value.json", "model/costs.json", "model/initiatives.json",
+              "model/baselines.json", "model/scores.json"):
+        assert f in skill, f"{f} missing from Phase 9 gate check"
     agent = (REPO_ROOT / "agents" / "business-case-analyst.md").read_text()
     assert "results.json" in agent
     # The analyst no longer computes ROM ranges itself.
