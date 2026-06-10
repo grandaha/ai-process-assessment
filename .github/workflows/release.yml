@@ -34,8 +34,9 @@ jobs:
           fetch-depth: 0
 
       - name: Verify tag matches manifest version
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
           TAG_VERSION="${TAG#v}"
           MANIFEST_VERSION="$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")"
           if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
@@ -54,21 +55,23 @@ jobs:
         run: pytest -q
 
       - name: Build release zip
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
           git archive --format=zip -o "ai-process-assessment-${TAG}.zip" "$TAG"
 
       - name: Extract release notes
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
           python3 .github/scripts/extract_changelog.py "${TAG#v}" > RELEASE_NOTES.md
           echo "----- notes -----"; cat RELEASE_NOTES.md
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
           ASSET="ai-process-assessment-${TAG}.zip"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ASSET" --clobber
