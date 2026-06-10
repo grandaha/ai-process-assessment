@@ -72,7 +72,7 @@ jobs:
           # version's notes. The zip (built above) is the tagged code; these notes
           # describe it using current tooling. Overlay only these two paths so the
           # already-built zip is untouched.
-          git fetch --depth=1 origin "$DEFAULT_BRANCH"
+          git fetch --depth=1 origin "${DEFAULT_BRANCH:?DEFAULT_BRANCH is unset}"
           git checkout "origin/$DEFAULT_BRANCH" -- CHANGELOG.md .github/scripts/extract_changelog.py
           python3 .github/scripts/extract_changelog.py "${TAG#v}" > RELEASE_NOTES.md
           echo "----- notes -----"; cat RELEASE_NOTES.md
