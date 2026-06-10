@@ -9,9 +9,9 @@ description: Phase 5 — applies opportunity type taxonomy to every mapped proce
 
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
-2. Read `process-map.md`, `baselines.md`, and `tech-inventory.md` — confirm each exists.
+2. Read `processes/_index.md` and `tech-inventory.md` — confirm each exists. Confirm no `Unavailable` entries in `processes/_index.md` before proceeding (each process without baselines must have been remediated or explicitly scoped out).
 
-Gate condition: Both `process-map.md` and `baselines.md` must be present before proceeding.
+Gate condition: `processes/_index.md` must be present before proceeding.
 
 ## Role in the system
 
@@ -19,7 +19,7 @@ This phase converts mapped processes into a typed opportunity log. Type — RPA 
 
 ## Gate condition
 
-`process-map.md` and `baselines.md` must both exist. This skill creates the `opportunities/` folder with per-OPP files and `opportunities/_index.md`.
+`processes/_index.md` must exist (all per-process files written by Phase 4). This skill creates the `opportunities/` folder with per-OPP files and `opportunities/_index.md`.
 
 ## OPP-NNN Entry Structure
 
@@ -27,15 +27,15 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 
 | Field | Content |
 |---|---|
-| Process reference | ID from `process-map.md` |
+| Process reference | ID from `processes/_index.md` |
 | Opportunity type | RPA / AI Augmentation / Chain Automation / AI Automation / Agentic / Data & Analytics |
 | Hypothesis | One-sentence statement: "We believe that [intervention] will [effect] because [mechanism]." |
-| Value hypothesis | Estimated value range, citing specific baseline(s) from `baselines.md` |
-| Chain formation | If two or more consecutive AI-capable steps from the process-map.md chain scan are involved: describe the chain (step range, checkpoints eliminated, current human effort at each eliminated checkpoint). If this is a single-step opportunity, write "Single step — no chain." |
+| Value hypothesis | Estimated value range, citing specific baseline(s) from `processes/PROC-NNN.md` |
+| Chain formation | If two or more consecutive AI-capable steps from the `processes/PROC-NNN.md` chain scan are involved: describe the chain (step range, checkpoints eliminated, current human effort at each eliminated checkpoint). If this is a single-step opportunity, write "Single step — no chain." |
 | Feasibility flag | Green / Yellow / Red — based on `tech-inventory.md` |
 | Data readiness flag | Green / Yellow / Red — based on data asset catalog |
 | GRC flag | Green / Yellow / Red — regulatory, model risk, auditability, failure consequence |
-| Structural response | `addressing-root` / `optimizing-around` / `not-applicable` — set against the process's challenge hypothesis from `process-map.md`. Annotates only; never blocks. |
+| Structural response | `addressing-root` / `optimizing-around` / `not-applicable` — set against the process's challenge hypothesis from `processes/PROC-NNN.md`. Annotates only; never blocks. |
 
 **Categorical rule: Hypothesis statement must be written before value is estimated. This prevents reverse-engineering the hypothesis from a desired outcome.**
 
@@ -49,8 +49,8 @@ The value hypothesis is written *before* the number (hypothesis-before-value dis
 
 Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.
 
-- **When:** After `process-map.md` and `baselines.md` are confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
-- **Pass to each subagent:** engagement folder path, process ID, and staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. The agent reads its own `process-map.md` entry, `baselines.md` rows, and `tech-inventory.md` sections. Do not pass file content to the subagent.
+- **When:** After `processes/_index.md` is confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
+- **Pass to each subagent:** engagement folder path, process ID (PROC-NNN), the absolute path to `processes/PROC-NNN.md` for that process, and staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. The agent reads its own `processes/PROC-NNN.md` (which contains both process map data and baseline metrics) and the relevant `tech-inventory.md` sections. Do not pass file content to the subagent.
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
 - **Assembly:** After all agents complete, assemble with Bash:
   ```bash
@@ -94,10 +94,10 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 
 ## Phase checklist
 
-- [ ] Confirm `process-map.md` and `baselines.md` exist
+- [ ] Confirm `processes/_index.md` exists and all entries have `Baseline: Ready`
 - [ ] For each mapped process, walk the opportunity type taxonomy and assign the correct type
 - [ ] Write the hypothesis statement BEFORE estimating value
-- [ ] Source value range against named baseline(s) from `baselines.md`
+- [ ] Source value range against named baseline(s) from `processes/PROC-NNN.md`
 - [ ] Set feasibility flag against `tech-inventory.md`
 - [ ] Set data readiness flag against data asset catalog
 - [ ] Set GRC flag based on regulatory exposure, model risk, auditability, failure consequence
@@ -109,8 +109,8 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 
 ## Workflow
 
-1. Load `process-map.md` and `baselines.md`. If either is missing, return to Phase 4.
-2. For each process, review the chain scan from `process-map.md`. Identify chain formation opportunities first — runs of consecutive Green steps that could eliminate one or more human verification checkpoints. These are Chain Automation type candidates. Then walk the six-row taxonomy for remaining steps. Pick the type that fits the work, not the brand the client wants on the slide.
+1. Load `processes/_index.md`. If missing, return to Phase 4. For each PROC-NNN entry, confirm `processes/PROC-NNN.md` exists.
+2. For each process, review the chain scan from `processes/PROC-NNN.md`. Identify chain formation opportunities first — runs of consecutive Green steps that could eliminate one or more human verification checkpoints. These are Chain Automation type candidates. Then walk the six-row taxonomy for remaining steps. Pick the type that fits the work, not the brand the client wants on the slide.
 3. Write the hypothesis. The format is forcing: it requires naming the intervention, the effect, and the mechanism.
 4. Estimate value. Cite the baseline by name. If no baseline supports the claim, the process is not opportunity-eligible — return to Phase 4 for baseline capture.
 5. Set the three flags. Be honest about Yellow and Red — they're inputs to scoring and gating, not failures.

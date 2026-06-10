@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:discovering-processes
-description: Phase 4 — evidence-gathering core. Maps processes via four-round interview sequence (sponsor → operator → adjacent → clarification), captures volume/cycle time/error rate/FTE for every process. Enforces the Baseline, Value & Challenge gate. Saves process-map.md and baselines.md.
+description: Phase 4 — evidence-gathering core. Maps processes via four-round interview sequence (sponsor → operator → adjacent → clarification), captures volume/cycle time/error rate/FTE for every process. Enforces the Baseline, Value & Challenge gate. Saves processes/_index.md and processes/PROC-NNN.md per process.
 ---
 
 # Phase 4: Discovering Processes
@@ -16,17 +16,17 @@ Gate condition: `tech-inventory.md` must be present before proceeding.
 
 ## Role in the system
 
-This is the evidence-gathering core of the methodology. Everything downstream — opportunity identification, scoring, sequencing, brief writing — cites this phase's output. Two artifacts come out: `process-map.md` describes how work actually happens, and `baselines.md` captures the metrics that ground every later value claim.
+This is the evidence-gathering core of the methodology. Everything downstream — opportunity identification, scoring, sequencing, brief writing — cites this phase's output. The output is the `processes/` folder: one `processes/PROC-NNN.md` per process (combining process map and baseline metrics in one file) and a machine-readable `processes/_index.md`.
 
 ## Gate condition
 
-`tech-inventory.md` must exist. The engagement's `evidence-log.md` should be active and used to record interview rounds. This skill creates `process-map.md` AND `baselines.md`.
+`tech-inventory.md` must exist. The engagement's `evidence-log.md` should be active and used to record interview rounds. This skill creates the `processes/` folder: `processes/_index.md` and one `processes/PROC-NNN.md` per process.
 
 ## Baseline, Value & Challenge Gate
 
 This is the single most load-bearing rule in the methodology.
 
-For every process mapped, `baselines.md` MUST contain at minimum:
+For every process mapped, `processes/PROC-NNN.md` MUST contain at minimum in its Baselines section:
 
 - **Volume** — transactions per unit time (e.g., "1,200 invoices/month")
 - **Cycle time** — median and P90 (e.g., "median 4h, P90 18h")
@@ -37,11 +37,11 @@ For every process mapped, `baselines.md` MUST contain at minimum:
 
 If a baseline cannot be sourced (estimated by an operator, pulled from a system, sampled), the process does not advance to Phase 5. It is logged as "baseline unavailable" with a remediation action.
 
-**Challenge clause (second-order check).** For every process mapped, `process-map.md` MUST also carry a **challenge hypothesis** (see Key Outputs). Automate a broken process and you get a faster broken process — this clause forces the question of whether the process structure itself is the constraint before any automation is typed. A process with no challenge hypothesis does not advance to Phase 5: it is logged as "challenge hypothesis unavailable" with a remediation action (return to the sponsor for the three structural questions), identically to a missing baseline. The hypothesis *surfaces* the redesign question; it does not solve it, and the signal it produces downstream annotates — it never blocks opportunity creation.
+**Challenge clause (second-order check).** For every process mapped, `processes/PROC-NNN.md` MUST also carry a **challenge hypothesis** (see Key Outputs). Automate a broken process and you get a faster broken process — this clause forces the question of whether the process structure itself is the constraint before any automation is typed. A process with no challenge hypothesis does not advance to Phase 5: it is logged as "challenge hypothesis unavailable" with a remediation action (return to the sponsor for the three structural questions), identically to a missing baseline. The hypothesis *surfaces* the redesign question; it does not solve it, and the signal it produces downstream annotates — it never blocks opportunity creation.
 
 ## Recording baselines for the engine
 
-Capture each baseline as raw, sourced inputs in the engagement's `model/baselines.json` — one object per process, keyed by `process_id`: `volume`, `cycle_time_median`, `cycle_time_p90`, `error_rate`, `fte`, and `source`. Use the same `process_id` values that `process-map.md` assigns, so downstream phases can reference a baseline by id. Do not multiply or annualize any figure in prose — record the raw measured value and its source only. The engine reads `model/baselines.json`, echoes every baseline into `model/results.json` under `baselines.<process_id>`, and resolves the value-hypothesis volume for each opportunity from it (Phase 5). `baselines.md` remains the human-readable, source-cited narrative; every numeric figure it states must equal its `results.json` source, so the figures are deterministic and auditable. A figure that appears only in `baselines.md` with no `baselines.json` source is a defect the deliverable-gate must catch.
+Capture each baseline as raw, sourced inputs in the engagement's `model/baselines.json` — one object per process, keyed by `process_id`: `volume`, `cycle_time_median`, `cycle_time_p90`, `error_rate`, `fte`, and `source`. Use the same `process_id` values that `processes/PROC-NNN.md` assigns, so downstream phases can reference a baseline by id. Do not multiply or annualize any figure in prose — record the raw measured value and its source only. The engine reads `model/baselines.json`, echoes every baseline into `model/results.json` under `baselines.<process_id>`, and resolves the value-hypothesis volume for each opportunity from it (Phase 5). `processes/PROC-NNN.md` is the human-readable, source-cited baseline record; every numeric figure it states must equal its `results.json` source, so the figures are deterministic and auditable. A figure that appears only in `processes/PROC-NNN.md` with no `baselines.json` source is a defect the deliverable-gate must catch.
 
 ## Four-Round Interview Sequence
 
@@ -57,10 +57,10 @@ Capture each baseline as raw, sourced inputs in the engagement's `model/baseline
 
 Interview-round synthesis is offloaded to subagents to keep the main context clean. The main context owns the gate decisions; subagents own the per-round write-up.
 
-- **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `process-map.md` content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
-- **Pass to each subagent:** engagement folder path, round number, and the raw notes for that round only. The agent reads `tech-inventory.md` itself to extract relevant sections, and applies the `process-map.md`/`baselines.md` field schemas defined in its own agent spec (which mirror the Key Outputs below). It derives its own `_staging/phase4/round-N.md` output path from the engagement folder path and round number. Do not pass any file content to the subagent.
-- **Return:** Write structured entries to `<engagement-folder>/_staging/phase4/round-N.md`. Return a one-line summary only: "Round N complete: N processes mapped, N baselines captured." The orchestrator assembles `process-map.md` and `baselines.md` from staging files — it does NOT receive entry content from the subagent.
-- **What stays in main context:** The Baseline, Value & Challenge gate, the chain scan across the assembled map, the conflict-resolution decision from Round 4, and **synthesizing the per-process challenge hypothesis** from the Round-1 `Sponsor structural input` (one paragraph per process: structurally sound, or the single surfaced redesign question). These are cross-round judgments and must not be delegated.
+- **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `processes/PROC-NNN.md`-ready content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
+- **Pass to each subagent:** engagement folder path, round number, and the raw notes for that round only. The agent reads `tech-inventory.md` itself to extract relevant sections, and applies the `processes/PROC-NNN.md` field schema defined in its own agent spec (which mirrors the Key Outputs below). It derives its own `_staging/phase4/round-N.md` output path from the engagement folder path and round number. Do not pass any file content to the subagent.
+- **Return:** Write structured entries to `<engagement-folder>/_staging/phase4/round-N.md`. Return a one-line summary only: "Round N complete: N processes mapped, N baselines captured." The orchestrator assembles `processes/PROC-NNN.md` files from staging files — it does NOT receive entry content from the subagent.
+- **What stays in main context:** The Baseline, Value & Challenge gate, the chain scan across the assembled map, the conflict-resolution decision from Round 4, and **synthesizing the per-process challenge hypothesis** from the Round-1 `Sponsor structural input` (one paragraph per process: structurally sound, or the single surfaced redesign question). These are cross-round judgments and must not be delegated. After synthesis, the orchestrator writes one `processes/PROC-NNN.md` per process and generates `processes/_index.md` via Bash.
 
 ## Phase checklist
 
@@ -71,42 +71,75 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - [ ] Round 4: Clarification — resolve conflicts; record named participants in `evidence-log.md` stakeholder interview log
 - [ ] For every process, capture volume, cycle time (median + P90), error/exception rate, FTE effort
 - [ ] For every step in each process, assign AI capability flag (Green / Yellow / Red)
-- [ ] Run chain scan — identify consecutive Green runs; record in process-map.md; flag high-fragmentation processes
+- [ ] Run chain scan — identify consecutive Green runs; record in `processes/PROC-NNN.md`; flag high-fragmentation processes
 - [ ] Apply the Baseline, Value & Challenge gate — flag any process missing baselines
 - [ ] For every process, synthesize a challenge hypothesis from the sponsor's structural input; flag any process missing one as "challenge hypothesis unavailable"
-- [ ] Save `process-map.md`
-- [ ] Save `baselines.md`
+- [ ] Save each process to `docs/engagements/<name>/processes/PROC-NNN.md` (process map + baselines + challenge hypothesis + chain scan in one file per process)
+- [ ] Generate `processes/_index.md` via Bash from extraction headers
+- [ ] Confirm all `processes/_index.md` Baseline entries are `Ready` (no `Unavailable` rows advance to Phase 5 unless explicitly scoped out with a documented reason)
 - [ ] Confirm `evidence-log.md` stakeholder interview log is complete — one row per session, every participant named
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:identifying-opportunities`
 
 ## Key outputs
 
-### process-map.md
+### processes/_index.md
 
-| Field | Content |
+Machine-readable index generated from extraction headers after all `PROC-NNN.md` files are written.
+
+| Column | Content |
 |---|---|
-| Process name and ID | Stable identifier referenced by later phases |
-| Trigger | What initiates the process |
-| Steps | Actual steps as executed (not as documented) |
-| Actors | Roles, systems, and external parties involved |
-| Decision points | Where humans exercise judgment; what informs the call |
-| Exceptions | Common deviations and how they're handled |
-| Upstream / downstream | What feeds this; what consumes its output |
-| Conflicts | Where interview rounds disagreed; resolution |
-| AI capability per step | For each step in the sequence: AI-capable (Green), Uncertain (Yellow), or Not AI-capable (Red). Record what makes a step hard for AI (judgment, unstructured input, regulatory requirement, etc.). |
-| Chain scan | Identify every run of consecutive Green steps. Record the run as [step i → step j] and count how many current human verification points the run would eliminate if chained. Flag processes where Green steps are interleaved with Red steps as high-fragmentation. |
-| Challenge hypothesis | One paragraph per process, authored by the orchestrator at assembly from the sponsor's Round-1 structural answers. Either "structurally sound — [why]" or the single surfaced redesign question (boundary / actor model / sequence) with its basis. Surfaces the question; does not solve it. |
+| PROC-ID | Stable process identifier (PROC-001, PROC-002, …) |
+| Process Name | Descriptive name from the `## PROC-NNN —` heading |
+| Baseline | `Ready` if all four baseline fields are present and sourced; `Unavailable` otherwise |
 
-### baselines.md
+### processes/PROC-NNN.md
 
-| Field | Content |
-|---|---|
-| Process ID | Reference to `process-map.md` |
-| Volume | Transactions per unit time, with source |
-| Cycle time | Median and P90, with source |
-| Error / exception rate | Fraction off happy path, with source |
-| FTE effort | Current human effort estimate, with source |
-| Source confidence | High (system-pulled) / Medium (sampled) / Low (estimated) |
+One file per process. Contains both process map fields and baseline fields in a single combined file. Each file carries an extraction header on the line immediately after the `## PROC-NNN` heading.
+
+```markdown
+## PROC-001 — [Process Name]
+<!-- index: baseline=Ready -->
+
+**Trigger:** [what initiates the process]
+
+### Process Map
+
+**Steps:** [actual steps as executed; for each step: step → Green/Yellow/Red — what makes Red/Yellow hard]
+**Actors:** [roles, systems, external parties]
+**Decision points:** [where humans exercise judgment; what informs the call]
+**Exceptions:** [common deviations and how they're handled]
+**Upstream / downstream:** [what feeds this; what consumes its output]
+**Conflicts:** [where interview rounds disagreed; resolution]
+**Chain scan:** [runs of consecutive Green steps: [step i → step j] — checkpoints eliminated; flag high-fragmentation processes]
+**Challenge hypothesis:** [one paragraph: "structurally sound — [why]" OR the single surfaced redesign question (boundary / actor model / sequence) with its basis]
+
+### Baselines
+
+| Field | Value | Source | Confidence |
+|---|---|---|---|
+| Volume | [transactions per unit time] | [source] | [High/Medium/Low] |
+| Cycle time | [median] / [P90] | [source] | [High/Medium/Low] |
+| Error / exception rate | [fraction off happy path] | [source] | [High/Medium/Low] |
+| FTE effort | [current human effort] | [source] | [High/Medium/Low] |
+```
+
+**Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## PROC-NNN` heading (line 2 of the file). Set `baseline=Ready` when all four baseline fields carry a real sourced value; set `baseline=Unavailable` when any field is missing or unconfirmed. Spaces in the value are not permitted — use `Ready` or `Unavailable` exactly.
+
+**Assembly — after all synthesis is complete, generate the index:**
+```bash
+mkdir -p docs/engagements/<name>/processes
+echo "| PROC-ID | Process Name | Baseline |" > docs/engagements/<name>/processes/_index.md
+echo "|---------|--------------|----------|" >> docs/engagements/<name>/processes/_index.md
+for f in docs/engagements/<name>/processes/PROC-*.md; do
+  id=$(basename "$f" .md)
+  proc_name=$(grep -m1 "^## PROC-" "$f" | sed 's/^## PROC-[0-9][0-9][0-9] — //')
+  baseline=$(grep "^<!-- index:" "$f" | grep -o 'baseline=[^ >]*' | cut -d= -f2)
+  baseline=${baseline:-Unavailable}
+  echo "| $id | $proc_name | $baseline |" >> docs/engagements/<name>/processes/_index.md
+done
+```
+Verify: `ls docs/engagements/<name>/processes/PROC-*.md | wc -l`
+Cleanup: `rm -rf docs/engagements/<name>/_staging/phase4`
 
 ## Stakeholder Interview Log
 
@@ -146,7 +179,7 @@ After each interview round, append rows to the `## Stakeholder Interview Log` se
 
 ## Handoff Protocol
 
-**Output rule:** Do NOT reproduce the contents of `process-map.md` or `baselines.md` in this response. State the file paths only. Present findings as bullets — do not quote or echo file content.
+**Output rule:** Do NOT reproduce the contents of `processes/PROC-NNN.md` or `processes/_index.md` in this response. State the file paths only. Present findings as bullets — do not quote or echo file content.
 
 Before invoking the next skill, Janice must surface the phase output to the user:
 
@@ -159,8 +192,8 @@ Before invoking the next skill, Janice must surface the phase output to the user
 
 Key findings to surface for this phase: processes mapped (count), baselines captured, any "baseline unavailable" flags, stakeholder interview log completeness.
 
-**Session boundary:** After the user approves `process-map.md` and `baselines.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:identifying-opportunities` to begin Phase 5. Do not continue methodology work in this session.
+**Session boundary:** After the user approves `processes/_index.md`, this phase session is complete. Instruct the user to start a fresh Claude Code session and invoke `ai-process-assessment:identifying-opportunities` to begin Phase 5. Do not continue methodology work in this session.
 
 ## Chain to next skill
 
-→ `ai-process-assessment:identifying-opportunities` (after `process-map.md` and `baselines.md` are saved)
+→ `ai-process-assessment:identifying-opportunities` (after `processes/_index.md` is saved)

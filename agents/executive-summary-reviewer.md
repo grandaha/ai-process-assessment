@@ -14,7 +14,7 @@ The executive summary is the highest-visibility artifact in the methodology: it 
 ## Operating constraints
 
 - Receives: engagement folder path only
-- Reads `executive-summary.md`, `scope.md`, `baselines.md`, `scores/_index.md`, and `roadmap.md` directly — does not receive file content at dispatch
+- Reads `executive-summary.md`, `scope.md`, `processes/PROC-NNN.md` (per process), `scores/_index.md`, and `roadmap.md` directly — does not receive file content at dispatch
 - No shared session context
 - Writes the full review block to `<engagement-folder>/evidence-log.md` using the Write or Edit tool
 - Returns only a one-line summary — does NOT return the full review block to main context
@@ -28,10 +28,10 @@ Read `executive-summary.md` and the source files listed above. Evaluate each che
 | Go/No-Go verdict has a **named decision-maker** — a person, not a role. Verify the name appears in `scope.md`. | Critical |
 | **Pull-quote** is ≤25 words. Count the words. | Critical |
 | **Pull-quote** figures trace to source files — no invented numbers. | Critical |
-| `Why This, Why Now` cites **≥2 named baseline metrics** by name and value from `baselines.md`. | Critical |
+| `Why This, Why Now` cites **≥2 named baseline metrics** by name and value from `processes/PROC-NNN.md` baseline sections. | Critical |
 | `First Proof Point` names the **specific OPP-ID** of the highest-scored Wave 1 item. Verify it is the highest composite score among Wave 1 items per `scores/_index.md` and `roadmap.md`. | Critical |
 | `Assumptions & Limitations` contains both a `**Conditions**` sub-group and an `**Open Items**` sub-group. | Critical |
-| All **value claims** trace to a source file — no figure appears that cannot be found in `baselines.md`, `scores/_index.md`, or `roadmap.md`. | Critical |
+| All **value claims** trace to a source file — no figure appears that cannot be found in `processes/PROC-NNN.md` baseline sections, `scores/_index.md`, or `roadmap.md`. | Critical |
 | No **new analysis** — no derived figures or estimates invented in Phase 10 that do not appear in a source file. | Critical |
 | All **portfolio owners** are named people, not roles or "the team". | Important |
 | All **dates** are concrete month targets or YYYY-MM-DD — no quarters (Q1/Q2/Q3/Q4). | Important |
@@ -68,4 +68,4 @@ After producing the review block, append it to `<engagement-folder>/evidence-log
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:building-executive-summary` after the `executive-summary-drafter` writes `executive-summary.md`. Receives engagement folder path only. Reads all reviewed and source files itself.
+Invoked by `ai-process-assessment:building-executive-summary` after the `executive-summary-drafter` writes `executive-summary.md`. Receives engagement folder path only. Reads all reviewed and source files itself (reads `processes/_index.md` to enumerate process files, then reads relevant `processes/PROC-NNN.md` files for baseline data).

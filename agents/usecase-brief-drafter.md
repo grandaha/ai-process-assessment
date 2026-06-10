@@ -14,8 +14,8 @@ Single-opportunity brief writer. Produces one self-contained UC-NNN brief in SCR
 | Input | Source |
 |---|---|
 | OPP-NNN entry | Read from `opportunities/OPP-NNN.md` — the single opportunity being briefed |
-| Process context | Relevant section(s) from `process-map.md` |
-| Baselines | Relevant rows from `baselines.md` |
+| Process context | Relevant section(s) from `processes/PROC-NNN.md` (process map fields) |
+| Baselines | Relevant baseline rows from `processes/PROC-NNN.md` (Baselines section) |
 | Scoring record | Read from `scores/OPP-NNN.md` (includes B/B/P classification and 6-dimension rationale) |
 | Roadmap placement | OPP-NNN entry from `roadmap.md` (wave, month target, enabler dependencies) |
 | GRC conditions | Read from `grc/OPP-NNN.md` if the file exists; omit if file is absent (opportunity was Cleared) |
@@ -31,7 +31,7 @@ Draft fields in this order. Do not skip fields. Do not write Resolution before C
 |---|---|---|
 | 1 | Opportunity reference | OPP-NNN identifier from `opportunities/OPP-NNN.md` |
 | 2 | Opportunity type | From `opportunities/OPP-NNN.md`; must match rubric (RPA / AI Augmentation / AI Automation / Agentic / Data & Analytics / Hybrid) |
-| 3 | Situation | Current state — cite `process-map.md` step or actor; cite `baselines.md` volume/cycle/FTE figure |
+| 3 | Situation | Current state — cite `processes/PROC-NNN.md` step or actor; cite `processes/PROC-NNN.md` baseline volume/cycle/FTE figure |
 | 4 | Complication | Why this is on the roadmap now — the pain, gap, or changed condition. Must precede Resolution. |
 | 5 | Resolution | The intervention — tied to opportunity type; describe the system behavior, not the project plan |
 | 6 | Action | Specific next step. Requires: named owner (not "the team"), date or month target. "Evaluate" or "discuss" are not actions. |

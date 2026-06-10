@@ -19,6 +19,11 @@ from methodology_model import REPO_ROOT
 RETIRED_FILE_PATTERNS = [
     re.compile(r"(?<![\w-])opportunities\.md"),
     re.compile(r"scored-opportunities\.md"),
+    # (?<![\w/]) differs from the opportunities pattern above (which uses (?<![\w-])):
+    # the / exclusion prevents matching path/to/baselines.md while still catching bare
+    # baselines.md references. model/baselines.json is safe — the .json suffix won't match.
+    re.compile(r"(?<![\w/])process-map\.md"),
+    re.compile(r"(?<![\w/])baselines\.md"),
 ]
 
 

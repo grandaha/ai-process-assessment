@@ -13,7 +13,7 @@ This skill runs as a standalone session. At session start:
    - `cost-actuals.md`
    - `usecase-briefs/_index.md`
    - `roadmap.md`
-   - `baselines.md`
+   - `processes/_index.md`
    - `opportunities/_index.md`
    - `scores/_index.md`
 
@@ -52,7 +52,7 @@ All five must be present. If any is missing, the skill halts and reports which f
 |---|---|
 | `roadmap.md` | Wave 1 initiative list, sequencing, enablers |
 | `usecase-briefs/_index.md` + Wave 1 `UC-NNN.md` files | Fully specified Wave 1 briefs (SCRA structure, sourcing recommendations). Read the index to identify Wave 1 UC file names, then read only those files. |
-| `baselines.md` | Current-state metrics — the value denominator |
+| `processes/_index.md` + `processes/PROC-NNN.md` per process | Current-state baseline metrics — the value denominator |
 | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per Wave 1 initiative | Value hypotheses (written before value — must be honored as written, not re-derived); read `opportunities/_index.md` to identify Wave 1 OPP-IDs, then read each `opportunities/OPP-NNN.md` for the verbatim value hypothesis |
 | `scores/_index.md` + `scores/OPP-NNN.md` per Wave 1 initiative | Build/Buy/Partner classification per initiative with rationale; read `scores/_index.md` to confirm Wave 1 OPP-IDs, then read each `scores/OPP-NNN.md` for B/B/P classification and rationale |
 
@@ -91,7 +91,7 @@ For each Wave 1 initiative, produce one labeled block. Each `[range]` and the **
 
 For each Wave 1 initiative:
 
-- **Named baseline:** cite the exact baseline entry from `baselines.md` — no floating figures
+- **Named baseline:** cite the exact baseline entry from `processes/PROC-NNN.md` — no floating figures
 - **Value hypothesis:** verbatim from `opportunities/OPP-NNN.md` — not re-derived or paraphrased
 - **Expected improvement:** drawn from the value hypothesis, not invented
 - **Annual value calculation:** read from `model/results.json` (`value.<OPP-ID>`) — the engine computes improvement × volume × rate; every component is named and sourced in prose but not multiplied here
@@ -113,7 +113,7 @@ If a `cost-actuals.md` file exists in the engagement folder, reference its entri
 Per-initiative cost and value analysis is independent across Wave 1 initiatives — they parallelize cleanly.
 
 - **When:** After confirming all five source files exist, dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel tool-call batch.
-- **Pass to each subagent:** engagement folder path and UC-NNN file path for this initiative. The agent reads its own roadmap.md entry, UC-NNN.md, baselines.md rows, opportunities/OPP-NNN.md value hypothesis, scores/OPP-NNN.md B/B/P classification, and cost-actuals.md rows itself. Do not pass file content to the subagent.
+- **Pass to each subagent:** engagement folder path and UC-NNN file path for this initiative. The agent reads its own roadmap.md entry, UC-NNN.md, processes/PROC-NNN.md baseline rows, opportunities/OPP-NNN.md value hypothesis, scores/OPP-NNN.md B/B/P classification, and cost-actuals.md rows itself. Do not pass file content to the subagent.
 - **Return:** The agent writes its cost structure block and value case block to `<engagement-folder>/_staging/phase9/<initiative-id>.md`. Returns one-line summary: "initiative-id: ROM $X–$Y, value category." The orchestrator assembles `business-case.md` from staging files — it does NOT receive block content from subagents.
 - **What stays in main context:** Assembly of returned blocks, reading the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` (engine-computed — never summed in prose), mandatory label verification, and Key Assumptions compilation.
 

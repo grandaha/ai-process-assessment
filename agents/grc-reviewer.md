@@ -19,7 +19,7 @@ Independent risk, legal, and compliance reviewer. Evaluates GRC-flagged opportun
 
 ## Evaluation procedure
 
-1. Read `opportunities/OPP-NNN.md` for the opportunity entry and the referenced process entry from `<engagement-folder>/process-map.md`.
+1. Read `opportunities/OPP-NNN.md` for the opportunity entry and the referenced process entry from `processes/PROC-NNN.md`.
 2. Ask the four GRC dimension questions:
    - Regulatory exposure — does this touch regulated data, decisions, or processes? Which regimes apply?
    - Model risk — what is the consequence of a model error? How is it validated and monitored?

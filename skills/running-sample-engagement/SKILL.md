@@ -69,7 +69,7 @@ When you run each phase skill, substitute the live-interview step with reading t
 | 2 — Context | `ai-process-assessment:mapping-context` | `intake/org-context.md` |
 | 3 — Tech & Data | `ai-process-assessment:inventorying-tech-data` | `intake/systems-and-data.md` |
 | 4 — Discovery | `ai-process-assessment:discovering-processes` | `intake/interview-notes.md` (four rounds + baselines are all in this file; reconcile the three conflicts as instructed) |
-| 5 — Opportunities | `ai-process-assessment:identifying-opportunities` | *(no new input — uses `process-map.md` + `baselines.md`)* |
+| 5 — Opportunities | `ai-process-assessment:identifying-opportunities` | *(no new input — uses `processes/PROC-NNN.md` files)* |
 | Gate A — GRC | `ai-process-assessment:governance-risk-gate` | *(fires for any non-Green GRC flag — it will fire on the deliverable-content and commercial-data opportunities)* |
 | 6 — Scoring | `ai-process-assessment:scoring-opportunities` | *(no new input)* |
 | 7 — Roadmap | `ai-process-assessment:prioritizing-roadmap` | *(no new input)* |
@@ -95,9 +95,9 @@ In a real engagement, Phase 8.5 collects cost data from live stakeholders (labor
 ## Expected outcome (so you can tell whether the run was faithful)
 
 - A populated `docs/engagements/sample-pso-delivery/` with every phase's output file present.
-- Seven mapped processes (PROC-01…PROC-07) with baselines; the three intake conflicts reconciled in `process-map.md`/`baselines.md` with both the resolved value and the disagreement recorded.
+- Seven mapped processes (PROC-01…PROC-07) with baselines; the three intake conflicts reconciled in `processes/PROC-NNN.md` files with both the resolved value and the disagreement recorded.
 - The GRC gate having fired on at least the deliverable-content (QA) and commercial-data (SOW) opportunities.
-- Every value claim in Phases 5–9 citing a baseline from `baselines.md` — **no orphan value hypotheses**.
+- Every value claim in Phases 5–9 citing a baseline from `processes/PROC-NNN.md` — **no orphan value hypotheses**.
 - A rendered `deliverable.html` that can serve as the reference example output.
 
 ## Rationalization Table

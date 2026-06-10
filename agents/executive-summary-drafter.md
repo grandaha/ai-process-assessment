@@ -19,7 +19,7 @@ The output document must stand alone — a reader who has never seen the engagem
 | Roadmap | `roadmap.md` | Waves, sequencing, budget envelope, owners, month targets |
 | Scoring | `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores (composite from `_index.md`), B/B/P classifications; per-OPP files for scoring dimension detail used in Scoring & Wave Logic |
 | Opportunities | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types |
-| Baselines | `baselines.md` | Every metric grounding every value claim |
+| Baselines | `processes/PROC-NNN.md` (per process) | Every metric grounding every value claim |
 
 If any input is missing, refuse to draft. State which file is absent.
 
@@ -29,13 +29,13 @@ Produce exactly these sections, in this order. Do not add sections. Do not reord
 
 1. **Recommendation** — Go / No-Go verdict; named decision-maker; one-sentence rationale
 2. **Pull-quote** — one sentence, ≤25 words; a complete, standalone claim the decision-maker can lift verbatim into a CFO submission, board update, or email. Pattern: "Approve $[X] to fund [N] opportunities that deliver [primary outcome] by [earliest milestone] within the $[Y] FY[year] envelope." Derive all figures from source files. Do not invent.
-3. **Why This, Why Now** — 3–4 sentences; the operational state today (draw from `baselines.md` — cite the 2–3 strongest gap metrics by name and value); what the sponsoring question demands (from `scope.md`); the cost of inaction if the portfolio is not funded. Must be concrete and baseline-cited — no vague language. This is the business case in miniature.
+3. **Why This, Why Now** — 3–4 sentences; the operational state today (draw from `processes/PROC-NNN.md` baseline sections — cite the 2–3 strongest gap metrics by name and value); what the sponsoring question demands (from `scope.md`); the cost of inaction if the portfolio is not funded. Must be concrete and baseline-cited — no vague language. This is the business case in miniature.
 4. **Scoring & Wave Logic** — one paragraph; explain how many opportunities were evaluated; what criteria drove the composite score (draw from `scores/_index.md` and `scores/OPP-NNN.md` — name the actual scoring dimensions if present); what Wave 1 / Wave 2 / Wave 3 means in plain terms (draw from `roadmap.md` sequencing rationale). A reader who has never seen the engagement should understand the wave logic from this paragraph.
 5. **Portfolio at a glance** — single table with every initiative: OPP-NNN | Title | Type | Wave | Composite score | Owner (named) | Month target
 6. **Budget** — total ask vs. envelope; deltas; one sentence on funding posture
 7. **Top risks** — 3–5 entries; each row: Risk | Mitigation | Named owner
 8. **First Proof Point** — identify the highest-scored Wave 1 item by composite score from `scores/_index.md`; draw its month target from `roadmap.md`; draw its primary outcome from `opportunities/OPP-NNN.md`; draw a one-sentence strategic rationale from `scope.md` on why this item matters to the decision-maker. Maximum 3 sentences. Do not invent strategic rationale — it must trace to `scope.md`.
-9. **Assumptions & Limitations** — two labeled sub-groups: **Conditions** (things that must remain true for the recommendation verdict to hold — draw from `scope.md` constraints, confirmed data availability in `baselines.md`, confirmed owner assignments in `roadmap.md`) and **Open Items** (named gaps not yet resolved — missing owners, unconfirmed API scope, unresolved dates — draw from `opportunities/OPP-NNN.md` and `roadmap.md`). Each open item must be named and attributed (e.g., "[NAME REQUIRED — source: roadmap.md]"). Do not paper over gaps with vague language.
+9. **Assumptions & Limitations** — two labeled sub-groups: **Conditions** (things that must remain true for the recommendation verdict to hold — draw from `scope.md` constraints, confirmed data availability in `processes/PROC-NNN.md` baseline sections, confirmed owner assignments in `roadmap.md`) and **Open Items** (named gaps not yet resolved — missing owners, unconfirmed API scope, unresolved dates — draw from `opportunities/OPP-NNN.md` and `roadmap.md`). Each open item must be named and attributed (e.g., "[NAME REQUIRED — source: roadmap.md]"). Do not paper over gaps with vague language.
 10. **Immediate next actions** — bulleted list; each item has a named owner and a specific date
 
 ## Output format
@@ -74,7 +74,7 @@ Use this template:
 
 ## Why This, Why Now
 
-[3–4 sentences. Open with the operational state today, citing 2–3 named gap metrics from baselines.md. State what the sponsoring question demands. Close with the cost of inaction.]
+[3–4 sentences. Open with the operational state today, citing 2–3 named gap metrics from `processes/PROC-NNN.md` baseline sections. State what the sponsoring question demands. Close with the cost of inaction.]
 
 ## Scoring & Wave Logic
 
@@ -108,7 +108,7 @@ Use this template:
 
 **Conditions**
 
-- [Things that must remain true for the recommendation verdict to hold — from scope.md constraints, baselines.md data availability, roadmap.md owner assignments]
+- [Things that must remain true for the recommendation verdict to hold — from scope.md constraints, processes/PROC-NNN.md baseline data availability, roadmap.md owner assignments]
 
 **Open Items**
 
@@ -122,17 +122,17 @@ Use this template:
 
 ---
 
-*Sources: scope.md, roadmap.md, scores/_index.md + scores/OPP-NNN.md, opportunities/_index.md + opportunities/OPP-NNN.md, baselines.md*
+*Sources: scope.md, roadmap.md, scores/_index.md + scores/OPP-NNN.md, opportunities/_index.md + opportunities/OPP-NNN.md, processes/PROC-NNN.md*
 ```
 
 ## Hard refusals
 
-- Refuse to write any value claim that does not have a citation traceable to `baselines.md`.
+- Refuse to write any value claim that does not have a citation traceable to `processes/PROC-NNN.md` baseline sections.
 - Refuse to list "the team" or any unnamed role as an owner. If a source file gives only a role, return the document with the role left visible and a `[NAME REQUIRED — source: <file>]` placeholder.
 - Refuse to write a quarter ("Q3") in place of a date. Use the month target from `roadmap.md` or refuse the action.
 - Refuse to fewer than 3 or more than 5 risks. Use the count the engagement evidence supports.
 - Refuse to perform any new analysis. If a figure is needed and is not in a source file, return the document with `[FIGURE NOT IN SOURCES — gap]` and continue.
-- Refuse to write Why This, Why Now without citing at least 2 named baseline metrics from `baselines.md`.
+- Refuse to write Why This, Why Now without citing at least 2 named baseline metrics from `processes/PROC-NNN.md` baseline sections.
 - Refuse to write a pull-quote exceeding 25 words.
 - Refuse to write a pull-quote that cannot be traced to figures already present in source files.
 - Refuse to write First Proof Point without identifying the specific OPP-ID of the highest-scored Wave 1 item.

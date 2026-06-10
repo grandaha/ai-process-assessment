@@ -28,13 +28,13 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 
 | Dimension | What it measures | Required source |
 |---|---|---|
-| Value Potential | Magnitude of value if realized. For Chain Automation type: cite checkpoints eliminated × effort per checkpoint × volume. Do not aggregate step-level savings linearly — chain value is non-linear. | `baselines.md` |
+| Value Potential | Magnitude of value if realized. For Chain Automation type: cite checkpoints eliminated × effort per checkpoint × volume. Do not aggregate step-level savings linearly — chain value is non-linear. | `processes/PROC-NNN.md` Baselines section |
 | Technical Feasibility | Buildability given current systems and skills | `tech-inventory.md` |
 | Data Readiness | Whether data needed exists, is accessible, and is fit for purpose | `tech-inventory.md` (data asset catalog) |
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` |
-| Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` + `process-map.md` |
-| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. **Long-run is NOT a long timeline or complex prerequisites — it specifically means the opportunity cannot deliver value until someone's job or role boundary is redesigned. A long GRC clearance track or missing integration is a dependency (Constraint 1), not a Long-run classification.** | `process-map.md` chain scan + `context.md` |
+| Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` + `processes/PROC-NNN.md` |
+| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. **Long-run is NOT a long timeline or complex prerequisites — it specifically means the opportunity cannot deliver value until someone's job or role boundary is redesigned. A long GRC clearance track or missing integration is a dependency (Constraint 1), not a Long-run classification.** | `processes/PROC-NNN.md` chain scan + `context.md` |
 
 ### Scale Anchors (apply to all 6 dimensions)
 
@@ -82,7 +82,7 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 - 4 — 3–6 months; uses existing stack with known lead times
 - 5 — Under 3 months or measurable within one quarter; minimal dependencies
 
-**Categorical rule: Each dimension score must cite a source (`process-map.md`, `baselines.md`, `tech-inventory.md`, or `context.md`). No dimension may be scored from intuition.**
+**Categorical rule: Each dimension score must cite a source (`processes/PROC-NNN.md`, `tech-inventory.md`, or `context.md`). No dimension may be scored from intuition.**
 
 **Execution Horizon is a required field on every scored opportunity entry: Short-run / Long-run with one-sentence rationale. This field is consumed by Phase 7 sequencing.**
 
@@ -120,7 +120,7 @@ Calibration: uniform Buy across all opportunities in an engagement with a small 
 
 This phase already runs two subagents. This section names the pattern so it reads consistently with the other phases — the operational detail lives in the Phase checklist and Workflow below, which are authoritative.
 
-- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives: engagement folder path, OPP-ID, and staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. The agent reads its own OPP entry from `opportunities/OPP-NNN.md` and the relevant sections of `process-map.md`, `baselines.md`, `tech-inventory.md`, and `context.md` itself. Do not pass file content to the subagent. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
+- **Scorer dispatch (`opportunity-scorer`):** One subagent per opportunity, dispatched in a single parallel tool-call batch. Each receives: engagement folder path, OPP-ID, the path to `processes/PROC-NNN.md` for that opportunity's process, and staging file path: `<engagement-folder>/_staging/phase6/OPP-NNN.md`. The agent reads its own OPP entry from `opportunities/OPP-NNN.md`, its process file from `processes/PROC-NNN.md` (which contains both process context and baseline metrics), and the relevant sections of `tech-inventory.md` and `context.md`. Do not pass file content to the subagent. No cross-OPP context is shared. Each scorer writes its full entry to the staging file and returns only a one-line summary (composite score and B/B/P classification).
 - **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scores/` folder draft, for independent cross-OPP calibration and consistency review. Pass to the reviewer: engagement folder path. The reviewer reads the `scores/` folder itself. Do not pass document content. Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary to main context: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
 - **Assembly:** After all scorer agents complete, run the following sequence in order:
 
@@ -183,7 +183,7 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 ## Phase checklist
 
 - [ ] Confirm `opportunities/_index.md` exists and GRC gate cleared for flagged items
-- [ ] Dispatch one `opportunity-scorer` agent per opportunity in a single parallel tool-call batch (pass: OPP entry from `opportunities/OPP-NNN.md`, relevant process-map.md sections, baselines.md rows, tech-inventory.md sections, context.md sections)
+- [ ] Dispatch one `opportunity-scorer` agent per opportunity in a single parallel tool-call batch (pass: OPP-ID, OPP entry path `opportunities/OPP-NNN.md`, process file path `processes/PROC-NNN.md` for the opportunity's process, staging file path; the agent reads all source files itself)
 - [ ] Collect one-line summaries from scorer agents (OPP-NNN, composite, B/B/P). Full scored entries are in staging files.
 - [ ] Assemble via Bash: move staged files → compute composites + stamp + write `model/scores.json` → generate `scores/_index.md` (see Assembly sequence in Subagent Dispatch)
 - [ ] Verify count: `ls docs/engagements/<name>/scores/OPP-*.md | wc -l`; confirm no PENDING: `grep -l PENDING docs/engagements/<name>/scores/OPP-*.md` (expect no output)
@@ -196,7 +196,7 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 ## Workflow
 
 1. Confirm `opportunities/_index.md` exists and GRC clearance is recorded for all flagged opportunities.
-2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent its OPP entry from `opportunities/OPP-NNN.md`, the relevant sections from the four source files, and its staging file path (`_staging/phase6/OPP-NNN.md`). Do NOT share cross-OPP context between agents. Collect one-line summaries only — do NOT request the full scored entry back.
+2. Dispatch `opportunity-scorer` agents in parallel — one per opportunity. Pass each agent its OPP-ID, the paths to `opportunities/OPP-NNN.md` and `processes/PROC-NNN.md` (for the process the opportunity belongs to), and its staging file path (`_staging/phase6/OPP-NNN.md`). The agent reads all source files itself. Do NOT share cross-OPP context between agents. Collect one-line summaries only — do NOT request the full scored entry back.
 3. After all agents complete, run the Assembly sequence (see Assembly in Subagent Dispatch): move staged files → compute composites + stamp files + write `model/scores.json` (single Python script) → generate `scores/_index.md`. Verify count and confirm no PENDING values remain. Cleanup `_staging/phase6` (non-fatal). B/B/P is in the individual score files and the index — do not re-derive in main context.
 4. Dispatch the `opportunity-reviewer` subagent. Pass: engagement folder path only. The reviewer reads `scores/_index.md` and individual `scores/OPP-NNN.md` files itself. Do not pass document content.
 5. Resolve all Critical findings. Important findings should be addressed; Minor findings are noted.

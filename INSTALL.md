@@ -43,7 +43,7 @@ Then edit `~/.claude/plugins/installed_plugins.json` and add this entry inside t
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-process-assessment",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
@@ -172,7 +172,7 @@ Every engagement produces files in sequence under `docs/engagements/<name>/`:
 | 1 — Scoping | `scope.md` |
 | 2 — Context Mapping | `context.md` |
 | 3 — Tech & Data Inventory | `tech-inventory.md` |
-| 4 — Process Discovery | `process-map.md`, `baselines.md` |
+| 4 — Process Discovery | `processes/` (`_index.md` + `PROC-NNN.md` per process) |
 | 5 — Opportunity Identification | `opportunities/` (`_index.md` + `OPP-NNN.md` per opportunity) |
 | Gate A — GRC Review | `grc/` (`_index.md` + `OPP-NNN.md` per flagged opportunity; only when Gate A ran) |
 | 6 — Opportunity Scoring | `scores/` (`_index.md` + `OPP-NNN.md` per opportunity) |

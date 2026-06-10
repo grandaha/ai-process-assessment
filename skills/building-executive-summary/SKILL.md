@@ -14,7 +14,7 @@ This skill runs as a standalone session. At session start:
    - `roadmap.md`
    - `scores/_index.md`
    - `opportunities/_index.md`
-   - `baselines.md`
+   - `processes/_index.md`
    - `scope.md`
 3. Check `evidence-log.md` — confirm deliverable-gate clearance is recorded.
 
@@ -41,7 +41,7 @@ The drafter receives all source inputs listed below. If any is missing, the skil
 | `business-case.md` | Wave 1 investment range, value case, ROM assumptions, payback horizon |
 | `scores/_index.md` + `scores/OPP-NNN.md` per opportunity | Portfolio scores, B/B/P classifications; read `scores/_index.md` for the full OPP list and composite scores, then read individual `scores/OPP-NNN.md` files for scoring dimension detail used in Scoring & Wave Logic |
 | `opportunities/_index.md` + `opportunities/OPP-NNN.md` per opportunity | Value hypotheses, GRC flags, opportunity types; read `opportunities/_index.md` for the full OPP list, then read individual `opportunities/OPP-NNN.md` files for value hypotheses and GRC flags |
-| `baselines.md` | Key metrics grounding all value claims |
+| `processes/_index.md` + `processes/PROC-NNN.md` per process | Key baseline metrics grounding all value claims |
 
 ## Required content
 
@@ -49,7 +49,7 @@ The summary contains exactly these sections, in this order:
 
 1. **Go / No-Go recommendation** — the verdict, with the named decision-maker (from `scope.md`)
 2. **Pull-quote** — one sentence, ≤25 words, all figures traceable to source files
-3. **Why This, Why Now** — 3–4 sentences, citing ≥2 named baseline metrics from `baselines.md`, sponsoring question from `scope.md`, cost of inaction
+3. **Why This, Why Now** — 3–4 sentences, citing ≥2 named baseline metrics from `processes/PROC-NNN.md`, sponsoring question from `scope.md`, cost of inaction
 4. **Scoring & Wave Logic** — one paragraph explaining evaluation criteria from `scores/_index.md` + individual `scores/OPP-NNN.md` files and wave sequencing from `roadmap.md`
 5. **Portfolio view** — single table covering every initiative: OPP-NNN, title, type, wave, composite score, named owner, month target
 6. **Budget ask vs. envelope** — total investment range and value range from `business-case.md`; ROM accuracy label (AACE Class 5 ±50%); rough payback horizon; note that a definitive business case requires finance involvement and procurement data
@@ -61,10 +61,10 @@ The summary contains exactly these sections, in this order:
 ## Phase checklist
 
 - [ ] Confirm `deliverable-gate` clearance is recorded in `evidence-log.md`
-- [ ] Confirm all required source files exist (`scope.md`, `roadmap.md`, `business-case.md`, `baselines.md`, `scores/_index.md`, `opportunities/_index.md`)
-- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent.
+- [ ] Confirm all required source files exist (`scope.md`, `roadmap.md`, `business-case.md`, `processes/_index.md`, `scores/_index.md`, `opportunities/_index.md`)
+- [ ] Dispatch one `executive-summary-drafter` agent in a single tool call; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `processes/_index.md` + individual `processes/PROC-NNN.md` files. Do not pass file content to the subagent.
 - [ ] The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk. The orchestrator does NOT receive document content.
-- [ ] Dispatch one `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `baselines.md`, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content.
+- [ ] Dispatch one `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `processes/_index.md` + `processes/PROC-NNN.md` files, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content.
 - [ ] The reviewer appends its findings to `<engagement-folder>/evidence-log.md` directly and returns one-line summary: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive the full review block.
 - [ ] Resolve all Critical findings. Important findings must be addressed before delivery. Minor findings are noted.
 - [ ] Save to `docs/engagements/<engagement>/executive-summary.md`
@@ -73,9 +73,9 @@ The summary contains exactly these sections, in this order:
 ## Workflow
 
 1. Confirm preconditions: deliverable-gate cleared; all required source files present.
-2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `baselines.md`. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
+2. Dispatch the `executive-summary-drafter` agent; pass: engagement folder path. The agent reads all source files itself: `scope.md`, `roadmap.md`, `scores/_index.md` + individual `scores/OPP-NNN.md` files, `opportunities/_index.md` + individual `opportunities/OPP-NNN.md` files, `processes/_index.md` + individual `processes/PROC-NNN.md` files. Do not pass file content to the subagent. The agent is a single-pass writer — no fan-out, no parallelism. The document is short enough that assembly overhead would outweigh any benefit.
 3. The agent writes `executive-summary.md` directly to `<engagement-folder>/executive-summary.md`. Returns one-line confirmation: "executive-summary.md written." Orchestrator confirms file exists on disk. The orchestrator does NOT receive document content.
-4. Dispatch the `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `baselines.md`, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content. The reviewer appends findings to `evidence-log.md` and returns one-line summary only.
+4. Dispatch the `executive-summary-reviewer` agent; pass: engagement folder path only. The reviewer reads `executive-summary.md`, `scope.md`, `processes/_index.md` + `processes/PROC-NNN.md` files, `scores/_index.md`, and `roadmap.md` itself. Do not pass file content. The reviewer appends findings to `evidence-log.md` and returns one-line summary only.
 5. Resolve all Critical findings. Important findings must be addressed before delivery.
 6. Save the file. The chain advances to `building-deliverable`.
 
@@ -84,7 +84,7 @@ The summary contains exactly these sections, in this order:
 | Rationalization / Shortcut | Correct Reframe |
 |---|---|
 | "The HTML deliverable already covers this — we don't need a separate summary." | The HTML opens in a browser. The executive summary travels in email, in calendar invites, on phones. They serve different consumption contexts. Skip it and you lose the read-ahead. |
-| "We can re-derive numbers here for clarity." | New analysis in Phase 10 is rework with no review. Every figure must trace to `baselines.md` exactly as it appears in `scores/OPP-NNN.md`. |
+| "We can re-derive numbers here for clarity." | New analysis in Phase 10 is rework with no review. Every figure must trace to `processes/PROC-NNN.md` baseline sections exactly as they appear in `scores/OPP-NNN.md`. |
 | "Owners can be the role — 'Head of Ops' is fine." | Roles change; people own decisions. Name the person. If unknown, that is a Phase 7 gap to fix in roadmap.md, not a Phase 10 problem to paper over. |
 | "Dates can be quarters — 'Q3' is enough." | Q3 is a planning artifact, not a commitment. Use month-X targets from `roadmap.md`. |
 | "Three risks is enough — we don't need five." | Three to five is the rule. Truncating to three when five matter hides risk; padding to five when three matter dilutes signal. Use the count the engagement evidence supports. |

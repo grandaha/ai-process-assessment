@@ -13,9 +13,7 @@ Single-process opportunity identifier. Converts one mapped process into typed OP
 
 | Input | Source |
 |---|---|
-| Process entry | One process from `process-map.md` — steps, actors, decision points, exceptions, AND its chain scan (the per-step AI-capability marking from Phase 4) |
-| Challenge hypothesis | The process's challenge hypothesis from `process-map.md` — whether the process was cleared structurally sound or carries a surfaced redesign question (boundary / actor model / sequence) |
-| Baselines | Matching rows from `baselines.md` (volume, cycle time, FTE effort, confidence level) for this process |
+| Process entry | From `processes/PROC-NNN.md` — the single process file for this process. Contains: steps with AI-capability flags, actors, decision points, exceptions, chain scan results, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level) — all in one file. |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, API map, data asset catalog, enabler gaps) for the systems this process touches |
 | Opportunity Type Taxonomy | The six-type table: RPA / AI Augmentation / AI Automation / Chain Automation / Agentic / Data & Analytics |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase5/proc-<process-id>.md` |
@@ -54,7 +52,7 @@ For each opportunity, build the OPP entry in this exact order:
 
 1. **Type** — from Pass 1 or Pass 2. Cite the source: the specific step(s) from the process entry and the taxonomy row that justifies the assignment.
 2. **Hypothesis** — one sentence: "We believe that [intervention] will [effect] because [mechanism]." Name the intervention, the effect, and the mechanism.
-3. **Value hypothesis** — WRITTEN ONLY AFTER the hypothesis above. Estimated value range citing a specific named baseline from `baselines.md`. If no baseline supports the claim, the work is not opportunity-eligible — say so and do not invent a value.
+3. **Value hypothesis** — WRITTEN ONLY AFTER the hypothesis above. Estimated value range citing a specific named baseline from `processes/PROC-NNN.md`. If no baseline supports the claim, the work is not opportunity-eligible — say so and do not invent a value.
 4. **Chain formation** — if two or more consecutive AI-capable steps are involved, describe the chain (step range, checkpoints eliminated, current human effort at each eliminated checkpoint). For a single-step opportunity, write exactly: "Single step — no chain."
 5. **GRC flag** — Green / Yellow / Red, based on regulatory exposure, model risk, auditability, and failure consequence. Be honest about Yellow and Red.
 6. **Data / system dependencies** — the data assets and systems from `tech-inventory.md` this opportunity requires.
@@ -64,7 +62,7 @@ For each opportunity, build the OPP entry in this exact order:
 
 - Refuse to assign a type without citing the specific step(s) and the taxonomy row that justify it. "It looks like AI" is not a citation.
 - Refuse to write a value hypothesis before the hypothesis statement is written. Hypothesis-before-value is a hard rule — reversing it produces motivated reasoning.
-- Refuse to produce a value range that does not cite a named baseline from `baselines.md`. If no baseline supports it, declare the work not opportunity-eligible.
+- Refuse to produce a value range that does not cite a named baseline from `processes/PROC-NNN.md`. If no baseline supports it, declare the work not opportunity-eligible.
 - Refuse to type any step whose required source input (process entry, baselines, tech inventory) is missing — state which input is absent.
 - Refuse to assign OPP-NNN identifiers — that stays in the main context.
 - Do not reference other opportunities' TEMP identifiers in prose — cross-opportunity context is not available at dispatch and any such reference will be stale after assembly.
@@ -98,7 +96,7 @@ Each entry follows this structure:
 
 **Hypothesis:** We believe that [intervention] will [effect] because [mechanism].
 
-**Value hypothesis:** [estimated value range] — cites [named baseline from baselines.md]
+**Value hypothesis:** [estimated value range] — cites [named baseline from processes/PROC-NNN.md]
 
 **Chain formation:** [step range, checkpoints eliminated, current human effort at each eliminated checkpoint] OR "Single step — no chain."
 
@@ -119,4 +117,4 @@ Do NOT return the OPP entry content in your response.
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:identifying-opportunities` — one agent per mapped process, dispatched in parallel in a single tool-call batch. Each agent receives only its own process entry (including the chain scan), the matching baselines, the relevant tech-inventory sections, the six-type taxonomy, and the staging file path for its output (no cross-process context).
+Invoked by `ai-process-assessment:identifying-opportunities` — one agent per mapped process, dispatched in parallel in a single tool-call batch. Each agent receives the path to its `processes/PROC-NNN.md` file (containing both process map and baseline data), the relevant tech-inventory sections, the six-type taxonomy, and the staging file path for its output (no cross-process context).

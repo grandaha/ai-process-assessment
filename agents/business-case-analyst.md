@@ -16,7 +16,7 @@ Single-initiative analyst. Receives one Wave 1 initiative's complete data packag
 |---|---|
 | Roadmap entry | OPP-NNN block from `roadmap.md` — wave, month target, enabler dependencies, sourcing recommendation |
 | Use case brief | OPP-NNN brief from `usecase-briefs/UC-NNN.md` — SCRA fields, data requirements, success metric, risks |
-| Baseline rows | Relevant rows from `baselines.md` for this initiative's process area — volume, cycle time, FTE figures |
+| Baseline rows | Relevant rows from `processes/PROC-NNN.md` for this initiative's process area — volume, cycle time, FTE figures |
 | Value hypothesis | Read from `opportunities/OPP-NNN.md` — must be used as-is, not re-derived |
 | B/B/P classification | Read from `scores/OPP-NNN.md` — Build/Buy/Partner classification and rationale |
 | Cost actuals (optional) | Relevant rows from `cost-actuals.md` if the file was found in the engagement folder — labor rates and/or vendor quotes for this initiative type |
@@ -59,10 +59,10 @@ Return one cost structure block per the format below. Use confirmed figures from
 ```markdown
 ### OPP-NNN — [Title] — Value Case
 
-- **Named baseline:** [Exact baseline entry from baselines.md — cite the metric name and figure verbatim. No floating figures.]
+- **Named baseline:** [Exact baseline entry from `processes/PROC-NNN.md` — cite the metric name and figure verbatim. No floating figures.]
 - **Value hypothesis:** [Verbatim from `opportunities/OPP-NNN.md` — do not paraphrase or re-derive.]
 - **Expected improvement:** [Drawn directly from the value hypothesis — state what changes and by how much.]
-- **Annual value:** read from `model/results.json` `value.<OPP-ID>` = **[low]–[high]/year**. Name the improvement quantity, the volume/frequency (sourced from baselines.md), and the rate/cost (sourced or flagged as benchmark) — the engine multiplies them; do not multiply in prose.
+- **Annual value:** read from `model/results.json` `value.<OPP-ID>` = **[low]–[high]/year**. Name the improvement quantity, the volume/frequency (sourced from `processes/PROC-NNN.md`), and the rate/cost (sourced or flagged as benchmark) — the engine multiplies them; do not multiply in prose.
 ```
 
 ## Refusal rules
@@ -71,7 +71,7 @@ Return one cost structure block per the format below. Use confirmed figures from
 - Refuse to estimate implementation labor without a basis: either hours derived from the brief's Resolution/data requirements fields, or a vendor quote from cost-actuals.md.
 - Refuse to omit the AACE Class 5 (±50%) label from the Initiative ROM range row.
 - Refuse to paraphrase the value hypothesis — it must appear verbatim from `opportunities/OPP-NNN.md`.
-- Refuse to cite a floating figure — every number in the value calculation must trace to a named source (baselines.md row, cost-actuals.md entry, or named benchmark with the label applied).
+- Refuse to cite a floating figure — every number in the value calculation must trace to a named source (`processes/PROC-NNN.md` baseline row, cost-actuals.md entry, or named benchmark with the label applied).
 - Refuse to blend one-time and recurring costs into a single figure — they must be separated.
 - If cost-actuals.md provides a rate for this initiative's labor types, use it. If absent or PENDING, render the labor row as PENDING — do not use a benchmark rate as a substitute.
 - If B/B/P classification is Buy or Partner and no vendor quote is present in cost-actuals.md, render the technology row as PENDING — do not use a benchmark figure.
