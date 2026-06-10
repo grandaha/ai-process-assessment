@@ -63,7 +63,17 @@ jobs:
       - name: Extract release notes
         env:
           TAG: ${{ steps.tag.outputs.tag }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
+          # Notes come from the canonical default-branch CHANGELOG and the current
+          # extractor — never the tag's tree. Tags cut before the release tooling
+          # existed (or before a CHANGELOG section was written) don't carry either,
+          # and the default-branch CHANGELOG is the single source of truth for every
+          # version's notes. The zip (built above) is the tagged code; these notes
+          # describe it using current tooling. Overlay only these two paths so the
+          # already-built zip is untouched.
+          git fetch --depth=1 origin "$DEFAULT_BRANCH"
+          git checkout "origin/$DEFAULT_BRANCH" -- CHANGELOG.md .github/scripts/extract_changelog.py
           python3 .github/scripts/extract_changelog.py "${TAG#v}" > RELEASE_NOTES.md
           echo "----- notes -----"; cat RELEASE_NOTES.md
 
@@ -74,8 +84,12 @@ jobs:
         run: |
           ASSET="ai-process-assessment-${TAG}.zip"
           if gh release view "$TAG" >/dev/null 2>&1; then
+            # Re-release (recovery / re-run): refresh the asset and notes, but
+            # leave the title alone — existing releases may carry a curated,
+            # human-written title that the plain tag would flatten.
             gh release upload "$TAG" "$ASSET" --clobber
-            gh release edit "$TAG" --title "$TAG" --notes-file RELEASE_NOTES.md
+            gh release edit "$TAG" --notes-file RELEASE_NOTES.md
           else
+            # First release of this tag: title defaults to the tag.
             gh release create "$TAG" "$ASSET" --title "$TAG" --notes-file RELEASE_NOTES.md
           fi
