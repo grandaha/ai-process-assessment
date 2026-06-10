@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.2] — 2026-06-10
+
+### Changed
+- **Engagement folders moved to project root** — removed the `docs/engagements/` prefix
+  everywhere. Engagements now live at `<name>/` directly in the project root. Phase 1
+  (`scoping-engagement`) already prompts for the name; it now uses that name as the full
+  folder path.
+- **Auto-gitignore on engagement creation** — `scoping-engagement` now appends `<name>/`
+  to `.gitignore` immediately after `mkdir`, so client data is protected without any manual
+  step.
+- **Reserved-name guard** — Phase 1 now rejects engagement names that collide with existing
+  repo structure (`docs`, `skills`, `templates`, `samples`, `tests`, `agents`, `engine`,
+  `hooks`, `.claude`).
+
 ## [2.8.1] — 2026-06-10
 
 ### Fixed
