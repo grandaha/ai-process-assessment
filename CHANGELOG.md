@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.3] — 2026-06-10
+
+### Added
+- **Auto-tag on merge** — new `auto-tag.yml` workflow reads `plugin.json` version on every
+  push to main and creates the matching `vX.Y.Z` tag if it doesn't exist. This triggers
+  `release.yml` automatically, removing the manual tag-push step.
+- **`make bump VERSION=x.y.z`** — Makefile target that updates the version in all three
+  manifest files (`plugin.json`, `marketplace.json`, `INSTALL.md`) in one command.
+
 ## [2.8.2] — 2026-06-10
 
 ### Changed
