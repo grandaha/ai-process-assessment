@@ -76,7 +76,7 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - [ ] For every process, synthesize a challenge hypothesis from the sponsor's structural input; flag any process missing one as "challenge hypothesis unavailable"
 - [ ] Save each process to `docs/engagements/<name>/processes/PROC-NNN.md` (process map + baselines + challenge hypothesis + chain scan in one file per process)
 - [ ] Generate `processes/_index.md` via Bash from extraction headers
-- [ ] Confirm all `processes/_index.md` Baseline entries are `Ready` (no `Unavailable` rows advance to Phase 5)
+- [ ] Confirm all `processes/_index.md` Baseline entries are `Ready` (no `Unavailable` rows advance to Phase 5 unless explicitly scoped out with a documented reason)
 - [ ] Confirm `evidence-log.md` stakeholder interview log is complete — one row per session, every participant named
 - [ ] Present output summary and key findings to user; wait for explicit approval; then chain to `ai-process-assessment:identifying-opportunities`
 
@@ -132,8 +132,9 @@ echo "| PROC-ID | Process Name | Baseline |" > docs/engagements/<name>/processes
 echo "|---------|--------------|----------|" >> docs/engagements/<name>/processes/_index.md
 for f in docs/engagements/<name>/processes/PROC-*.md; do
   id=$(basename "$f" .md)
-  proc_name=$(head -1 "$f" | sed 's/^## PROC-[0-9][0-9][0-9] — //')
+  proc_name=$(grep -m1 "^## PROC-" "$f" | sed 's/^## PROC-[0-9][0-9][0-9] — //')
   baseline=$(grep "^<!-- index:" "$f" | grep -o 'baseline=[^ >]*' | cut -d= -f2)
+  baseline=${baseline:-Unavailable}
   echo "| $id | $proc_name | $baseline |" >> docs/engagements/<name>/processes/_index.md
 done
 ```

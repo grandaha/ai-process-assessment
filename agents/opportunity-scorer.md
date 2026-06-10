@@ -130,4 +130,4 @@ Do NOT return the scored entry content in your response.
 
 ## Dispatch point
 
-Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its OPP entry, `processes/PROC-NNN.md` for the opportunity's process, and three source files (`tech-inventory.md`, `context.md`) (no cross-OPP context). Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase6/OPP-NNN.md`.
+Invoked by `ai-process-assessment:scoring-opportunities` — one agent per opportunity, dispatched in parallel. Each agent receives only its OPP entry, `processes/PROC-NNN.md` for the opportunity's process, and two source files (`tech-inventory.md`, `context.md`) (no cross-OPP context). Each agent also receives a staging file path for its output in the format `<engagement-folder>/_staging/phase6/OPP-NNN.md`.
