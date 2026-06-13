@@ -19,7 +19,7 @@ Before any setup, ask the user which scenario to use:
 
 **If the user chooses A:** proceed directly to **Setup** below. All steps apply exactly as written.
 
-**If the user chooses B:** invoke `ai-process-assessment:generating-sample-intake`. Do not continue to Setup until the generator confirms it is complete and provides the engagement name (`sample-<slug>`) and intake root (`samples/<slug>/intake`). Then return here and substitute those values throughout Setup and the Phase → intake-file mapping.
+**If the user chooses B:** chain to `ai-process-assessment:generating-sample-intake` in this session. Do not continue to Setup until the generator confirms it is complete and provides the engagement name (`sample-<slug>`) and intake root (`samples/<slug>/intake`). Then return here and substitute those values throughout Setup and the Phase → intake-file mapping.
 
 ---
 
@@ -38,11 +38,11 @@ For the bundled PSO scenario, the sample subject is **Lattice Consulting Group**
 
 ## Setup
 
-> **Generated scenario:** If you are running a generated scenario (chosen B in Step 0), substitute your scenario's engagement name for `sample-pso-delivery` and its intake root for `samples/pso-delivery-team/intake` everywhere in this Setup section and in the Phase → intake-file mapping below. The generator will have already written the `.sample-run.md` marker (Step 4 below is already done); skip Step 4 and proceed to the Phase 1 handoff.
+> **Generated scenario (stop here first):** If you are running a generated scenario (chosen B in Step 0), the generator has already written the intake files and `.sample-run.md` marker. Skip steps 1 and 4 below entirely. Substitute your scenario's engagement name for `sample-pso-delivery` and its intake root for `samples/pso-delivery-team/intake` everywhere in the remaining steps and in the Phase → intake-file mapping. Then proceed directly to step 3 (read the README) and the Phase 1 handoff.
 
 At session start:
 
-1. **Locate the intake files.** They ship with the plugin at `samples/pso-delivery-team/intake/`. Confirm the four intake files and the README are present:
+1. **Locate the PSO intake files** *(PSO path only — skip if running a generated scenario).* They ship with the plugin at `samples/pso-delivery-team/intake/`. Confirm the four intake files and the README are present:
    - `samples/pso-delivery-team/intake/engagement-request.md`
    - `samples/pso-delivery-team/intake/org-context.md`
    - `samples/pso-delivery-team/intake/systems-and-data.md`
@@ -51,7 +51,7 @@ At session start:
    If they are missing, halt and tell the user where the plugin's `samples/` folder is expected.
 2. **Fix the engagement name.** This run uses the engagement name **`sample-pso-delivery`**. The Phase 1 skill will create `sample-pso-delivery/` and write the `Engagement folder:` field into `scope.md`. Do not improvise a different name — downstream the run is expected to live at `sample-pso-delivery/`.
 3. **Read the scenario README** (`samples/pso-delivery-team/README.md`) so you understand the case before scoping it.
-4. **Write the sample-run marker.** Create the engagement folder (`sample-pso-delivery/`) if it does not already exist, then use the Write tool to create `sample-pso-delivery/.sample-run.md` with exactly this content:
+4. **Write the sample-run marker** *(PSO path only — skip if running a generated scenario; the generator already wrote it).* Create the engagement folder (`sample-pso-delivery/`) if it does not already exist, then use the Write tool to create `sample-pso-delivery/.sample-run.md` with exactly this content:
 
    ```markdown
    ---
