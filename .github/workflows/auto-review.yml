@@ -1,0 +1,149 @@
+name: auto-review
+
+# Runs on every PR to main. Reviews via claude-code-action, then a deterministic
+# gate decides: auto-merge (python-only, approved, green), dispatch the fixer
+# (python-only rejection), or leave it for a human. See
+# docs/superpowers/specs/2026-06-14-pr-auto-review-fix-merge-design.md
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+    branches: [main]
+
+concurrency:
+  # One run per PR; a new push cancels the in-flight run (avoids racing reviews).
+  group: auto-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  actions: read
+
+jobs:
+  review-and-gate:
+    # Skip drafts and skip the loop's own fixer commits triggering noise is fine
+    # (they SHOULD re-review). Only skip if the PR is a draft.
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # PAT so any push we make later re-triggers this workflow (synchronize).
+          token: ${{ secrets.WORKFLOW_PAT }}
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Collect PR facts
+        id: facts
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          # Changed files (newline-separated).
+          gh pr view "$PR" --json files --jq '.files[].path' > changed_files.txt
+          # Labels (newline-separated).
+          gh pr view "$PR" --json labels --jq '.labels[].name' > labels.txt
+          # Round = number of prior auto-fix commits on this branch (marker in msg).
+          ROUND=$(git log --pretty=%s origin/main..HEAD | grep -c '^fix(auto):' || true)
+          {
+            echo "round=$ROUND"
+            echo "changed_files<<EOF"; cat changed_files.txt; echo "EOF"
+            echo "labels<<EOF"; cat labels.txt; echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Claude review
+        id: review
+        uses: anthropics/claude-code-action@v1.0.140
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this pull request for correctness and BEHAVIOR PRESERVATION.
+            Focus on real defects, regressions, and broken tests — not style.
+            Post a concise human-readable review comment on the PR, and also
+            return your verdict via the structured output schema:
+              - verdict: "AUTOMERGE" if the change is correct and safe to merge,
+                otherwise "HOLD".
+              - summary: one sentence.
+            If you are unsure, choose "HOLD".
+          claude_args: |
+            --json-schema '{"type":"object","properties":{"verdict":{"type":"string","enum":["AUTOMERGE","HOLD"]},"summary":{"type":"string"}},"required":["verdict"]}'
+
+      - name: Parse verdict
+        id: verdict
+        env:
+          STRUCTURED: ${{ steps.review.outputs.structured_output }}
+        run: |
+          # Reuse the tested module for verdict parsing (DRY, fails closed).
+          V=$(python - <<'PY'
+          import os, sys
+          sys.path.insert(0, "scripts")
+          import auto_merge_gate as g
+          print(g.parse_verdict(os.environ.get("STRUCTURED") or None, None))
+          PY
+          )
+          echo "verdict=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for tests check
+        id: ci
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Poll the 'tests' check on the head SHA. Do NOT use `gh pr checks --watch`
+          # (it would wait on THIS workflow too and deadlock). Wait specifically
+          # for the test workflow's check run.
+          PASSED=false
+          for i in $(seq 1 60); do          # up to ~10 min (60 * 10s)
+            STATUS=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/check-runs" \
+              --jq '.check_runs[] | select(.name=="test") | .conclusion' | head -n1)
+            STATE=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${HEAD_SHA}/check-runs" \
+              --jq '.check_runs[] | select(.name=="test") | .status' | head -n1)
+            if [ "$STATE" = "completed" ]; then
+              [ "$STATUS" = "success" ] && PASSED=true
+              break
+            fi
+            sleep 10
+          done
+          echo "passed=$PASSED" >> "$GITHUB_OUTPUT"
+        # NOTE: the check-run name "test" matches the job id in test.yml. Confirm
+        # during smoke test (Task 7) and adjust the select() name if needed.
+
+      - name: Gate decision
+        id: gate
+        run: |
+          python scripts/auto_merge_gate.py \
+            --verdict "${{ steps.verdict.outputs.verdict }}" \
+            --ci-passed "${{ steps.ci.outputs.passed }}" \
+            --changed-files "${{ steps.facts.outputs.changed_files }}" \
+            --labels "${{ steps.facts.outputs.labels }}" \
+            --round "${{ steps.facts.outputs.round }}" \
+            >> "$GITHUB_OUTPUT"
+
+      - name: Merge (or report-only)
+        if: steps.gate.outputs.decision == 'merge'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          PR: ${{ github.event.pull_request.number }}
+          ENABLED: ${{ vars.AUTO_MERGE_ENABLED }}
+        run: |
+          if [ "$ENABLED" = "true" ]; then
+            gh pr merge "$PR" --squash --delete-branch
+            echo "Auto-merged PR #$PR."
+          else
+            echo "REPORT-ONLY: would merge PR #$PR (${{ steps.gate.outputs.reason }})."
+          fi
+
+      - name: Leave for human
+        if: steps.gate.outputs.decision == 'human'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR" --body "🤖 auto-review: leaving this for a human — ${{ steps.gate.outputs.reason }}."
