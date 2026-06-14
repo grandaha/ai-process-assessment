@@ -24,9 +24,14 @@ permissions:
 
 jobs:
   review-and-gate:
-    # Skip drafts and skip the loop's own fixer commits triggering noise is fine
-    # (they SHOULD re-review). Only skip if the PR is a draft.
-    if: github.event.pull_request.draft == false
+    # Skip drafts. Also require the PR to originate from THIS repo (not a fork):
+    # the fixer edits code and the workflow pushes with WORKFLOW_PAT, so it must
+    # never run on untrusted fork code. On a private repo secrets are already
+    # withheld from forks (the run would fail closed), but this guard makes the
+    # safety explicit and is essential if this repo ever goes public.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR head
