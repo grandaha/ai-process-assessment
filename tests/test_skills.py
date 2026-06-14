@@ -3,9 +3,11 @@
 # Skills intentionally absent from the Phase Map:
 #   using-methodology     — the keystone (carries the map itself)
 #   running-sample-engagement — meta entry point for the bundled demo
+#   generating-sample-intake  — demo-support: synthesizes sample intake files
 ALLOWLIST_NON_PHASE = {
     "ai-process-assessment:using-methodology",
     "ai-process-assessment:running-sample-engagement",
+    "ai-process-assessment:generating-sample-intake",
 }
 
 
@@ -40,5 +42,5 @@ def test_no_orphan_skills(methodology):
 
 
 def test_skill_count(methodology):
-    # 14 phase skills + 2 allow-listed non-phase skills.
-    assert len(methodology.skills) == 16
+    # 14 phase skills + 3 allow-listed non-phase skills.
+    assert len(methodology.skills) == 17
