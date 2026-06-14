@@ -114,3 +114,42 @@ def decide(
         return {"decision": "fix", "reason": "python-only rejection under the round cap"}
 
     return {"decision": "human", "reason": f"verdict {verdict} — failing closed"}
+
+
+# --- CLI ---
+
+def _parse_bool(s: str) -> bool:
+    return s.strip().lower() in ("true", "1", "yes", "success")
+
+
+def _split_lines(s: str) -> list[str]:
+    return [line.strip() for line in s.splitlines() if line.strip()]
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    p = argparse.ArgumentParser(description="Auto-merge gate decision.")
+    p.add_argument("--verdict", required=True)            # YES | NO | UNKNOWN
+    p.add_argument("--ci-passed", required=True)          # true/false/success
+    p.add_argument("--changed-files", default="")         # newline-separated
+    p.add_argument("--labels", default="")                # newline-separated
+    p.add_argument("--round", type=int, default=0)
+    p.add_argument("--max-rounds", type=int, default=3)
+    args = p.parse_args(argv)
+
+    result = decide(
+        verdict=args.verdict.strip().upper(),
+        ci_passed=_parse_bool(args.ci_passed),
+        changed_files=_split_lines(args.changed_files),
+        labels=_split_lines(args.labels),
+        round_count=args.round,
+        max_rounds=args.max_rounds,
+    )
+    print(f"decision={result['decision']}")
+    print(f"reason={result['reason']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

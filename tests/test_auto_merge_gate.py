@@ -133,3 +133,48 @@ class TestDecide:
     def test_protected_file_never_merges_even_if_approved(self):
         d = self._decide(changed_files=["scripts/auto_merge_gate.py"])
         assert d["decision"] == "human"
+
+
+import subprocess
+
+
+class TestCli:
+    SCRIPT = REPO_ROOT / "scripts" / "auto_merge_gate.py"
+
+    def _run(self, args):
+        return subprocess.run(
+            [sys.executable, str(self.SCRIPT), *args],
+            capture_output=True, text=True,
+        )
+
+    def test_cli_emits_merge_decision(self):
+        r = self._run([
+            "--verdict", "YES",
+            "--ci-passed", "true",
+            "--changed-files", "engine/foo.py",
+            "--labels", "",
+            "--round", "0",
+        ])
+        assert r.returncode == 0
+        assert "decision=merge" in r.stdout
+
+    def test_cli_emits_reason(self):
+        r = self._run([
+            "--verdict", "YES",
+            "--ci-passed", "false",
+            "--changed-files", "engine/foo.py",
+            "--labels", "",
+            "--round", "0",
+        ])
+        assert "decision=human" in r.stdout
+        assert "reason=" in r.stdout
+
+    def test_cli_handles_multiple_changed_files_and_labels(self):
+        r = self._run([
+            "--verdict", "YES",
+            "--ci-passed", "true",
+            "--changed-files", "engine/foo.py\nREADME.md",
+            "--labels", "security\nbug",
+            "--round", "0",
+        ])
+        assert "decision=human" in r.stdout
