@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.9.0] — 2026-06-14
+
+### Added
+- **Autonomous PR auto-review/fix/merge loop** — new `auto-review.yml` workflow runs on every
+  PR to `main`: `claude-code-action` reviews the PR and returns a structured verdict, a
+  deterministic gate (`scripts/auto_merge_gate.py`) decides, and test-covered Python that
+  passes review auto-merges once CI is green. Rejected Python is auto-fixed and re-reviewed
+  (bounded to 3 rounds); anything touching markdown gets review/fix-for-Python but always
+  waits for a human to merge.
+- **`scripts/auto_merge_gate.py`** — pure, fully-tested decision module (verdict parsing that
+  fails closed, path classification, merge-eligibility predicate, fixer-dispatch logic) with
+  43 unit tests.
+
+### Security
+- The fixer agent has **no push or merge authority** (the workflow owns both); the merge is
+  double-gated behind a `security`-label block and the `AUTO_MERGE_ENABLED` repo variable
+  (report-only by default). Workflow inputs are passed via `env:` (no `${{ }}` in shell
+  bodies) to prevent command injection, and the job is guarded to this repo (no fork PRs).
+
 ## [2.8.3] — 2026-06-10
 
 ### Added

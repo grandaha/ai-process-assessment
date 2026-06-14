@@ -1,0 +1,197 @@
+name: auto-review
+
+# Runs on every PR to main. Reviews via claude-code-action, then a deterministic
+# gate decides: auto-merge (python-only, approved, green), dispatch the fixer
+# (python-only rejection), or leave it for a human. See
+# docs/superpowers/specs/2026-06-14-pr-auto-review-fix-merge-design.md
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+    branches: [main]
+
+concurrency:
+  # One run per PR; a new push cancels the in-flight run. This is intentional:
+  # acting on a superseded SHA would be incorrect — we always want to review the
+  # latest commit, not an older one that is no longer the PR head.
+  group: auto-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write          # required by claude-code-action to fetch its OIDC token
+  checks: read             # GITHUB_TOKEN reads the test check-run conclusion
+  actions: read
+
+jobs:
+  review-and-gate:
+    # Skip drafts. Also require the PR to originate from THIS repo (not a fork):
+    # the fixer edits code and the workflow pushes with WORKFLOW_PAT, so it must
+    # never run on untrusted fork code. On a private repo secrets are already
+    # withheld from forks (the run would fail closed), but this guard makes the
+    # safety explicit and is essential if this repo ever goes public.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          # PAT so any push we make later re-triggers this workflow (synchronize).
+          token: ${{ secrets.WORKFLOW_PAT }}
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Collect PR facts
+        id: facts
+        env:
+          GH_TOKEN: ${{ github.token }}   # read-only PR query — default token suffices
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          # Changed files (newline-separated).
+          gh pr view "$PR" --json files --jq '.files[].path' > changed_files.txt
+          # Labels (newline-separated).
+          gh pr view "$PR" --json labels --jq '.labels[].name' > labels.txt
+          # Round = number of prior auto-fix commits on this branch (marker in msg).
+          ROUND=$(git log --pretty=%s origin/main..HEAD | grep -c '^fix(auto):' || true)
+          {
+            echo "round=$ROUND"
+            echo "changed_files<<EOF"; cat changed_files.txt; echo "EOF"
+            echo "labels<<EOF"; cat labels.txt; echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Claude review
+        id: review
+        uses: anthropics/claude-code-action@v1.0.140
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this pull request for correctness and BEHAVIOR PRESERVATION.
+            Focus on real defects, regressions, and broken tests — not style.
+            Post a concise human-readable review comment on the PR, and also
+            return your verdict via the structured output schema:
+              - verdict: "AUTOMERGE" if the change is correct and safe to merge,
+                otherwise "HOLD".
+              - summary: one sentence.
+            If you are unsure, choose "HOLD".
+          claude_args: |
+            --json-schema '{"type":"object","properties":{"verdict":{"type":"string","enum":["AUTOMERGE","HOLD"]},"summary":{"type":"string"}},"required":["verdict"]}'
+
+      - name: Parse verdict
+        id: verdict
+        env:
+          STRUCTURED: ${{ steps.review.outputs.structured_output }}
+        run: |
+          # Reuse the tested module for verdict parsing (DRY, fails closed).
+          # NOTE: the prose AUTOMERGE: fallback in parse_verdict is intentionally
+          # unused here — structured output is the only channel. Empty/garbage
+          # input → UNKNOWN → human, which is fail-safe.
+          V=$(python - <<'PY'
+          import os, sys
+          sys.path.insert(0, "scripts")
+          import auto_merge_gate as g
+          print(g.parse_verdict(os.environ.get("STRUCTURED") or None, None))
+          PY
+          )
+          echo "verdict=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for tests check
+        id: ci
+        env:
+          GH_TOKEN: ${{ github.token }}   # read-only checks API — needs checks: read (above)
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Poll the 'test' check on the head SHA. Do NOT use `gh pr checks --watch`
+          # (it would wait on THIS workflow too and deadlock). Query ONCE per
+          # iteration, selecting the LATEST check-run by started_at to avoid reading
+          # a stale "success" from an older re-run attempt.
+          PASSED=false
+          for i in $(seq 1 60); do          # up to ~10 min (60 * 10s)
+            RUN=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA/check-runs" \
+              --jq '[.check_runs[] | select(.name=="test")] | sort_by(.started_at) | last')
+            STATE=$(jq -r '.status // empty' <<<"$RUN")
+            STATUS=$(jq -r '.conclusion // empty' <<<"$RUN")
+            if [ "$STATE" = "completed" ]; then
+              [ "$STATUS" = "success" ] && PASSED=true
+              break
+            fi
+            sleep 10
+          done
+          echo "passed=$PASSED" >> "$GITHUB_OUTPUT"
+        # NOTE: check-run name "test" matches the job id in test.yml — confirm in smoke test.
+
+      - name: Gate decision
+        id: gate
+        env:
+          VERDICT: ${{ steps.verdict.outputs.verdict }}
+          CI_PASSED: ${{ steps.ci.outputs.passed }}
+          CHANGED_FILES: ${{ steps.facts.outputs.changed_files }}
+          LABELS: ${{ steps.facts.outputs.labels }}
+          ROUND: ${{ steps.facts.outputs.round }}
+        run: |
+          python scripts/auto_merge_gate.py \
+            --verdict "$VERDICT" --ci-passed "$CI_PASSED" \
+            --changed-files "$CHANGED_FILES" --labels "$LABELS" \
+            --round "$ROUND" >> "$GITHUB_OUTPUT"
+
+      - name: Merge (or report-only)
+        if: steps.gate.outputs.decision == 'merge'
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          PR: ${{ github.event.pull_request.number }}
+          ENABLED: ${{ vars.AUTO_MERGE_ENABLED }}
+          REASON: ${{ steps.gate.outputs.reason }}
+        run: |
+          if [ "$ENABLED" = "true" ]; then
+            gh pr merge "$PR" --squash --delete-branch
+            echo "Auto-merged PR #$PR."
+          else
+            echo "REPORT-ONLY: would merge PR #$PR ($REASON)."
+          fi
+
+      - name: Leave for human
+        if: steps.gate.outputs.decision == 'human'
+        env:
+          GH_TOKEN: ${{ github.token }}   # comment only — default token suffices
+          PR: ${{ github.event.pull_request.number }}
+          REASON: ${{ steps.gate.outputs.reason }}
+        run: |
+          gh pr comment "$PR" --body "🤖 auto-review: leaving this for a human — $REASON."
+
+      - name: Claude fixer (python only)
+        if: steps.gate.outputs.decision == 'fix'
+        id: fix
+        uses: anthropics/claude-code-action@v1.0.140
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            A reviewer rejected this PR. Read the review feedback on the PR and
+            address it by editing ONLY Python files under engine/, tests/, or
+            scripts/. Do NOT edit any markdown, docs, or workflow files. Run the
+            tests with pytest. Stage and commit your changes with a commit
+            message that starts EXACTLY with "fix(auto): ". Do not push.
+          claude_args: |
+            --allowedTools "Edit,Read,Write,Bash(pytest*),Bash(git add*),Bash(git commit*),Bash(git status*),Bash(git diff*)"
+            --disallowedTools "Bash(git push*),Bash(git merge*),Bash(git checkout*),Bash(git rebase*)"
+
+      - name: Push fix if a commit landed
+        if: steps.gate.outputs.decision == 'fix'
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # Success = a real new commit, never the action's exit code.
+          NEW=$(git rev-list --count "origin/$HEAD_REF..HEAD" 2>/dev/null || echo 0)
+          if [ "$NEW" != "0" ] && [ -n "$NEW" ]; then
+            git push origin "HEAD:$HEAD_REF"
+            echo "Pushed $NEW fix commit(s); synchronize will trigger re-review."
+          else
+            gh pr comment "$PR" --body "🤖 auto-review: the fixer produced no commit — leaving this for a human."
+          fi
