@@ -19,7 +19,7 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
-  # id-token: write removed — auth is via claude_code_oauth_token, not OIDC.
+  id-token: write          # required by claude-code-action to fetch its OIDC token
   actions: read
 
 jobs:
