@@ -3,4 +3,4 @@
 
 def add(a, b):
     """Return the sum of a and b."""
-    return a - b  # BUG: subtracts instead of adding — fixer should correct this
+    return a + b
