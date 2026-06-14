@@ -20,6 +20,7 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write          # required by claude-code-action to fetch its OIDC token
+  checks: read             # GITHUB_TOKEN reads the test check-run conclusion
   actions: read
 
 jobs:
@@ -50,7 +51,7 @@ jobs:
       - name: Collect PR facts
         id: facts
         env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          GH_TOKEN: ${{ github.token }}   # read-only PR query — default token suffices
           PR: ${{ github.event.pull_request.number }}
         run: |
           # Changed files (newline-separated).
@@ -103,7 +104,7 @@ jobs:
       - name: Wait for tests check
         id: ci
         env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          GH_TOKEN: ${{ github.token }}   # read-only checks API — needs checks: read (above)
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           # Poll the 'test' check on the head SHA. Do NOT use `gh pr checks --watch`
@@ -157,7 +158,7 @@ jobs:
       - name: Leave for human
         if: steps.gate.outputs.decision == 'human'
         env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          GH_TOKEN: ${{ github.token }}   # comment only — default token suffices
           PR: ${{ github.event.pull_request.number }}
           REASON: ${{ steps.gate.outputs.reason }}
         run: |
