@@ -70,3 +70,47 @@ def classify_paths(changed_files: list[str]) -> dict:
         "touches_markdown": touches_markdown,
         "touches_protected": touches_protected,
     }
+
+
+# --- top-level decision ---
+
+RISK_LABELS = ("security",)
+
+
+def decide(
+    verdict: str,
+    ci_passed: bool,
+    changed_files: list[str],
+    labels: list[str],
+    round_count: int,
+    max_rounds: int = 3,
+) -> dict:
+    """Return {'decision': 'merge'|'fix'|'human', 'reason': str}.
+
+    'merge' = eligible to auto-merge (the workflow still honors report-only mode).
+    'fix'   = dispatch the Python-only fixer, then push + re-review.
+    'human' = leave the PR for a person; reason explains why.
+    Fail-safe: any path that isn't clearly 'merge' or 'fix' returns 'human'.
+    """
+    paths = classify_paths(changed_files)
+    has_risk_label = any(lbl in RISK_LABELS for lbl in labels)
+
+    if verdict == "YES":
+        if has_risk_label:
+            return {"decision": "human", "reason": "carries a security/risk label"}
+        if not ci_passed:
+            return {"decision": "human", "reason": "CI is not green"}
+        if paths["touches_protected"]:
+            return {"decision": "human", "reason": "touches protected machinery (.github/ or gate module)"}
+        if not paths["python_only"]:
+            return {"decision": "human", "reason": "approved, but touches markdown — ready for you to merge"}
+        return {"decision": "merge", "reason": "python-only, approved, CI green"}
+
+    if verdict == "NO":
+        if not paths["python_only"]:
+            return {"decision": "human", "reason": "rejected and touches markdown — fixer cannot edit prose"}
+        if round_count >= max_rounds:
+            return {"decision": "human", "reason": f"max auto-fix rounds ({max_rounds}) reached"}
+        return {"decision": "fix", "reason": "python-only rejection under the round cap"}
+
+    return {"decision": "human", "reason": f"verdict {verdict} — failing closed"}

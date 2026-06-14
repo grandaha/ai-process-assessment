@@ -78,3 +78,58 @@ class TestClassifyPaths:
     def test_empty_changeset_is_not_python_only(self):
         c = gate.classify_paths([])
         assert c["python_only"] is False
+
+
+class TestDecide:
+    def _decide(self, **kw):
+        defaults = dict(
+            verdict="YES",
+            ci_passed=True,
+            changed_files=["engine/foo.py"],
+            labels=[],
+            round_count=0,
+            max_rounds=3,
+        )
+        defaults.update(kw)
+        return gate.decide(**defaults)
+
+    def test_python_approved_green_merges(self):
+        d = self._decide()
+        assert d["decision"] == "merge"
+
+    def test_ci_red_does_not_merge(self):
+        d = self._decide(ci_passed=False)
+        assert d["decision"] == "human"
+        assert "ci" in d["reason"].lower()
+
+    def test_security_label_blocks_merge(self):
+        d = self._decide(labels=["security"])
+        assert d["decision"] == "human"
+        assert "security" in d["reason"].lower()
+
+    def test_approved_markdown_waits_for_human(self):
+        d = self._decide(changed_files=["skills/x/SKILL.md"])
+        assert d["decision"] == "human"
+        assert "markdown" in d["reason"].lower()
+
+    def test_unknown_verdict_never_merges(self):
+        d = self._decide(verdict="UNKNOWN")
+        assert d["decision"] != "merge"
+
+    def test_rejected_python_under_cap_dispatches_fixer(self):
+        d = self._decide(verdict="NO", round_count=0)
+        assert d["decision"] == "fix"
+
+    def test_rejected_python_at_cap_stops(self):
+        d = self._decide(verdict="NO", round_count=3)
+        assert d["decision"] == "human"
+        assert "round" in d["reason"].lower()
+
+    def test_rejected_markdown_never_fixes(self):
+        # Vector B guard: the fixer must never touch markdown.
+        d = self._decide(verdict="NO", changed_files=["skills/x/SKILL.md"])
+        assert d["decision"] == "human"
+
+    def test_protected_file_never_merges_even_if_approved(self):
+        d = self._decide(changed_files=["scripts/auto_merge_gate.py"])
+        assert d["decision"] == "human"
