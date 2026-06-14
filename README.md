@@ -134,3 +134,5 @@ The rationalization tables are the durability mechanism: each real engagement th
 ## License
 
 MIT © Dave Raffaele
+
+<!-- auto-review smoke test: markdown guard (remove me) -->
