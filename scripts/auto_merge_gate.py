@@ -35,3 +35,38 @@ def parse_verdict(structured_output: str | None, review_text: str | None) -> str
             return "YES"
 
     return "UNKNOWN"
+
+
+# --- path classification ---
+
+ALLOWED_PREFIXES = ("engine/", "tests/", "scripts/")
+MARKDOWN_SUFFIXES = (".md",)
+# Never auto-merge changes to the loop's own machinery, even though they live
+# under allowed prefixes. claude-code-action also cannot edit .github/ files,
+# but we guard it deterministically regardless.
+PROTECTED_PREFIXES = (".github/",)
+PROTECTED_FILES = ("scripts/auto_merge_gate.py",)
+
+
+def classify_paths(changed_files: list[str]) -> dict:
+    """Classify a PR's changed-file set for merge eligibility.
+
+    python_only is True iff there is at least one changed file and ALL changed
+    files are under an allowed prefix, none are markdown, and none are protected.
+    """
+    touches_markdown = any(
+        f.endswith(MARKDOWN_SUFFIXES) for f in changed_files
+    )
+    touches_protected = any(
+        f in PROTECTED_FILES or f.startswith(PROTECTED_PREFIXES)
+        for f in changed_files
+    )
+    all_allowed = bool(changed_files) and all(
+        f.startswith(ALLOWED_PREFIXES) for f in changed_files
+    )
+    python_only = all_allowed and not touches_markdown and not touches_protected
+    return {
+        "python_only": python_only,
+        "touches_markdown": touches_markdown,
+        "touches_protected": touches_protected,
+    }

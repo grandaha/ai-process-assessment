@@ -39,3 +39,42 @@ class TestParseVerdict:
     def test_unknown_is_not_yes(self):
         # The whole point: UNKNOWN must never be treated as approval.
         assert gate.parse_verdict(None, "") != "YES"
+
+
+class TestClassifyPaths:
+    def test_python_only(self):
+        c = gate.classify_paths(["engine/foo.py", "tests/test_foo.py"])
+        assert c == {"python_only": True, "touches_markdown": False, "touches_protected": False}
+
+    def test_scripts_dir_is_python(self):
+        c = gate.classify_paths(["scripts/helper.py"])
+        assert c["python_only"] is True
+
+    def test_markdown_flagged(self):
+        c = gate.classify_paths(["skills/scoping-engagement/SKILL.md"])
+        assert c["touches_markdown"] is True
+        assert c["python_only"] is False
+
+    def test_mixed_python_and_markdown_is_not_python_only(self):
+        c = gate.classify_paths(["engine/foo.py", "README.md"])
+        assert c["python_only"] is False
+        assert c["touches_markdown"] is True
+
+    def test_path_outside_allowlist_is_not_python_only(self):
+        c = gate.classify_paths(["src/whatever.py"])  # not under an allowed prefix
+        assert c["python_only"] is False
+
+    def test_workflow_file_is_protected(self):
+        c = gate.classify_paths([".github/workflows/auto-review.yml"])
+        assert c["touches_protected"] is True
+        assert c["python_only"] is False
+
+    def test_gate_module_itself_is_protected(self):
+        # Never auto-merge changes to the auto-merge logic.
+        c = gate.classify_paths(["scripts/auto_merge_gate.py"])
+        assert c["touches_protected"] is True
+        assert c["python_only"] is False
+
+    def test_empty_changeset_is_not_python_only(self):
+        c = gate.classify_paths([])
+        assert c["python_only"] is False
