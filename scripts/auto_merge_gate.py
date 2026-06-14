@@ -7,6 +7,7 @@ single decision. Every ambiguity fails closed: when in doubt, do NOT merge.
 from __future__ import annotations
 
 import json
+import re
 
 
 def parse_verdict(structured_output: str | None, review_text: str | None) -> str:
@@ -31,7 +32,9 @@ def parse_verdict(structured_output: str | None, review_text: str | None) -> str
         body = review_text.upper()
         if "AUTOMERGE: NO" in body:   # checked first — NO wins, fail-safe
             return "NO"
-        if "AUTOMERGE: YES" in body:
+        # Strict line-anchored match so substrings like "AUTOMERGE: YESTERDAY"
+        # or "XAUTOMERGE: YES" do NOT produce a false YES.
+        if re.search(r"(?mi)^\s*AUTOMERGE:\s*YES\s*$", review_text):
             return "YES"
 
     return "UNKNOWN"
@@ -92,8 +95,14 @@ def decide(
     'human' = leave the PR for a person; reason explains why.
     Fail-safe: any path that isn't clearly 'merge' or 'fix' returns 'human'.
     """
+    # FIX 3: coerce strictly — only boolean True counts as CI passed.
+    ci_passed = ci_passed is True
+
     paths = classify_paths(changed_files)
-    has_risk_label = any(lbl in RISK_LABELS for lbl in labels)
+
+    # FIX 1: normalize to lowercase + strip so "Security" and " security " block.
+    _RISK = {lbl.lower() for lbl in RISK_LABELS}
+    has_risk_label = any(lbl.strip().lower() in _RISK for lbl in labels)
 
     if verdict == "YES":
         if has_risk_label:
@@ -102,6 +111,10 @@ def decide(
             return {"decision": "human", "reason": "CI is not green"}
         if paths["touches_protected"]:
             return {"decision": "human", "reason": "touches protected machinery (.github/ or gate module)"}
+        # FIX 4: empty changeset gets its own explicit reason before falling into
+        # the markdown/python_only checks (which would produce a misleading message).
+        if not changed_files:
+            return {"decision": "human", "reason": "no changed files detected — failing closed"}
         if not paths["python_only"]:
             return {"decision": "human", "reason": "approved, but touches markdown — ready for you to merge"}
         return {"decision": "merge", "reason": "python-only, approved, CI green"}

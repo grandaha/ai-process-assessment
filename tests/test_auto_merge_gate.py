@@ -40,6 +40,37 @@ class TestParseVerdict:
         # The whole point: UNKNOWN must never be treated as approval.
         assert gate.parse_verdict(None, "") != "YES"
 
+    # --- FIX 2: strict YES token — substring must not trigger YES ---
+
+    def test_automerge_yesterday_is_not_yes(self):
+        # "AUTOMERGE: YESTERDAY" contains "AUTOMERGE: YES" as a substring — must NOT match.
+        result = gate.parse_verdict(None, "AUTOMERGE: YESTERDAY")
+        assert result != "YES"
+        assert result == "UNKNOWN"
+
+    def test_xautomerge_yes_is_not_yes(self):
+        # "XAUTOMERGE: YES" must not match — token must be line-anchored.
+        result = gate.parse_verdict(None, "XAUTOMERGE: YES")
+        assert result != "YES"
+        assert result == "UNKNOWN"
+
+    def test_automerge_yes_inline_prefix_garbage_is_not_yes(self):
+        # " garbage AUTOMERGE: YES" — not at the start of a line; must not match.
+        result = gate.parse_verdict(None, "something AUTOMERGE: YES more text on same line")
+        assert result != "YES"
+
+    def test_multiline_automerge_yes_still_works(self):
+        # The proper line-anchored case must still return YES.
+        assert gate.parse_verdict(None, "blah\nAUTOMERGE: YES") == "YES"
+
+    def test_automerge_yes_with_leading_whitespace_still_works(self):
+        # A line with leading whitespace like "  AUTOMERGE: YES" should still match.
+        assert gate.parse_verdict(None, "  AUTOMERGE: YES") == "YES"
+
+    def test_automerge_yes_case_insensitive(self):
+        # The regex uses the i flag so lowercase should match too.
+        assert gate.parse_verdict(None, "automerge: yes") == "YES"
+
 
 class TestClassifyPaths:
     def test_python_only(self):
@@ -133,6 +164,58 @@ class TestDecide:
     def test_protected_file_never_merges_even_if_approved(self):
         d = self._decide(changed_files=["scripts/auto_merge_gate.py"])
         assert d["decision"] == "human"
+
+    # --- FIX 1: case-insensitive risk-label matching ---
+
+    def test_title_case_security_label_blocks_merge(self):
+        # "Security" must block just like "security" — was a fail-open gap.
+        d = self._decide(labels=["Security"])
+        assert d["decision"] == "human"
+        assert "security" in d["reason"].lower()
+
+    def test_padded_security_label_blocks_merge(self):
+        # " security " (with spaces) must also block.
+        d = self._decide(labels=[" security "])
+        assert d["decision"] == "human"
+        assert "security" in d["reason"].lower()
+
+    def test_uppercase_security_label_blocks_merge(self):
+        d = self._decide(labels=["SECURITY"])
+        assert d["decision"] == "human"
+        assert "security" in d["reason"].lower()
+
+    # --- FIX 3: strict ci_passed bool coercion ---
+
+    def test_ci_passed_string_false_does_not_merge(self):
+        # The string "false" is truthy in Python — must NOT be treated as CI green.
+        d = self._decide(ci_passed="false")
+        assert d["decision"] != "merge"
+        assert d["decision"] == "human"
+
+    def test_ci_passed_string_true_does_not_merge(self):
+        # The string "true" is also truthy but is not boolean True — must block.
+        d = self._decide(ci_passed="true")
+        assert d["decision"] != "merge"
+
+    def test_ci_passed_integer_1_does_not_merge(self):
+        # Truthy int 1 is not boolean True — must block.
+        d = self._decide(ci_passed=1)
+        assert d["decision"] != "merge"
+
+    # --- FIX 4: empty-changeset reason ---
+
+    def test_empty_changeset_is_human(self):
+        d = self._decide(changed_files=[])
+        assert d["decision"] == "human"
+
+    def test_empty_changeset_reason_does_not_mention_markdown(self):
+        # Previously the reason was "approved, but touches markdown" which was misleading.
+        d = self._decide(changed_files=[])
+        assert "markdown" not in d["reason"].lower()
+
+    def test_empty_changeset_reason_mentions_failing_closed(self):
+        d = self._decide(changed_files=[])
+        assert "failing closed" in d["reason"].lower() or "no changed files" in d["reason"].lower()
 
 
 import subprocess
