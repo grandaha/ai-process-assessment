@@ -38,7 +38,7 @@ jobs:
       - name: Run Claude Code
         # Pinned to an explicit release — the moving v1 tag currently hits an
         # internal "tsconfig fd 4 directory mismatch" bug in the prepare step.
-        uses: anthropics/claude-code-action@v1.0.140
+        uses: anthropics/claude-code-action@v1.0.148
         with:
           # Auth via Claude subscription (no API billing). Generate with
           # `claude setup-token` and store as the CLAUDE_CODE_OAUTH_TOKEN secret.
