@@ -36,9 +36,9 @@ def test_agent_name_matches_filename(methodology):
 
 
 def test_agent_count(methodology):
-    # 15 = the 14 prior agents + section-renderer-checkpoint-baseline,
-    # the baseline-validation checkpoint renderer added in feat/checkpoint-baseline.
-    assert len(methodology.agents) == 15
+    # 16 = 15 prior agents + section-renderer-checkpoint-scope,
+    # the scope-and-context validation checkpoint renderer (Checkpoint 1).
+    assert len(methodology.agents) == 16
 
 
 def _referenced_agent_tokens(methodology) -> set[str]:
