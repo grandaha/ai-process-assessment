@@ -46,6 +46,13 @@ Dimensions that require later phases (Logic chain through scores/roadmap/briefs,
 
 Record clearance as a distinct checkpoint entry in `evidence-log.md`, e.g. `Checkpoint baseline — cleared (Evidence, Determinism, Completeness)`. On non-clearance, route to the dimension's owning phase (for `baseline`: Phase 4) for remediation before the checkpoint renders.
 
+For `checkpoint=scope` (after Phase 2), read only: `scope.md` and `context.md`. Run only the applicable dimensions:
+
+- **Completeness** — every in-scope domain named in `scope.md` is present and legible in the rendered scope view, and the scope is internally coherent (sponsoring question ↔ success criteria ↔ in/out-of-scope align).
+- **Evidence integrity** — every claim to be rendered traces to a `scope.md` / `context.md` source.
+
+**Determinism integrity is not applicable** at the `scope` checkpoint — no numeric figures exist yet; state this rather than checking it. Record clearance as `Checkpoint scope — cleared (Completeness, Evidence)`. On non-clearance, route a scope-field gap (sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints) to Phase 1 and a context-field gap (business model, strategic priorities, funding model) to Phase 2 before the checkpoint renders.
+
 ## Phase checklist
 
 - [ ] Run Evidence integrity check — sample value claims, walk each to its baseline
