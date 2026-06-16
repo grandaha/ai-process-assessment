@@ -36,10 +36,9 @@ def test_agent_name_matches_filename(methodology):
 
 
 def test_agent_count(methodology):
-    # 14 = the 13 prior agents + process-mapper, the Phase 4 round synthesizer
-    # added when test_referenced_agents_resolve surfaced that
-    # discovering-processes dispatched it with no agent file behind it.
-    assert len(methodology.agents) == 14
+    # 15 = the 14 prior agents + section-renderer-checkpoint-baseline,
+    # the baseline-validation checkpoint renderer added in feat/checkpoint-baseline.
+    assert len(methodology.agents) == 15
 
 
 def _referenced_agent_tokens(methodology) -> set[str]:
