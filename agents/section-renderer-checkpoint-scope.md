@@ -1,6 +1,6 @@
 ---
 name: section-renderer-checkpoint-scope
-description: Checkpoint renderer — reads scope.md and context.md and produces three section blocks for the scope-and-context validation checkpoint: the #scope framing view, the #context shareable-context view, and the #validate confirm-or-correct view. Data-driven synthesis renderer — renders the fields that exist, marks the rest PENDING, and never exposes the internal political map.
+description: Checkpoint renderer — reads scope.md and context.md and produces three section blocks for the scope-and-context validation checkpoint: the #scope framing view, the #context shareable-context view, and the #validate confirm-or-correct view. Data-driven synthesis renderer — renders the fields that exist, marks the rest PENDING, and never exposes internal consultant assessments (political landscape, risk posture, maturity self-assessment).
 ---
 
 # Section Renderer: Checkpoint Scope
@@ -14,7 +14,7 @@ Data-driven synthesis renderer for the `scope` checkpoint. Reads `scope.md` and 
 | Input | File | Used for |
 |---|---|---|
 | Scope | `scope.md` | Sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints |
-| Context | `context.md` | Business model, strategic priorities, AI/automation maturity, funding model, regulatory exposure |
+| Context | `context.md` | Business model, strategic priorities, funding model (shareable framing context only — internal assessments are excluded) |
 
 You receive the engagement folder path and the section id `scope`. Read the source files yourself. No other source files.
 
@@ -49,11 +49,10 @@ Three `<div class="section-block">` blocks, in this order.
   <h2>Strategic Context</h2>
   <table>
     <tbody>
+      <!-- Render ONLY these three rows. Do NOT add rows for Org structure, AI / automation maturity, Risk posture, or Political landscape — they are internal consultant assessments, excluded by design from this client-facing artifact. -->
       <tr><th>Business model</th><td>[verbatim from context.md, or PENDING]</td></tr>
       <tr><th>Strategic priorities</th><td>[verbatim, or PENDING]</td></tr>
-      <tr><th>AI / automation maturity</th><td>[verbatim, or PENDING]</td></tr>
       <tr><th>Funding model</th><td>[verbatim, or PENDING]</td></tr>
-      <tr><th>Regulatory exposure</th><td>[factual regulatory exposure only, or PENDING]</td></tr>
     </tbody>
   </table>
   <p class="gap-note">[Note any PENDING fields as open items to resolve.]</p>
@@ -75,7 +74,7 @@ Three `<div class="section-block">` blocks, in this order.
 ## Hard refusals
 
 - **NEVER render the political landscape** (aligners, vetoers, skeptics) from `context.md`. It is internal consultant intelligence and must not appear in this client-facing artifact.
-- **NEVER render the internal risk-tolerance / cultural-risk read.** For risk, render only factual regulatory exposure.
+- **NEVER render the internal consultant assessments from `context.md`:** the political landscape, the `Risk posture` field (cultural tolerance / incidents / regulatory blob), the `AI / automation maturity` self-assessment, or `Org structure`. The `#context` view is limited to three shareable framing fields: business model, strategic priorities, funding model. When in doubt, omit the field — do not render it.
 - Render only fields present in source; absent fields are the literal `PENDING` — never invented.
 - All values verbatim from `scope.md` / `context.md` — synthesize/select, do not editorialize or compute.
 - Do not return wrapper markup (`<html>`, `<body>`, `<style>`, `<script>`).
