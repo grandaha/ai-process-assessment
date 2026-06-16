@@ -53,6 +53,14 @@ For `checkpoint=scope` (after Phase 2), read only: `scope.md` and `context.md`. 
 
 **Determinism integrity is not applicable** at the `scope` checkpoint — no numeric figures exist yet; state this rather than checking it. Record clearance as `Checkpoint scope — cleared (Completeness, Evidence)`. On non-clearance, route a scope-field gap (sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints) to Phase 1 and a context-field gap (business model, strategic priorities, funding model) to Phase 2 before the checkpoint renders.
 
+For `checkpoint=portfolio` (after Phase 7), read only: `scope.md` (header), `scores/_index.md`, the `scores/OPP-NNN.md` files, `opportunities/_index.md`, the `opportunities/OPP-NNN.md` files, `roadmap.md`, and the computed inputs `model/scores.json`, `model/initiatives.json`, and `model/results.json`. If `scores/_index.md` or `roadmap.md` is missing, the checkpoint does **NOT** clear — route back (scores → Phase 6, roadmap → Phase 7); a missing portfolio must not silently pass. Run only the applicable dimensions:
+
+- **Completeness** — every OPP-ID in `scores/_index.md` is reflected in the portfolio and has a `scores/OPP-NNN.md`; every wave in `roadmap.md` is present; the portfolio is internally coherent (ranking ↔ wave assignment ↔ Build/Buy/Partner align).
+- **Evidence integrity** — every figure to be rendered traces to a `scores/` / `opportunities/` / `roadmap.md` source.
+- **Determinism integrity** — every composite equals its `model/scores.json` / `model/results.json` source; ROM/investment figures trace to `model/initiatives.json`; PENDING renders as PENDING, never an invented number.
+
+Dimensions that require later phases (Business Case, Communication readiness) are not applicable at this checkpoint — note them as deferred. Do **not** dispatch the `opportunity-reviewer` subagent in Checkpoint Mode; checkpoint clearance is a lighter, scoped pass. Record clearance as `Checkpoint portfolio — cleared (Completeness, Evidence, Determinism)` in `evidence-log.md`. On non-clearance, route a score/ranking gap to Phase 6 (`scoring-opportunities`) and a wave/sequencing gap to Phase 7 (`prioritizing-roadmap`) for remediation before the checkpoint renders.
+
 ## Phase checklist
 
 - [ ] Run Evidence integrity check — sample value claims, walk each to its baseline
