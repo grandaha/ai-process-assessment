@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.10.0] — 2026-06-16
+
+### Added
+- **Stakeholder validation checkpoints** — the methodology's first interim, client-facing
+  artifact. New `building-checkpoint` skill (registry-driven; Checkpoint 2 "baseline" wired)
+  renders `checkpoints/checkpoint-baseline.html` after Phase 4 so process owners and the
+  sponsor can confirm the process maps and baseline metrics — and decide the challenge
+  hypotheses — before opportunities, scores, roadmap, and the business case are built on
+  them. Synthesis-only: every figure traces to `processes/PROC-NNN.md` / `model/baselines.json`;
+  absent metrics render as PENDING.
+- **`section-renderer-checkpoint-baseline`** — data-driven renderer (renders whatever metrics
+  each process actually has, unlike the sample-specific Phase 11 renderers); emits `#baselines`
+  and `#validate` blocks.
+- **Checkpoint feedback loop** — `templates/checkpoint-outcome-template.md`; a "Changes
+  Requested" outcome routes back to Phase 4 (correct source → regenerate → re-run engine).
+  Recommended-and-recorded, not a hard gate (CLAUDE.md can make it mandatory).
+
+### Changed
+- **`deliverable-gate` gains a backward-compatible Checkpoint Mode** — runs the integrity
+  dimensions (Evidence, Determinism, Completeness) over only the files that exist at a
+  checkpoint, treating later-phase files as legitimately absent. The terminal gate path is
+  unchanged. A missing `model/baselines.json` does not clear the baseline checkpoint.
+- Keystone + `system-prompt.md` wire the checkpoint (engagement-folder `checkpoints/` convention,
+  routing recommendation after Phase 4, when-to-invoke trigger). Registered via the test
+  allow-list, not the Phase Map (it is cross-cutting, not a linear phase).
+
+### Tests
+- Allow-list + count updates for the new skill/agent; new `test_system_prompt_envelope_balanced`
+  guard so a dropped mirror wrapper tag can no longer pass silently.
+
 ## [2.9.0] — 2026-06-14
 
 ### Added
