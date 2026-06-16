@@ -11,7 +11,7 @@ This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
 3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. For `portfolio`: both `roadmap.md` and `scores/_index.md` must exist; halt naming whichever is missing. Halt with a clear message naming whichever file is missing if not.
+4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. Halt with a clear message naming whichever file is missing if not.
 
 ## Role in the system
 
