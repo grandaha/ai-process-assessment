@@ -25,9 +25,9 @@ It is **recommended-and-recorded**, not a hard gate: the keystone recommends inv
 
 Only the `baseline` row is active. The table format anticipates Checkpoints 1 and 3 (future cycles).
 
-| id | Insert after | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
-|---|---|---|---|---|---|---|
-| `baseline` | Phase 4 | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
+| id | Insert after | Audience | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
+|---|---|---|---|---|---|---|---|
+| `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
 
 ## Gate condition
 
