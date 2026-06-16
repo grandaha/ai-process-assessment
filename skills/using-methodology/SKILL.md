@@ -85,6 +85,7 @@ The entry is written before the table row — so the escape and the fix are perm
 - On any new engagement prompt → invoke `ai-process-assessment:scoping-engagement`.
 - After each phase's output file is saved → invoke the next skill in the chain.
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
+- After Phase 4 saves `processes/_index.md`, before Phase 5 → **recommended:** invoke `ai-process-assessment:building-checkpoint` (checkpoint `baseline`) to validate the process maps and baseline metrics with process owners + the sponsor. It is recommended-and-recorded, not a hard gate — Phase 5 is not blocked on it unless CLAUDE.md makes it mandatory. On a "Changes Requested" outcome, route back to Phase 4, correct, re-run the engine, and regenerate before Phase 5.
 - If any opportunity in `opportunities/_index.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
 - After `usecase-briefs/_index.md` is saved and reviewer cleared → invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) before Phase 9.
@@ -111,6 +112,7 @@ The entry is written before the table row — so the escape and the fix are perm
 | "collect cost data", "get vendor quotes", "what do we need to price this", "gather the estimates" | `ai-process-assessment:collecting-cost-actuals` |
 | "build the business case", "what does Wave 1 cost", "estimate the investment" | `ai-process-assessment:building-business-case` |
 | "run the sample", "test the methodology", "demo engagement", "try it end-to-end" | `ai-process-assessment:running-sample-engagement` |
+| "validate the baselines", "review the process maps with the client", "stakeholder checkpoint" | `ai-process-assessment:building-checkpoint` |
 
 ## Engagement Folder Convention
 
@@ -125,6 +127,7 @@ Every engagement gets its own folder under `<engagement-name>/` at the project r
 - `scores/` — Phase 6 (folder: `_index.md` + `OPP-NNN.md` per opportunity)
 - `roadmap.md` — Phase 7
 - `usecase-briefs/` — Phase 8 (folder: `_index.md` master index + `UC-NNN.md` per opportunity, one file per UC across all three waves)
+- `checkpoints/` — stakeholder validation checkpoints (folder: `checkpoint-<id>.html` + `CP-<id>-outcome.md`; recommended, recorded — see Routing Logic). Present only when a checkpoint was run.
 - `cost-actuals.md` — Phase 8.5 (labor rates, implementation hours, vendor quotes, IT integration estimates — required before Phase 9)
 - `business-case.md` — Phase 9
 - `model/` — structured numeric inputs (`value.json`, `scores.json`, `costs.json`, `baselines.json`, `initiatives.json`) and the engine output `results.json`
