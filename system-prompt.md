@@ -93,6 +93,7 @@ The entry is written before the table row — so the escape and the fix are perm
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
 - After Phase 2 saves `context.md`, before Phase 3 → **recommended:** invoke `ai-process-assessment:building-checkpoint` (checkpoint `scope`) to validate the engagement framing — sponsoring question, decision-maker, scope, success criteria, and strategic context — with the sponsor + decision-maker. Recommended-and-recorded, not a hard gate. On "Changes Requested", route scope-field corrections to Phase 1 and context-field corrections to Phase 2, then regenerate before Phase 3.
 - After Phase 4 saves `processes/_index.md`, before Phase 5 → **recommended:** invoke `ai-process-assessment:building-checkpoint` (checkpoint `baseline`) to validate the process maps and baseline metrics with process owners + the sponsor. It is recommended-and-recorded, not a hard gate — Phase 5 is not blocked on it unless CLAUDE.md makes it mandatory. On a "Changes Requested" outcome, route back to Phase 4, correct, re-run the engine, and regenerate before Phase 5.
+- After Phase 7 saves `roadmap.md`, before Phase 8 → **recommended:** invoke `ai-process-assessment:building-checkpoint` (checkpoint `portfolio`) to validate the prioritized portfolio and wave sequencing — ranking, scoring, quick wins, dependencies, and the investment envelope — with the decision-maker + sponsor + IT lead. Recommended-and-recorded, not a hard gate — Phase 8 is not blocked on it unless CLAUDE.md makes it mandatory. On a "Changes Requested" outcome, route score corrections to Phase 6 and sequencing corrections to Phase 7, re-run the engine, and regenerate before Phase 8.
 - If any opportunity in `opportunities/_index.md` has a non-Green GRC flag → invoke `ai-process-assessment:governance-risk-gate` before scoring.
 - Before any external sharing of any output → invoke `ai-process-assessment:deliverable-gate`.
 - After `usecase-briefs/_index.md` is saved and reviewer cleared → invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) before Phase 9.
@@ -121,6 +122,7 @@ The entry is written before the table row — so the escape and the fix are perm
 | "run the sample", "test the methodology", "demo engagement", "try it end-to-end" | `ai-process-assessment:running-sample-engagement` |
 | "validate the baselines", "review the process maps with the client", "stakeholder checkpoint" | `ai-process-assessment:building-checkpoint` |
 | "validate the scope", "confirm the engagement framing", "scope alignment checkpoint" | `ai-process-assessment:building-checkpoint` |
+| "validate the portfolio", "review the roadmap with the client", "portfolio sequencing checkpoint" | `ai-process-assessment:building-checkpoint` |
 
 ## Engagement Folder Convention
 
