@@ -48,8 +48,16 @@ Two `<div class="section-block">` blocks, in this order.
   <div class="callout">
     <strong>Confirm or correct each baseline above.</strong> These figures drive every value estimate in the rest of the assessment.
   </div>
-  <!-- For each process: its challenge hypothesis (root-cause vs optimize-around) presented as a decision -->
-  <!-- Use .callout-note per process; state the hypothesis and the question for the stakeholder -->
+  <!-- For each process: one .callout-note using the skeleton below -->
+  <!-- ============================================================
+       Per-process .callout-note skeleton (repeat once per process)
+       ============================================================
+  <div class="callout-note">
+    <strong>[Process name — verbatim from processes/PROC-NNN.md]</strong><br>
+    <em>Challenge hypothesis:</em> [root-cause (fix the underlying problem) | optimize-around (work around the constraint)] — [one-sentence rationale verbatim from PROC-NNN.md]<br>
+    <strong>Question for you:</strong> Does this hypothesis match your experience of the process? If not, what would you correct?
+  </div>
+  -->
   <p class="gap-note">[List open questions / data gaps (PENDING metrics) the stakeholders should resolve.]</p>
 </div>
 ```

@@ -15,5 +15,5 @@
 
 ## Routing
 
-- On **Changes Requested**: route to <route-back phase — e.g., Phase 4 discovering-processes>; correct the source file(s); re-run `python -m engine.run <engagement>/` if any number changed; regenerate the checkpoint; append a new outcome record.
+- On **Changes Requested**: route to <route-back phase — e.g., Phase 4 discovering-processes>; correct the source file(s) (`processes/PROC-NNN.md` / `model/baselines.json`) — editing the source file is what refreshes the checkpoint; regenerate the checkpoint from the corrected source(s); then re-run `python -m engine.run <engagement>/` so downstream phases pick up the change; append a new outcome record.
 - On **Confirmed**: downstream phases may rely on the validated output; the terminal deliverable-gate and final deliverable may cite this sign-off.

@@ -11,7 +11,7 @@ This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
 3. Resolve the checkpoint id (default and only wired value: `baseline`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor output exists (for `baseline`: `processes/_index.md`). Halt with a clear message naming the missing file if not.
+4. Verify the registry row's predecessor outputs exist (for `baseline`: both `processes/_index.md` and `model/baselines.json`). Halt with a clear message naming whichever file is missing if not.
 
 ## Role in the system
 
@@ -31,7 +31,7 @@ Only the `baseline` row is active. The table format anticipates Checkpoints 1 an
 
 ## Gate condition
 
-The checkpoint's predecessor output exists (for `baseline`: `processes/_index.md`). Before producing the HTML, this skill MUST invoke `ai-process-assessment:deliverable-gate` in **Checkpoint Mode** for this checkpoint id (see that skill's "Checkpoint Mode" section). Proceed only on checkpoint clearance recorded in `evidence-log.md`.
+The checkpoint's predecessor outputs exist (for `baseline`: `processes/_index.md` and `model/baselines.json`). Before producing the HTML, this skill MUST invoke `ai-process-assessment:deliverable-gate` in **Checkpoint Mode** for this checkpoint id (see that skill's "Checkpoint Mode" section). Proceed only on checkpoint clearance recorded in `evidence-log.md`.
 
 ## Orchestration
 
@@ -76,10 +76,10 @@ function navScrollTo(anchorId) {
 
 ## Recording the outcome
 
-After the HTML is produced, the checkpoint is taken to the stakeholders named in the registry's audience (for `baseline`: process owners + sponsor). Record the result in `<name>/checkpoints/CP-<id>-outcome.md` using `templates/checkpoint-outcome-template.md`.
+After the HTML is produced, the checkpoint is taken to the stakeholders named in the registry's audience (for `baseline`: process owners + sponsor). Record the result in `<name>/checkpoints/CP-<id>-outcome.md` (for baseline: `checkpoints/CP-baseline-outcome.md`) by copying `templates/checkpoint-outcome-template.md` and filling it in — do not name the output after the template.
 
 - **Confirmed** → downstream phases may rely on the validated output. The terminal deliverable-gate and final deliverable may cite the sign-off.
-- **Changes Requested** → route to the registry's route-back phase (for `baseline`: Phase 4, `ai-process-assessment:discovering-processes`). Apply the corrections to `processes/PROC-NNN.md` / `model/baselines.json`, **re-run the engine** (`python -m engine.run <name>/`) if any number changed, regenerate the checkpoint, and append a new outcome record. Repeat until Confirmed.
+- **Changes Requested** → route to the registry's route-back phase (for `baseline`: Phase 4, `ai-process-assessment:discovering-processes`). Correct the source file(s) (`processes/PROC-NNN.md` / `model/baselines.json`) — **editing the source file is what refreshes the checkpoint, not the engine run**. Then regenerate the checkpoint from the corrected source(s). Finally, re-run `python -m engine.run <name>/` so downstream phases pick up the change. Append a new outcome record. Repeat until Confirmed.
 
 ## Phase checklist
 
