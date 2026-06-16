@@ -73,9 +73,9 @@ Per-OPP six-dimension detail, one compact group per OPP that has a `scores/OPP-N
   <!-- one block per OPP, in portfolio rank order -->
   <h3>[OPP-NNN] — [title] · Composite [composite] · Horizon [Short-run/Long-run] · [B/B/P]</h3>
   <table>
-    <thead><tr><th>Dimension</th><th>Score</th><th>Rationale</th></tr></thead>
+    <thead><tr><th>Dimension</th><th>Score</th><th>Source citation</th></tr></thead>
     <tbody>
-      <tr><th>Value Potential</th><td>[1–5, or PENDING]</td><td>[rationale verbatim, or PENDING]</td></tr>
+      <tr><th>Value Potential</th><td>[1–5, or PENDING]</td><td>[source citation verbatim, or PENDING]</td></tr>
       <tr><th>Technical Feasibility</th><td>[…]</td><td>[…]</td></tr>
       <tr><th>Data Readiness</th><td>[…]</td><td>[…]</td></tr>
       <tr><th>Org Change Readiness</th><td>[…]</td><td>[…]</td></tr>
