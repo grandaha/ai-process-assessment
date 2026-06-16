@@ -4,10 +4,12 @@
 #   using-methodology     — the keystone (carries the map itself)
 #   running-sample-engagement — meta entry point for the bundled demo
 #   generating-sample-intake  — demo-support: synthesizes sample intake files
+#   building-checkpoint   — cross-cutting stakeholder validation checkpoint (interim)
 ALLOWLIST_NON_PHASE = {
     "ai-process-assessment:using-methodology",
     "ai-process-assessment:running-sample-engagement",
     "ai-process-assessment:generating-sample-intake",
+    "ai-process-assessment:building-checkpoint",
 }
 
 
@@ -42,5 +44,5 @@ def test_no_orphan_skills(methodology):
 
 
 def test_skill_count(methodology):
-    # 14 phase skills + 3 allow-listed non-phase skills.
-    assert len(methodology.skills) == 17
+    # 14 phase skills + 4 allow-listed non-phase skills.
+    assert len(methodology.skills) == 18
