@@ -310,6 +310,23 @@ def test_system_prompt_mirrors_keystone():
     for stale in ("scored-opportunities.md", "7-dimension", "ten sequential phases"):
         assert stale not in system_prompt, f"stale token in system-prompt.md: {stale!r}"
 
+
+def test_system_prompt_envelope_balanced():
+    # Defends: the <EXTREMELY_IMPORTANT> wrapper envelope in system-prompt.md is
+    # balanced. A dropped closing tag (e.g. from a re-mirror truncation) must fail
+    # this test, not silently pass.
+    import re
+    system_prompt = (REPO_ROOT / "system-prompt.md").read_text()
+    opening = re.findall(r"(?m)^<EXTREMELY_IMPORTANT>$", system_prompt)
+    closing = re.findall(r"(?m)^</EXTREMELY_IMPORTANT>$", system_prompt)
+    assert len(opening) >= 1, "system-prompt.md is missing the opening <EXTREMELY_IMPORTANT> tag"
+    assert len(closing) >= 1, "system-prompt.md is missing the closing </EXTREMELY_IMPORTANT> tag"
+    assert len(opening) == len(closing), (
+        f"system-prompt.md has unbalanced EXTREMELY_IMPORTANT tags: "
+        f"{len(opening)} opening vs {len(closing)} closing"
+    )
+
+
 # --- #improvement-log guard (defends: undocumented rationalization escapes) ---
 # improvement-log.md must exist at the repo root, carry a schema section, have at
 # least one example entry, and be referenced by the keystone with a write-trigger.

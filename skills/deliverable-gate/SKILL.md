@@ -39,7 +39,7 @@ When invoked by `ai-process-assessment:building-checkpoint` with a `checkpoint=<
 For `checkpoint=baseline` (after Phase 4), read only: `scope.md`, `processes/_index.md`, the relevant `processes/PROC-NNN.md` files, and `model/baselines.json`. If `model/baselines.json` is missing, the checkpoint does **NOT** clear — route back to Phase 4 for remediation; a missing baseline must not silently pass. Run only the applicable dimensions:
 
 - **Evidence integrity** — every figure to be rendered traces to a `processes/PROC-NNN.md` / `model/baselines.json` source. No figure floats free.
-- **Determinism integrity** — every numeric figure equals its `model/results.json` / `model/baselines.json` source; PENDING renders as PENDING, never an invented number.
+- **Determinism integrity** — every numeric figure equals its `model/baselines.json` source; PENDING renders as PENDING, never an invented number.
 - **Completeness** — every in-scope process domain from `scope.md` that Phase 4 should have covered is present in `processes/`, or its gap is acknowledged.
 
 Dimensions that require later phases (Logic chain through scores/roadmap/briefs, Business Case, Communication readiness) are **not applicable** at this checkpoint and are skipped — note them as "deferred to later checkpoints / terminal gate." Do **not** dispatch the `opportunity-reviewer` subagent in Checkpoint Mode (opportunities do not exist yet); checkpoint clearance is a lighter, scoped pass.

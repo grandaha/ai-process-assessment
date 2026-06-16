@@ -147,3 +147,4 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 ## Chain to next skill
 
 → `ai-process-assessment:scoping-engagement` (on any new engagement prompt)
+</EXTREMELY_IMPORTANT>
