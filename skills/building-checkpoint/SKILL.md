@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:building-checkpoint
-description: Cross-cutting checkpoint — renders an interim, client-facing HTML stakeholder-validation artifact at a defined point in the methodology (Checkpoints 1 `scope` and 2 `baseline` are wired). Parameterized by checkpoint id via the Checkpoint Registry. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
+description: Cross-cutting checkpoint — renders an interim, client-facing HTML stakeholder-validation artifact at a defined point in the methodology (Checkpoints 1 `scope`, 2 `baseline`, and 3 `portfolio` are wired). Parameterized by checkpoint id via the Checkpoint Registry. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
 ---
 
 # [CROSS-CUTTING] Building a Stakeholder Validation Checkpoint
@@ -10,8 +10,8 @@ description: Cross-cutting checkpoint — renders an interim, client-facing HTML
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
-3. Resolve the checkpoint id (wired values: `baseline`, `scope`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. Halt with a clear message naming whichever file is missing if not.
+3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`). Look up its row in the Checkpoint Registry below.
+4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. Halt with a clear message naming whichever file is missing if not.
 
 ## Role in the system
 
@@ -23,12 +23,13 @@ It is **recommended-and-recorded**, not a hard gate: the keystone recommends inv
 
 ## Checkpoint Registry
 
-The `baseline` (Checkpoint 2) and `scope` (Checkpoint 1) rows are active. The table format anticipates Checkpoint 3 (future cycle).
+The `baseline` (Checkpoint 2), `scope` (Checkpoint 1), and `portfolio` (Checkpoint 3) rows are all active — the checkpoint pattern is complete.
 
 | id | Insert after | Audience | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|---|
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
 | `scope` | Phase 2 | Sponsor + decision-maker | `scope.md`, `context.md` | `section-renderer-checkpoint-scope` | `checkpoints/checkpoint-scope.html` | `checkpoints/CP-scope-outcome.md` | Phase 1 (`ai-process-assessment:scoping-engagement`) for scope-field changes; Phase 2 (`ai-process-assessment:mapping-context`) for context-field changes |
+| `portfolio` | Phase 7 | Decision-maker + sponsor + IT lead | `scores/_index.md`, `scores/OPP-NNN.md`, `opportunities/_index.md`, `opportunities/OPP-NNN.md`, `roadmap.md`, `scope.md` (header only) | `section-renderer-checkpoint-portfolio` | `checkpoints/checkpoint-portfolio.html` | `checkpoints/CP-portfolio-outcome.md` | Phase 6 (`ai-process-assessment:scoring-opportunities`) for score/ranking changes; Phase 7 (`ai-process-assessment:prioritizing-roadmap`) for wave/sequencing changes |
 
 ## Gate condition
 
@@ -68,6 +69,7 @@ The sticky nav and section blocks are per-checkpoint:
 
 - `baseline` → nav `Baselines` (`#baselines`), `Validate` (`#validate`); masthead label "Baseline Validation — Interim"; blocks `#baselines`, `#validate` from `section-renderer-checkpoint-baseline`.
 - `scope` → nav `Scope` (`#scope`), `Context` (`#context`), `Validate` (`#validate`); masthead label "Scope & Context Alignment — Interim"; blocks `#scope`, `#context`, `#validate` from `section-renderer-checkpoint-scope`.
+- `portfolio` → nav `Portfolio` (`#portfolio`), `Scoring` (`#scoring`), `Roadmap` (`#roadmap`), `Validate` (`#validate`); masthead label "Portfolio & Roadmap Review — Interim"; blocks `#portfolio`, `#scoring`, `#roadmap`, `#validate` from `section-renderer-checkpoint-portfolio`.
 
 Assemble the sticky nav with one `<a href="#anchor" onclick="navScrollTo('anchor'); return false;">Label</a>` per the resolved checkpoint's anchors, in block order, then the masthead, then the section blocks in order, then the `.doc-footer`.
 
@@ -87,6 +89,7 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 - **Confirmed** → downstream phases may rely on the validated output. The terminal deliverable-gate and final deliverable may cite the sign-off.
 - **Changes Requested** → route to the registry's route-back phase (for `baseline`: Phase 4, `ai-process-assessment:discovering-processes`). Correct the source file(s) (`processes/PROC-NNN.md` / `model/baselines.json`) — **editing the source file is what refreshes the checkpoint, not the engine run**. Then regenerate the checkpoint from the corrected source(s). Finally, re-run `python -m engine.run <name>/` so downstream phases pick up the change. Append a new outcome record. Repeat until Confirmed.
 - **Changes Requested (`scope` checkpoint) — route per field:** a corrected **scope** field (sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints) routes to Phase 1 (`ai-process-assessment:scoping-engagement`); a corrected **context** field (business model, strategic priorities, funding model) routes to Phase 2 (`ai-process-assessment:mapping-context`). A mixed outcome routes to both. Correct the source file(s) — editing the source is what refreshes the checkpoint — then regenerate `checkpoints/checkpoint-scope.html` and append a new outcome record. Repeat until Confirmed. (No engine run is involved at this checkpoint — there are no figures.)
+- **Changes Requested (`portfolio` checkpoint) — route per field:** a corrected **score/ranking** field (composite score, dimension score, Build/Buy/Partner, type) routes to Phase 6 (`ai-process-assessment:scoring-opportunities`); a corrected **wave/sequencing** field (wave assignment, sequencing constraint, enabler, investment envelope) routes to Phase 7 (`ai-process-assessment:prioritizing-roadmap`). A mixed outcome routes to both. Correct the owning phase's source(s) and re-run that phase's assembly so the affected inputs re-stamp: a score/ranking change means re-running Phase 6 (`ai-process-assessment:scoring-opportunities`), whose assembly recomputes and re-stamps the composites into `scores/OPP-NNN.md`, `model/scores.json`, and `scores/_index.md`; a wave/sequencing change means re-running Phase 7 (`ai-process-assessment:prioritizing-roadmap`), which rewrites `roadmap.md` and `model/initiatives.json`. The engine is **not** run at this checkpoint — `python -m engine.run` is a Phase 9 step. Then regenerate `checkpoints/checkpoint-portfolio.html` and append a new outcome record. Repeat until Confirmed.
 
 ## Phase checklist
 
@@ -111,6 +114,7 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 
 - `baseline`: on Confirmed → `ai-process-assessment:identifying-opportunities` (Phase 5); on Changes Requested → `ai-process-assessment:discovering-processes` (Phase 4).
 - `scope`: on Confirmed → `ai-process-assessment:inventorying-tech-data` (Phase 3); on Changes Requested → `ai-process-assessment:scoping-engagement` (Phase 1, scope fields) / `ai-process-assessment:mapping-context` (Phase 2, context fields).
+- `portfolio`: on Confirmed → `ai-process-assessment:packaging-usecases` (Phase 8); on Changes Requested → `ai-process-assessment:scoring-opportunities` (Phase 6, score fields) / `ai-process-assessment:prioritizing-roadmap` (Phase 7, sequencing fields).
 
 **Output rule:** Do NOT reproduce or echo the HTML content in this response. State the file path only.
 

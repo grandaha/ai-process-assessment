@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.0] — 2026-06-16
+
+### Added
+- **Checkpoint 3 — Portfolio & Roadmap Review** (`portfolio`): the third and final
+  stakeholder-validation checkpoint on the v2.10.0 pattern, rendered after Phase 7 so the
+  decision-maker, sponsor, and IT lead validate the prioritized portfolio, wave sequencing,
+  quick wins, dependencies, and investment envelope before Phase 8. Completes the
+  three-checkpoint pattern and closes #49.
+  - New bespoke data-driven renderer `section-renderer-checkpoint-portfolio` (emits
+    `#portfolio`, `#scoring`, `#roadmap`, `#validate`). Renders the full analytical work
+    product including per-OPP six-dimension scoring detail; renders only the
+    OPPs/initiatives/waves that exist (no hardcoded counts or sample values).
+  - `building-checkpoint` registry row, Session Start predecessor check
+    (`roadmap.md` + `scores/_index.md`), shell sticky-nav, per-field route-back
+    (score → Phase 6, sequencing → Phase 7; re-stamp via the owning phase, not the engine —
+    `engine.run` is a Phase 9 step), and chain-to-next-skill.
+  - `deliverable-gate` Checkpoint Mode `portfolio` case (Completeness, Evidence,
+    Determinism — composites trace to `model/scores.json`; `opportunity-reviewer` not
+    dispatched).
+  - Keystone Routing Logic + When-to-Invoke wiring, mirrored to `system-prompt.md`.
+
 ## [2.11.0] — 2026-06-16
 
 ### Added

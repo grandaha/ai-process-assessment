@@ -36,9 +36,9 @@ def test_agent_name_matches_filename(methodology):
 
 
 def test_agent_count(methodology):
-    # 16 = 15 prior agents + section-renderer-checkpoint-scope,
-    # the scope-and-context validation checkpoint renderer (Checkpoint 1).
-    assert len(methodology.agents) == 16
+    # 17 = 16 prior agents + section-renderer-checkpoint-portfolio,
+    # the portfolio-and-roadmap validation checkpoint renderer (Checkpoint 3).
+    assert len(methodology.agents) == 17
 
 
 def _referenced_agent_tokens(methodology) -> set[str]:
