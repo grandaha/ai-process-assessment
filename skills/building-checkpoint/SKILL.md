@@ -10,8 +10,8 @@ description: Cross-cutting checkpoint — renders an interim, client-facing HTML
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
-3. Resolve the checkpoint id (default and only wired value: `baseline`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist (for `baseline`: both `processes/_index.md` and `model/baselines.json`). Halt with a clear message naming whichever file is missing if not.
+3. Resolve the checkpoint id (wired values: `baseline`, `scope`). Look up its row in the Checkpoint Registry below.
+4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. Halt with a clear message naming whichever file is missing if not.
 
 ## Role in the system
 
@@ -23,11 +23,12 @@ It is **recommended-and-recorded**, not a hard gate: the keystone recommends inv
 
 ## Checkpoint Registry
 
-Only the `baseline` row is active. The table format anticipates Checkpoints 1 and 3 (future cycles).
+The `baseline` (Checkpoint 2) and `scope` (Checkpoint 1) rows are active. The table format anticipates Checkpoint 3 (future cycle).
 
 | id | Insert after | Audience | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|---|
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
+| `scope` | Phase 2 | Sponsor + decision-maker | `scope.md`, `context.md` | `section-renderer-checkpoint-scope` | `checkpoints/checkpoint-scope.html` | `checkpoints/CP-scope-outcome.md` | Phase 1 (`ai-process-assessment:scoping-engagement`) for scope-field changes; Phase 2 (`ai-process-assessment:mapping-context`) for context-field changes |
 
 ## Gate condition
 
@@ -53,17 +54,22 @@ Shell structure:
 <head> [<style> design-system CSS] [smooth-scroll JS helper] </head>
 <body>
   <nav class="sticky-nav">
-    <a href="#baselines" onclick="navScrollTo('baselines'); return false;">Baselines</a>
-    <a href="#validate"  onclick="navScrollTo('validate'); return false;">Validate</a>
+    [per-checkpoint anchors — see mapping below]
   </nav>
-  [masthead block — engagement name from scope.md, "Baseline Validation — Interim", date]
+  [masthead block — engagement name from scope.md, per-checkpoint label, date]
 
-  #baselines   ← section-renderer-checkpoint-baseline block 1
-  #validate    ← section-renderer-checkpoint-baseline block 2
+  [section blocks in anchor order — from the resolved checkpoint's renderer]
 
   <div class="doc-footer"> [confidentiality, preparer, "INTERIM — for stakeholder validation", date] </div>
 </body>
 ```
+
+The sticky nav and section blocks are per-checkpoint:
+
+- `baseline` → nav `Baselines` (`#baselines`), `Validate` (`#validate`); masthead label "Baseline Validation — Interim"; blocks `#baselines`, `#validate` from `section-renderer-checkpoint-baseline`.
+- `scope` → nav `Scope` (`#scope`), `Context` (`#context`), `Validate` (`#validate`); masthead label "Scope & Context Alignment — Interim"; blocks `#scope`, `#context`, `#validate` from `section-renderer-checkpoint-scope`.
+
+Assemble the sticky nav with one `<a href="#anchor" onclick="navScrollTo('anchor'); return false;">Label</a>` per the resolved checkpoint's anchors, in block order, then the masthead, then the section blocks in order, then the `.doc-footer`.
 
 The smooth-scroll helper is identical to the Phase 11 shell:
 
@@ -80,6 +86,7 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 
 - **Confirmed** → downstream phases may rely on the validated output. The terminal deliverable-gate and final deliverable may cite the sign-off.
 - **Changes Requested** → route to the registry's route-back phase (for `baseline`: Phase 4, `ai-process-assessment:discovering-processes`). Correct the source file(s) (`processes/PROC-NNN.md` / `model/baselines.json`) — **editing the source file is what refreshes the checkpoint, not the engine run**. Then regenerate the checkpoint from the corrected source(s). Finally, re-run `python -m engine.run <name>/` so downstream phases pick up the change. Append a new outcome record. Repeat until Confirmed.
+- **Changes Requested (`scope` checkpoint) — route per field:** a corrected **scope** field (sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints) routes to Phase 1 (`ai-process-assessment:scoping-engagement`); a corrected **context** field (business model, strategic priorities, maturity, funding, regulatory exposure) routes to Phase 2 (`ai-process-assessment:mapping-context`). A mixed outcome routes to both. Correct the source file(s) — editing the source is what refreshes the checkpoint — then regenerate `checkpoints/checkpoint-scope.html` and append a new outcome record. Repeat until Confirmed. (No engine run is involved at this checkpoint — there are no figures.)
 
 ## Phase checklist
 
