@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.11.0] — 2026-06-16
+
+### Added
+- **Checkpoint 1 — Scope & Context Alignment** (second checkpoint on the v2.10.0 pattern).
+  After Phase 2, the `building-checkpoint` skill (new `scope` registry row) renders
+  `checkpoints/checkpoint-scope.html` from `scope.md` + `context.md` so the sponsor and
+  decision-maker confirm the engagement framing — sponsoring question, decision-maker,
+  scope, success criteria, and the shareable strategic context — before tech inventory
+  (Phase 3) and discovery (Phase 4). Synthesis-only; PENDING for absent fields.
+- **`section-renderer-checkpoint-scope`** — data-driven renderer emitting `#scope`,
+  `#context`, `#validate`. **Renders only the shareable framing context** (business model,
+  strategic priorities, funding model) and **never exposes internal consultant assessments**
+  — the political landscape, the `Risk posture` cultural read, the AI-maturity self-assessment,
+  or org structure. A new guard (`test_scope_renderer_excludes_internal_context`) locks this in.
+
+### Changed
+- **`deliverable-gate` Checkpoint Mode** gains a `scope` case (Completeness + Evidence;
+  Determinism N/A — no figures yet). Terminal path unchanged.
+- **Per-field route-back:** a scope-field correction routes to Phase 1, a context-field
+  correction to Phase 2. Keystone + `system-prompt.md` recommend the scope checkpoint after
+  Phase 2 / before Phase 3 (recommended-and-recorded). Registered via the test allow-list
+  (no new skill; agent count 15 → 16).
+
 ## [2.10.0] — 2026-06-16
 
 ### Added
