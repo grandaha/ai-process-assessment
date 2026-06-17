@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -39,6 +39,12 @@ def create_app(engagement_dir) -> FastAPI:
     @app.get("/")
     def index() -> FileResponse:
         return FileResponse(WEB_DIR / "index.html")
+
+    @app.get("/favicon.ico")
+    def favicon() -> Response:
+        # The SPA ships no icon; answer the browser's automatic request with
+        # 204 No Content so it doesn't log a 404 on every page load.
+        return Response(status_code=204)
 
     @app.get("/api/events")
     async def events() -> StreamingResponse:

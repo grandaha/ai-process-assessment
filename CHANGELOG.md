@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.13.1] — 2026-06-17
+
+### Fixed
+- **Cockpit:** `/favicon.ico` now returns `204 No Content` instead of `404`. Browsers
+  request the favicon automatically on every page load; the SPA ships no icon, so the
+  404 was logged on each visit. The new route silences it. (+1 test, 33 total.)
+
 ## [2.13.0] — 2026-06-17
 
 ### Added
