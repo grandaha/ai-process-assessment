@@ -1,3 +1,5 @@
+import json
+
 from cockpit.state import read_state
 
 
@@ -69,6 +71,17 @@ def test_grc_required_when_non_green_flag(engagement):
     assert gates["grc"]["reason"] == "1 opportunity flagged Yellow/Red"
 
 
+def test_grc_required_plural_when_multiple_flags(engagement):
+    body = (
+        "| OPP-001 | PROC-001 | RPA | Yellow | Green | Yellow | None |\n"
+        "| OPP-002 | PROC-002 | Agentic | Yellow | Green | Red | None |\n"
+    )
+    root = engagement(**{"opportunities/_index.md": OPPS_HEADER + body})
+    gates = {g["id"]: g for g in read_state(root)["gates"]}
+    assert gates["grc"]["status"] == "required"
+    assert gates["grc"]["reason"] == "2 opportunities flagged Yellow/Red"
+
+
 def test_grc_done_when_grc_index_exists(engagement):
     body = "| OPP-002 | PROC-002 | Agentic | Yellow | Green | Red | None |\n"
     root = engagement(**{
@@ -89,9 +102,6 @@ def test_deliverable_gate_done_when_evidence_log_exists(engagement):
 def test_deliverable_gate_not_run_when_absent(engagement):
     gates = {g["id"]: g for g in read_state(engagement())["gates"]}
     assert gates["deliverable"]["status"] == "not-run"
-
-
-import json
 
 
 def test_model_results_none_when_absent(engagement):
