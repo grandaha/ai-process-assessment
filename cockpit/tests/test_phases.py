@@ -1,3 +1,7 @@
+import dataclasses
+
+import pytest
+
 from cockpit.phases import PHASES, GATES, Phase
 
 
@@ -32,8 +36,5 @@ def test_gates_present():
 
 def test_phase_is_frozen_dataclass():
     p = PHASES[0]
-    try:
+    with pytest.raises(dataclasses.FrozenInstanceError):
         p.id = "x"
-        assert False, "Phase should be immutable"
-    except Exception:
-        pass
