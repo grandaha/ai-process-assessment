@@ -35,7 +35,13 @@ def _phase_status(root: Path) -> list[dict]:
 
 
 def _count_non_green_grc(index_path: Path) -> int:
-    """Count opportunity rows whose GRC flag is Yellow or Red."""
+    """Count opportunity rows whose GRC flag is Yellow or Red.
+
+    Only the GRC column (index 5) gates: a Yellow/Red Feasibility or Data
+    Readiness flag does NOT trigger Gate A. This matches the methodology — the
+    GRC column is the governance/risk/compliance signal; the others are scoring
+    inputs handled in Phase 6.
+    """
     count = 0
     for line in index_path.read_text().splitlines():
         if not line.lstrip().startswith("|"):

@@ -52,6 +52,19 @@ def test_events_route_is_registered_as_event_stream(engagement):
     assert "/api/events" in routes
 
 
+def test_events_response_is_event_stream_content_type(engagement):
+    """The /api/events route builds a text/event-stream response.
+
+    Invoke the route's endpoint directly and inspect the StreamingResponse it
+    returns, rather than driving it through TestClient — the snapshot stream is
+    infinite and an HTTP round-trip would deadlock the client.
+    """
+    app = create_app(engagement("scope.md"))
+    route = next(r for r in app.routes if getattr(r, "path", None) == "/api/events")
+    response = anyio.run(route.endpoint)
+    assert response.media_type == "text/event-stream"
+
+
 def test_file_raw_serves_html(engagement):
     root = engagement(**{"deliverable.html": "<h1>Deck</h1>"})
     r = _client(root).get("/api/file-raw", params={"path": "deliverable.html"})
@@ -62,6 +75,15 @@ def test_file_raw_serves_html(engagement):
 
 def test_file_raw_rejects_traversal(engagement):
     r = _client(engagement()).get("/api/file-raw", params={"path": "../secret.md"})
+    assert r.status_code == 400
+
+
+def test_file_endpoint_rejects_symlink_escape(engagement, tmp_path):
+    root = engagement()
+    outside = tmp_path / "secret.md"
+    outside.write_text("secret")
+    (root / "link.md").symlink_to(outside)
+    r = _client(root).get("/api/file", params={"path": "link.md"})
     assert r.status_code == 400
 
 

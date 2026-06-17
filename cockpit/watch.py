@@ -11,7 +11,7 @@ from cockpit.state import read_state
 
 async def snapshot_events(engagement_dir):
     """Yield SSE 'data:' frames: the current snapshot, then one per filesystem change."""
-    root = Path(engagement_dir)
+    root = Path(engagement_dir).resolve()
     yield _frame(root)
     async for _changes in awatch(root):
         yield _frame(root)

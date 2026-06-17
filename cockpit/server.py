@@ -21,7 +21,7 @@ def _resolve_in_root(root: Path, path: str) -> Path:
     escapes the engagement folder, 404 if it is not an existing file.
     """
     target = (root / path).resolve()
-    if root not in target.parents and target != root:
+    if not target.is_relative_to(root):
         raise HTTPException(status_code=400, detail="path escapes engagement folder")
     if not target.is_file():
         raise HTTPException(status_code=404, detail="file not found")
@@ -41,7 +41,7 @@ def create_app(engagement_dir) -> FastAPI:
         return FileResponse(WEB_DIR / "index.html")
 
     @app.get("/api/events")
-    def events() -> StreamingResponse:
+    async def events() -> StreamingResponse:
         return StreamingResponse(
             snapshot_events(root), media_type="text/event-stream"
         )

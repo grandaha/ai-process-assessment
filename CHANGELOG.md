@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Engagement Cockpit — Slice 1 (read-only)** (`cockpit/`): a local single-page web
-  dashboard over one engagement folder. Shows live phase/gate status, the parsed
-  financial model, and every deliverable in one navigable place. Claude Code remains the
-  reasoning engine — this slice reads state and does not run Claude or edit files
-  (driving phases and editing-through-the-engine are Slices 2 and 3). Part of #53.
+  dashboard over one engagement folder. The board shows live phase/gate status and
+  renders every deliverable in one navigable place; the parsed financial model is exposed
+  in the snapshot API (UI rendering of the model is deferred to a later slice). Claude
+  Code remains the reasoning engine — this slice reads state and does not run Claude or
+  edit files (driving phases and editing-through-the-engine are Slices 2 and 3). Part of #53.
   - `cockpit/phases.py` encodes the methodology's 12-phase + 2-gate map as data (single
     source of truth: `skills/using-methodology/SKILL.md`).
   - `cockpit/state.py` — pure `read_state(engagement_dir)` snapshot builder: per-phase
