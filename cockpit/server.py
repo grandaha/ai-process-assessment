@@ -40,5 +40,14 @@ def create_app(engagement_dir) -> FastAPI:
             raise HTTPException(status_code=404, detail="file not found")
         return {"path": path, "content": target.read_text()}
 
+    @app.get("/api/file-raw")
+    def file_raw(path: str = Query(...)) -> FileResponse:
+        target = (root / path).resolve()
+        if root not in target.parents and target != root:
+            raise HTTPException(status_code=400, detail="path escapes engagement folder")
+        if not target.is_file():
+            raise HTTPException(status_code=404, detail="file not found")
+        return FileResponse(target)
+
     app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
     return app

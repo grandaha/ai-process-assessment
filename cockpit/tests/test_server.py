@@ -52,6 +52,14 @@ def test_events_route_is_registered_as_event_stream(engagement):
     assert "/api/events" in routes
 
 
+def test_file_raw_serves_html(engagement):
+    root = engagement(**{"deliverable.html": "<h1>Deck</h1>"})
+    r = _client(root).get("/api/file-raw", params={"path": "deliverable.html"})
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
+    assert "Deck" in r.text
+
+
 def test_snapshot_events_emits_initial_snapshot(engagement):
     """The SSE generator yields the current snapshot as its first frame.
 
