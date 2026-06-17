@@ -1,6 +1,10 @@
+import json as _json
+
+import anyio
 from fastapi.testclient import TestClient
 
 from cockpit.server import create_app
+from cockpit.watch import snapshot_events
 
 
 def _client(engagement_root):
@@ -37,13 +41,6 @@ def test_file_endpoint_404_for_missing(engagement):
 def test_file_endpoint_rejects_traversal(engagement):
     r = _client(engagement()).get("/api/file", params={"path": "../secret.md"})
     assert r.status_code == 400
-
-
-import json as _json
-
-import anyio
-
-from cockpit.watch import snapshot_events
 
 
 def test_events_route_is_registered_as_event_stream(engagement):

@@ -98,7 +98,7 @@ def _model_section(root: Path) -> dict:
     return {"results": results, "inputs_present": inputs_present}
 
 
-def read_state(engagement_dir) -> dict:
+def read_state(engagement_dir: Path | str) -> dict:
     root = Path(engagement_dir)
     phases = _phase_status(root)
     done = sum(1 for p in phases if p["status"] == "done")

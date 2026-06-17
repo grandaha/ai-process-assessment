@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     live as files land while phases run in the terminal.
   - `cockpit/web/` — dependency-free vanilla-JS phase-map board + deliverable reader.
   - `cockpit/__main__.py` — `python -m cockpit <engagement-folder> [--port 8765]`.
-  - 30 tests; new web deps (fastapi, uvicorn, watchfiles, httpx).
+  - 32 tests; new web deps (fastapi, uvicorn, watchfiles, httpx).
 
 ## [2.12.0] — 2026-06-16
 
