@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.13.0] — 2026-06-17
+
+### Added
+- **Engagement Cockpit — Slice 1 (read-only)** (`cockpit/`): a local single-page web
+  dashboard over one engagement folder. The board shows live phase/gate status and
+  renders every deliverable in one navigable place; the parsed financial model is exposed
+  in the snapshot API (UI rendering of the model is deferred to a later slice). Claude
+  Code remains the reasoning engine — this slice reads state and does not run Claude or
+  edit files (driving phases and editing-through-the-engine are Slices 2 and 3). Part of #53.
+  - `cockpit/phases.py` encodes the methodology's 12-phase + 2-gate map as data (single
+    source of truth: `skills/using-methodology/SKILL.md`).
+  - `cockpit/state.py` — pure `read_state(engagement_dir)` snapshot builder: per-phase
+    status (done/available/blocked) derived purely from file existence, GRC/deliverable
+    gate detection (GRC triggered by non-Green flags in `opportunities/_index.md`), and
+    parsed `model/results.json` + input presence.
+  - `cockpit/server.py` (FastAPI) — `/api/state`, `/api/file` + `/api/file-raw` (shared
+    traversal guard), `/api/events` (SSE), and the static SPA shell.
+  - `cockpit/watch.py` — `watchfiles`-backed async snapshot stream so the board updates
+    live as files land while phases run in the terminal.
+  - `cockpit/web/` — dependency-free vanilla-JS phase-map board + deliverable reader.
+  - `cockpit/__main__.py` — `python -m cockpit <engagement-folder> [--port 8765]`.
+  - 32 tests; new web deps (fastapi, uvicorn, watchfiles, httpx).
+
 ## [2.12.0] — 2026-06-16
 
 ### Added
