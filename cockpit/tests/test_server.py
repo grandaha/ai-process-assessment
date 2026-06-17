@@ -20,6 +20,11 @@ def test_state_endpoint_returns_snapshot(engagement):
     assert body["progress"]["done"] == 1
 
 
+def test_favicon_returns_no_content_not_404(engagement):
+    r = _client(engagement()).get("/favicon.ico")
+    assert r.status_code == 204
+
+
 def test_index_html_served_at_root(engagement):
     r = _client(engagement()).get("/")
     assert r.status_code == 200
