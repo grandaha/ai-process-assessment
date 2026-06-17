@@ -4,10 +4,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from cockpit.state import read_state
+from cockpit.watch import snapshot_events
 
 WEB_DIR = Path(__file__).parent / "web"
 
@@ -23,6 +24,12 @@ def create_app(engagement_dir) -> FastAPI:
     @app.get("/")
     def index() -> FileResponse:
         return FileResponse(WEB_DIR / "index.html")
+
+    @app.get("/api/events")
+    def events() -> StreamingResponse:
+        return StreamingResponse(
+            snapshot_events(root), media_type="text/event-stream"
+        )
 
     @app.get("/api/file")
     def file(path: str = Query(...)) -> dict:

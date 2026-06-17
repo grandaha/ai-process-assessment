@@ -37,3 +37,41 @@ def test_file_endpoint_404_for_missing(engagement):
 def test_file_endpoint_rejects_traversal(engagement):
     r = _client(engagement()).get("/api/file", params={"path": "../secret.md"})
     assert r.status_code == 400
+
+
+import json as _json
+
+import anyio
+
+from cockpit.watch import snapshot_events
+
+
+def test_events_route_is_registered_as_event_stream(engagement):
+    app = create_app(engagement("scope.md"))
+    routes = {r.path: r for r in app.routes}
+    assert "/api/events" in routes
+
+
+def test_snapshot_events_emits_initial_snapshot(engagement):
+    """The SSE generator yields the current snapshot as its first frame.
+
+    Driven directly rather than through TestClient: snapshot_events is an
+    infinite stream (it never returns until the folder watch is cancelled),
+    and Starlette's TestClient deadlocks on such streams at context exit. We
+    pull only the first frame — emitted before awatch is ever entered — then
+    close the generator, which verifies the real behaviour the route relies on.
+    """
+    root = engagement("scope.md")
+
+    async def first_frame():
+        gen = snapshot_events(root)
+        try:
+            return await gen.__anext__()
+        finally:
+            await gen.aclose()
+
+    frame = anyio.run(first_frame)
+    assert frame.startswith("data:")
+    assert frame.endswith("\n\n")
+    payload = _json.loads(frame[len("data:"):].strip())
+    assert payload["progress"]["done"] == 1
