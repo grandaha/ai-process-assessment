@@ -13,6 +13,21 @@ from cockpit.watch import snapshot_events
 WEB_DIR = Path(__file__).parent / "web"
 
 
+def _resolve_in_root(root: Path, path: str) -> Path:
+    """Resolve a request path against the engagement root, refusing escapes.
+
+    Single source of truth for the file-serving guard so the two file routes
+    cannot drift apart on this security-critical check. Raises 400 if the path
+    escapes the engagement folder, 404 if it is not an existing file.
+    """
+    target = (root / path).resolve()
+    if root not in target.parents and target != root:
+        raise HTTPException(status_code=400, detail="path escapes engagement folder")
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="file not found")
+    return target
+
+
 def create_app(engagement_dir) -> FastAPI:
     root = Path(engagement_dir).resolve()
     app = FastAPI(title="Engagement Cockpit")
@@ -33,21 +48,12 @@ def create_app(engagement_dir) -> FastAPI:
 
     @app.get("/api/file")
     def file(path: str = Query(...)) -> dict:
-        target = (root / path).resolve()
-        if root not in target.parents and target != root:
-            raise HTTPException(status_code=400, detail="path escapes engagement folder")
-        if not target.is_file():
-            raise HTTPException(status_code=404, detail="file not found")
+        target = _resolve_in_root(root, path)
         return {"path": path, "content": target.read_text()}
 
     @app.get("/api/file-raw")
     def file_raw(path: str = Query(...)) -> FileResponse:
-        target = (root / path).resolve()
-        if root not in target.parents and target != root:
-            raise HTTPException(status_code=400, detail="path escapes engagement folder")
-        if not target.is_file():
-            raise HTTPException(status_code=404, detail="file not found")
-        return FileResponse(target)
+        return FileResponse(_resolve_in_root(root, path))
 
     app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
     return app

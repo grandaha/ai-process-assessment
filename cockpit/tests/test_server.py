@@ -60,6 +60,11 @@ def test_file_raw_serves_html(engagement):
     assert "Deck" in r.text
 
 
+def test_file_raw_rejects_traversal(engagement):
+    r = _client(engagement()).get("/api/file-raw", params={"path": "../secret.md"})
+    assert r.status_code == 400
+
+
 def test_snapshot_events_emits_initial_snapshot(engagement):
     """The SSE generator yields the current snapshot as its first frame.
 
