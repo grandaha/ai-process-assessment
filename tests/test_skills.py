@@ -10,6 +10,7 @@ ALLOWLIST_NON_PHASE = {
     "ai-process-assessment:running-sample-engagement",
     "ai-process-assessment:generating-sample-intake",
     "ai-process-assessment:building-checkpoint",
+    "ai-process-assessment:conducting-engagement",
 }
 
 
@@ -44,5 +45,5 @@ def test_no_orphan_skills(methodology):
 
 
 def test_skill_count(methodology):
-    # 14 phase skills + 4 allow-listed non-phase skills.
-    assert len(methodology.skills) == 18
+    # 14 phase skills + 5 allow-listed non-phase skills (incl. the conductor).
+    assert len(methodology.skills) == 19
