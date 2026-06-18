@@ -1,4 +1,4 @@
-from cockpit.staleness import hash_inputs, changed_inputs
+from state.staleness import hash_inputs, changed_inputs
 
 
 def test_hash_inputs_only_includes_present_files(engagement):

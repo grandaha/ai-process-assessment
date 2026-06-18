@@ -6,7 +6,7 @@ import sys
 def test_module_is_runnable(engagement):
     root = engagement("scope.md")
     proc = subprocess.run(
-        [sys.executable, "-m", "cockpit.state", str(root)],
+        [sys.executable, "-m", "state.state", str(root)],
         capture_output=True, text=True,
     )
     assert proc.returncode == 0, proc.stderr
@@ -16,7 +16,7 @@ def test_module_is_runnable(engagement):
 
 def test_missing_folder_exits_nonzero(tmp_path):
     proc = subprocess.run(
-        [sys.executable, "-m", "cockpit.state", str(tmp_path / "nope")],
+        [sys.executable, "-m", "state.state", str(tmp_path / "nope")],
         capture_output=True, text=True,
     )
     assert proc.returncode != 0

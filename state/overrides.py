@@ -6,7 +6,7 @@ turns real override rows into satisfied phases so downstream phases unblock.
 """
 from __future__ import annotations
 
-from cockpit.phases import PHASES
+from state.phases import PHASES
 
 _PLACEHOLDERS = ("<", "e.g.,", "fill in")
 

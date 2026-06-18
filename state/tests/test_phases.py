@@ -2,7 +2,7 @@ import dataclasses
 
 import pytest
 
-from cockpit.phases import PHASES, GATES, Phase
+from state.phases import PHASES, GATES, Phase
 
 
 def test_twelve_phases_in_methodology_order():

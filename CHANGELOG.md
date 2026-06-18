@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.16.0] — 2026-06-18
+
+### Changed
+- **Renamed the `cockpit/` package to `state/`.** With the dashboard gone (#73),
+  "cockpit" was a misnomer — the package is just the methodology's deterministic
+  state layer (`phases`, `state`, `staleness`, `overrides`, `conductor_state`).
+  Renamed for honesty; kept as a top-level package separate from `engine/` (which
+  owns the deterministic-math layer) since the two are distinct concerns. Updated
+  the `conducting-engagement` skill commands (`python -m state.state`,
+  `from state.conductor_state import ...`, etc.), `pytest.ini` testpaths, its
+  regression guard, and all intra-package and test imports. No functional change;
+  full suite green. (#74)
+
 ## [2.15.0] — 2026-06-18
 
 ### Removed

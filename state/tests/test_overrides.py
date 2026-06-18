@@ -1,5 +1,5 @@
-from cockpit.overrides import parse_overrides, reconcile
-from cockpit.state import read_state
+from state.overrides import parse_overrides, reconcile
+from state.state import read_state
 
 
 REAL = (

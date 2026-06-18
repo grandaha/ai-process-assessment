@@ -34,7 +34,7 @@ magic phrase required.
 4. **Stamp `.conductor.md`** with `register`, `autonomy.should_confirm`,
    `methodology_version` (read from `.claude-plugin/plugin.json`), and empty
    `open_decisions` / `deferred_processes`. Use:
-   `python -c "from cockpit.conductor_state import write_conductor; ..."`.
+   `python -c "from state.conductor_state import write_conductor; ..."`.
 
 ## The drive loop
 
@@ -42,8 +42,8 @@ Repeat until Phase 11 is done and Gate B is cleared:
 
 0. **Resolve the active engagement:** the folder containing a `.conductor.md` whose work
    is incomplete. None → run Intake. More than one incomplete → ask which.
-1. **Read state:** `python -m cockpit.state <folder>` → JSON snapshot.
-2. **Reconcile overrides:** apply `cockpit.overrides.parse_overrides(CLAUDE.md)` +
+1. **Read state:** `python -m state.state <folder>` → JSON snapshot.
+2. **Reconcile overrides:** apply `state.overrides.parse_overrides(CLAUDE.md)` +
    `reconcile(...)` so authorized skips don't block. An override row only fires if its
    Override cell contains the phase's output filename (e.g. `context.md`) or skill dir
    name (e.g. `mapping-context`); a row that names the phase only in prose is silently
@@ -51,14 +51,14 @@ Repeat until Phase 11 is done and Gate B is cleared:
    token, surface it and ask the human to add it (must-ask) — never proceed as if the
    phase were unskipped.
 3. **Check staleness:** load `model_input_hashes` from `.conductor.md`; if
-   `cockpit.staleness.changed_inputs(folder, recorded)` is non-empty, a model input
+   `state.staleness.changed_inputs(folder, recorded)` is non-empty, a model input
    changed — re-run the engine and re-drive the affected portfolio phases forward
    (see "Staleness" below) before doing anything else.
 4. **Pick the next step:** the first phase whose status is `available`/`overridden`.
    Respect the convergence gate (below) before any portfolio phase.
 5. **Gather gaps, then execute** per the execution model below.
 6. **After a step that wrote a `model/*.json` input,** run `python -m engine.run <folder>/`
-   then `cockpit.conductor_state.record_input_hashes(folder)`.
+   then `state.conductor_state.record_input_hashes(folder)`.
 7. **At a checkpoint insertion point** (per the `building-checkpoint` registry: after
    Phase 2 `scope`, Phase 4 `baseline`, Phase 7 `portfolio`): offer to generate it
    (should-confirm); its stakeholder **outcome** is must-ask.
