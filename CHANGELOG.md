@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.14.0] — 2026-06-18
+
+### Added
+- **Engagement Conductor (Slice 1 — Drive).** A new `conducting-engagement` skill turns the
+  methodology into an AI-first product: a long-lived supervisor that derives state from the
+  engagement folder, interviews only for gaps, dispatches phases, runs the deterministic
+  engine, and stops only at genuine human touchpoints. It honors `using-methodology` as the
+  rulebook — no phase-skipping, no arithmetic in prose. Serves both a consultant and an
+  untrained operator from one product; the driver adapts (register + autonomy), not the user.
+  (Epic #58.)
+- **Cockpit helper modules backing the Conductor:**
+  - `python -m cockpit.state <folder>` — one-shot JSON state snapshot CLI. (#60)
+  - `cockpit/staleness.py` — content-hash (SHA-256) staleness detection over `model/*.json`
+    inputs, chosen over mtime because the repo lives in a sync-managed folder. (#61)
+  - `cockpit/overrides.py` — reconciles a state snapshot with authorized CLAUDE.md
+    Methodology Overrides; fail-closed on placeholder/incomplete rows. (#62)
+  - `cockpit/conductor_state.py` — typed read/write of the Conductor's private
+    `.conductor.md` (register, autonomy, version stamp, deferred processes, input hashes). (#63)
+
+### Fixed
+- **CI gate gap:** `pytest -q` now collects `cockpit/tests` (added to `testpaths` with a
+  regression guard). The 33-test cockpit suite was previously never run in CI. (#59)
+
+### Changed
+- **Conductor skill:** override rows must name a phase by its output filename or skill dir
+  token to take effect; the skill now instructs the driver to surface prose-only override
+  rows as a must-ask rather than silently ignoring them.
+
 ## [2.13.1] — 2026-06-17
 
 ### Fixed
