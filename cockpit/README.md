@@ -1,22 +1,24 @@
-# Engagement Cockpit (Slice 1 — read-only)
+# Cockpit — engagement state helpers
 
-A local dashboard over a single engagement folder. Shows live phase/gate status,
-the parsed financial model, and every deliverable in one place. Read-only: it does
-not run Claude or edit files (those are Slice 2 and Slice 3).
+The state layer the `conducting-engagement` Conductor depends on. Pure, file-derived
+helpers that read an engagement folder and report where the methodology stands. No
+web server, no UI — the Conductor reads state and narrates it conversationally.
 
-## Run
+## Modules
 
-    pip install -r requirements.txt
-    python -m cockpit path/to/engagement-folder --port 8765
+- `state.py` — derives phase/gate status purely from file existence, using the
+  methodology's phase map (`skills/using-methodology/SKILL.md`). A pure function of
+  the folder. Run as a CLI for a one-shot JSON snapshot:
 
-Open http://127.0.0.1:8765.
+      python -m cockpit.state path/to/engagement-folder
 
-## How it works
-
-Phase status is derived purely from file existence, using the methodology's phase
-map (`skills/using-methodology/SKILL.md`). The backend (`cockpit/state.py`) is a
-pure function of the folder; the server watches the folder and pushes updates over
-SSE. See `docs/superpowers/specs/2026-06-16-engagement-cockpit-design.md`.
+- `phases.py` — the phase/gate map that `state.py` reads.
+- `staleness.py` — content-hash (SHA-256) staleness detection over `model/*.json`
+  inputs (hash, not mtime, because the repo lives in a sync-managed folder).
+- `overrides.py` — reconciles a state snapshot with authorized CLAUDE.md Methodology
+  Overrides; fail-closed on placeholder/incomplete rows.
+- `conductor_state.py` — typed read/write of the Conductor's private `.conductor.md`
+  (register, autonomy, version stamp, deferred processes, input hashes).
 
 ## Test
 
