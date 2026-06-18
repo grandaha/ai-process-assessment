@@ -1,4 +1,4 @@
-from cockpit.conductor_state import (
+from state.conductor_state import (
     read_conductor, write_conductor, record_input_hashes, CONDUCTOR_FILE,
 )
 

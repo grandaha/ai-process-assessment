@@ -1,6 +1,6 @@
 """Pure snapshot builder: an engagement folder -> a state dict.
 
-No Claude, no network, no mutation. The cockpit's correctness lives here, so it is
+No Claude, no network, no mutation. The state layer's correctness lives here, so it is
 a pure function of the filesystem and the encoded phase map.
 """
 from __future__ import annotations
@@ -10,7 +10,7 @@ import json
 import sys
 from pathlib import Path
 
-from cockpit.phases import GATES, MODEL_INPUTS, PHASES
+from state.phases import GATES, MODEL_INPUTS, PHASES
 
 
 def _phase_status(root: Path) -> list[dict]:
@@ -115,7 +115,7 @@ def read_state(engagement_dir: Path | str) -> dict:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="cockpit.state")
+    parser = argparse.ArgumentParser(prog="state.state")
     parser.add_argument("engagement", type=Path, help="path to the engagement folder")
     args = parser.parse_args(argv)
     if not args.engagement.is_dir():

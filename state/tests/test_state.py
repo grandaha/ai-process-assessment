@@ -1,6 +1,6 @@
 import json
 
-from cockpit.state import read_state
+from state.state import read_state
 
 
 def test_empty_engagement_only_phase1_available(engagement):

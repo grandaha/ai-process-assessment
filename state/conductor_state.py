@@ -1,9 +1,9 @@
 """Read/write the Conductor's private state file, <engagement>/.conductor.md.
 
 Interaction context only — never engagement content. Content state is always
-derived from the engagement files via cockpit.state.read_state(); this file holds
+derived from the engagement files via state.state.read_state(); this file holds
 register, autonomy, version stamp, deferred processes, and the model-input hashes
-that power staleness detection (cockpit.staleness).
+that power staleness detection (state.staleness).
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-from cockpit.staleness import hash_inputs
+from state.staleness import hash_inputs
 
 CONDUCTOR_FILE = ".conductor.md"
 

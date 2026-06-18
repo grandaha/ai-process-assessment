@@ -1,4 +1,4 @@
-# Cockpit — engagement state helpers
+# State — engagement state helpers
 
 The state layer the `conducting-engagement` Conductor depends on. Pure, file-derived
 helpers that read an engagement folder and report where the methodology stands. No
@@ -10,7 +10,7 @@ web server, no UI — the Conductor reads state and narrates it conversationally
   methodology's phase map (`skills/using-methodology/SKILL.md`). A pure function of
   the folder. Run as a CLI for a one-shot JSON snapshot:
 
-      python -m cockpit.state path/to/engagement-folder
+      python -m state.state path/to/engagement-folder
 
 - `phases.py` — the phase/gate map that `state.py` reads.
 - `staleness.py` — content-hash (SHA-256) staleness detection over `model/*.json`
@@ -22,4 +22,4 @@ web server, no UI — the Conductor reads state and narrates it conversationally
 
 ## Test
 
-    pytest cockpit/
+    pytest state/

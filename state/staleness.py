@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from cockpit.phases import MODEL_INPUTS
+from state.phases import MODEL_INPUTS
 
 
 def hash_inputs(root: Path) -> dict[str, str]:
