@@ -44,7 +44,12 @@ Repeat until Phase 11 is done and Gate B is cleared:
    is incomplete. None → run Intake. More than one incomplete → ask which.
 1. **Read state:** `python -m cockpit.state <folder>` → JSON snapshot.
 2. **Reconcile overrides:** apply `cockpit.overrides.parse_overrides(CLAUDE.md)` +
-   `reconcile(...)` so authorized skips don't block.
+   `reconcile(...)` so authorized skips don't block. An override row only fires if its
+   Override cell contains the phase's output filename (e.g. `context.md`) or skill dir
+   name (e.g. `mapping-context`); a row that names the phase only in prose is silently
+   ignored. If a Methodology Overrides row clearly intends a phase but carries no such
+   token, surface it and ask the human to add it (must-ask) — never proceed as if the
+   phase were unskipped.
 3. **Check staleness:** load `model_input_hashes` from `.conductor.md`; if
    `cockpit.staleness.changed_inputs(folder, recorded)` is non-empty, a model input
    changed — re-run the engine and re-drive the affected portfolio phases forward
