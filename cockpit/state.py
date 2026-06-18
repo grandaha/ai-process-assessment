@@ -5,7 +5,9 @@ a pure function of the filesystem and the encoded phase map.
 """
 from __future__ import annotations
 
+import argparse
 import json
+import sys
 from pathlib import Path
 
 from cockpit.phases import GATES, MODEL_INPUTS, PHASES
@@ -110,3 +112,18 @@ def read_state(engagement_dir: Path | str) -> dict:
         "gates": _gate_status(root),
         "model": _model_section(root),
     }
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(prog="cockpit.state")
+    parser.add_argument("engagement", type=Path, help="path to the engagement folder")
+    args = parser.parse_args(argv)
+    if not args.engagement.is_dir():
+        print(f"not a directory: {args.engagement}", file=sys.stderr)
+        return 2
+    print(json.dumps(read_state(args.engagement), indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
