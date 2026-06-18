@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.15.0] — 2026-06-18
+
+### Removed
+- **Cockpit dashboard layer.** Deleted the FastAPI web view over an engagement
+  folder (`cockpit/server.py`, `cockpit/watch.py`, `cockpit/__main__.py`,
+  `cockpit/web/`, `cockpit/tests/test_server.py`). The `conducting-engagement`
+  Conductor (v2.14.0, #58) makes it redundant — the AI derives and narrates state
+  conversationally, so the passive dashboard added cost without a consumer (nothing
+  imported it). (#73)
+- **Heaviest runtime dependencies.** Dropped `fastapi`, `uvicorn`, `watchfiles`,
+  `httpx`, and `anyio` from `requirements.txt` (used only by the deleted dashboard).
+  Leaves `pytest`, `pyyaml`, `openpyxl`, `formulas`. (#73)
+
+### Changed
+- **Cockpit is now the state layer, not a control surface.** The package keeps only
+  the load-bearing helpers the Conductor depends on (`state.py`, `phases.py`,
+  `staleness.py`, `overrides.py`, `conductor_state.py`); `README.md` and the package
+  docstring rewritten accordingly. Helper test suite unchanged and green. (#73)
+
 ## [2.14.0] — 2026-06-18
 
 ### Added

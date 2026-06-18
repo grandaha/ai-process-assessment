@@ -1,1 +1,1 @@
-"""Engagement Cockpit — local read-only control surface over an engagement folder."""
+"""Cockpit — engagement state helpers backing the conducting-engagement Conductor."""
