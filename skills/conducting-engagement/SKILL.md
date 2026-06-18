@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:conducting-engagement
-description: Front door and autonomous driver — on a natural-language request ("help me find AI opportunities", "assess this client/team"), drives the full 11-phase methodology end-to-end: derives state from the engagement folder, interviews only for gaps, dispatches phases, runs the engine, and stops only at genuine human-decision points. Honors using-methodology as the rulebook.
+description: Front door and autonomous driver — on a natural-language request ("help me find AI opportunities", "assess this client/team"), drives the full 11-phase methodology end-to-end — derives state from the engagement folder, interviews only for gaps, dispatches phases, runs the engine, and stops only at genuine human-decision points. Honors using-methodology as the rulebook.
 ---
 
 # Conducting an Engagement
