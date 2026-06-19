@@ -15,6 +15,8 @@ def test_build_results_matches_golden():
     assert res["costs"]["OPP-001"]["rom"] == {"low": 155_250.0, "high": 465_750.0}
     assert res["costs"]["OPP-001"]["rom_label"] == "ROM estimate, AACE Class 5 (±50%)"
     assert res["wave1_aggregate"]["investment"] == {"low": 227_700.0, "high": 683_100.0}
+    # Point estimate = sum of member totals (310,500 + 144,900); midpoint of the band.
+    assert res["wave1_aggregate"]["investment_point"] == 455_400.0
     assert res["wave1_aggregate"]["payback_years"] == {"low": 0.30, "high": 1.37}
 
 

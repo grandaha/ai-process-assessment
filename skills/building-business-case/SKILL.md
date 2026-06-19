@@ -25,7 +25,7 @@ Phase 9 performs **no arithmetic in prose** and **writes no input files**. Every
 
 1. **Verify the inputs exist — do not create or re-write them.** Confirm `model/value.json`, `model/costs.json`, `model/initiatives.json`, `model/baselines.json`, and `model/scores.json` are present in the engagement folder. If any is missing, halt and name the owning phase that must produce it (value → Phase 5; costs → Phase 8.5; initiatives → Phase 7; baselines → Phase 4; scores → Phase 6). Do not transcribe figures from prose into a missing file — return to the owning phase. A figure recorded as `null` in an existing file is expected (it renders PENDING); a missing *file* is a gate failure.
 2. **Run the engine:** `python -m engine.run <engagement-folder>/`. This reads the input files, writes `model/results.json`, and produces `financial-model.xlsx` (the CFO-facing workbook is a Phase 9 deliverable).
-3. Populate every figure in `business-case.md` by citing `results.json` (per-initiative `costs.*.rom`, `value.*`, and `wave1_aggregate.investment` / `value` / `payback_years`). The ROM label `AACE Class 5 (±50%)` comes from `results.json` `rom_label`.
+3. Populate every figure in `business-case.md` by citing `results.json` (per-initiative `costs.*.rom`, `value.*`, and `wave1_aggregate.investment` / `investment_point` / `value` / `payback_years`). The ROM label `AACE Class 5 (±50%)` comes from `results.json` `rom_label`.
 4. Any `results.json` value equal to `"PENDING"` renders as **PENDING** in the business case with a note on what input is missing — never a fabricated number.
 
 ## Role in the system
@@ -63,7 +63,7 @@ The file contains exactly these sections, in this order:
 1. **Wave 1 Scope** — number of initiatives, horizon, one-sentence total scope statement
 2. **Per-initiative cost structure** — one block per Wave 1 initiative (see format below)
 3. **Per-initiative value case** — one block per Wave 1 initiative (see format below)
-4. **Wave 1 Aggregate** — total investment range, total value range, rough payback horizon
+4. **Wave 1 Aggregate** — total investment range *and* the central point estimate, total value range, rough payback horizon. The point estimate is `model/results.json` `wave1_aggregate.investment_point` (the engine's sum of the member initiative totals); **cite it — never add the per-initiative totals together in prose** (that free-floating sum is an arithmetic-in-prose defect the deliverable-gate blocks on). State the ROM band from `wave1_aggregate.investment` and the central figure from `wave1_aggregate.investment_point` side by side.
 5. **Key Assumptions** — every assumption stated explicitly, labeled as assumption
 6. **What Would Tighten This Estimate** — missing data items, required vendor quotes, internal rates needed
 7. **ROM Accuracy** — AACE Class 5 ±50% by default; tighten to ±20–30% only if internal actuals from a `cost-actuals.md` file are present

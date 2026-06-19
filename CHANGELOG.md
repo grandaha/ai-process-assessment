@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.17.0] — 2026-06-19
+
+### Added
+- **Engine: `wave1_aggregate.investment_point`** (#82) — a deterministic Wave-1
+  central investment estimate (sum of member initiative totals; PENDING if any
+  member is PENDING), sitting at the midpoint of the ±50% ROM band. Gives the
+  business case a sourced point total to cite instead of summing initiative totals
+  in prose — the arithmetic-in-prose defect the deliverable-gate blocks on.
+  `building-business-case` now cites it and explicitly forbids the prose sum.
+
+### Fixed
+- **GRC-gate skill index Bash used a read-only `status` variable** (#78) — `status`
+  is read-only in zsh (alias of `$?`), so `grc/_index.md` generation errored on zsh
+  hosts. Renamed the loop variable.
+
+### Changed
+- **`conducting-engagement`: documented the venv/deps prerequisite** (#79) — the
+  state helpers import `pyyaml` and the engine imports `openpyxl`/`formulas`; a bare
+  `python3` without them fails at first contact. Added a one-time setup note.
+- **`conducting-engagement`: explicit pre-Phase-6 gate check** (#80) — per-phase
+  status is gate-independent; the drive loop now spells out that Gate A is signalled
+  in the `state.state` `gates` array (not `phases`) and must be consulted before any
+  portfolio phase.
+- **`identifying-opportunities`: documented the value-model unit convention** (#81)
+  — the engine does not annualize; `rate` must carry the period + per-unit dollar
+  basis. Added the FTE-effort and per-transaction recipes with a worked example.
+- **Sample: added a PROC-07 (forecasting/EAC) operator walkthrough** (#83) to
+  `interview-notes.md` — previously the only process without a dedicated Round-2
+  operator section. Baseline figures unchanged.
+
+_All six items surfaced by the #65 end-to-end Conductor validation._
+
 ## [2.16.0] — 2026-06-18
 
 ### Changed

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from engine.compute import (
     AACE_CLASS5_LABEL, cost_structure, initiative_rom, payback,
-    score_composite, value_range, wave1_aggregate,
+    score_composite, value_range, wave1_aggregate, wave1_point,
 )
 from engine.model import PENDING, Range, load_inputs
 from engine.workbook import write_workbook
@@ -36,11 +36,13 @@ def build_results(model_dir) -> dict:
 
     costs = {}
     rom_by_opp = {}
+    total_by_opp = {}
     for opp, c in inp.costs.items():
         cb = cost_structure(c.labor_hours, c.labor_rate, c.tech_cost,
                             c.integration_cost, c.change_mgmt_pct, c.contingency_pct)
         rom = initiative_rom(cb)
         rom_by_opp[opp] = rom
+        total_by_opp[opp] = PENDING if cb == PENDING else cb.total
         if cb == PENDING:
             costs[opp] = {"total": PENDING, "rom": PENDING, "rom_label": AACE_CLASS5_LABEL}
         else:
@@ -52,6 +54,7 @@ def build_results(model_dir) -> dict:
             }
 
     investment = wave1_aggregate([rom_by_opp.get(o, PENDING) for o in wave1])
+    investment_point = wave1_point([total_by_opp.get(o, PENDING) for o in wave1])
     value_ranges = []
     for o in wave1:
         vr = value.get(o, PENDING)
@@ -73,6 +76,7 @@ def build_results(model_dir) -> dict:
         },
         "wave1_aggregate": {
             "investment": _range_out(investment),
+            "investment_point": investment_point,
             "value": _range_out(annual_value),
             "payback_years": _range_out(pb),
         },

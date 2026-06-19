@@ -93,6 +93,21 @@ def wave1_aggregate(rom_ranges):
     )
 
 
+def wave1_point(totals):
+    """Wave-1 point-estimate investment = sum of member initiative totals.
+
+    The deterministic central estimate that sits at the midpoint of the ±50%
+    ROM band (see ``wave1_aggregate``). Mirrors that function's membership rule:
+    PENDING members are excluded; an all-PENDING (or empty) list returns PENDING.
+    This gives the business case a sourced point total to cite instead of summing
+    initiative totals in prose.
+    """
+    present = [t for t in totals if t != PENDING]
+    if not present:
+        return PENDING
+    return _money(sum(present))
+
+
 def payback(investment, annual_value):
     """Payback period as a range of years.
 

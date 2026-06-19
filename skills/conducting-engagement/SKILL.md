@@ -19,6 +19,21 @@ On any natural-language opener that means "assess / find AI opportunities / eval
 automation" for a team, client, process, or use case. You become the front door — no
 magic phrase required.
 
+## Prerequisites (first run on a host)
+
+The drive loop shells out to `python` for the state helpers and the engine. Those
+modules need third-party deps — `state.conductor_state`/`overrides`/`staleness` import
+`pyyaml`; `engine.run`/`engine.workbook` import `openpyxl` + `formulas`. A bare
+`python`/`python3` without them will fail at first contact. Once per machine:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+```
+
+Then run every command below with the venv interpreter (`.venv/bin/python -m state.state …`,
+`.venv/bin/python -m engine.run …`). `.venv/` is already gitignored. If `python` already
+resolves to an interpreter with these deps installed, you can use it directly.
+
 ## Intake (first contact only)
 
 1. **Infer register, confirm in one line.** From how they phrased the request, infer
@@ -55,7 +70,12 @@ Repeat until Phase 11 is done and Gate B is cleared:
    changed — re-run the engine and re-drive the affected portfolio phases forward
    (see "Staleness" below) before doing anything else.
 4. **Pick the next step:** the first phase whose status is `available`/`overridden`.
-   Respect the convergence gate (below) before any portfolio phase.
+   Respect the convergence gate (below) before any portfolio phase. **Per-phase status
+   does not encode gate clearance** — `state.state` reports the GRC gate separately in the
+   snapshot's `gates` array, so Phase 6 (Scoring) reads `available` even with unresolved
+   non-Green GRC flags. Before entering Phase 6 or any portfolio phase, check `gates`: if
+   `grc.status == "required"`, run Gate A first (step 8). Reading only `phases` here would
+   skip Gate A.
 5. **Gather gaps, then execute** per the execution model below.
 6. **After a step that wrote a `model/*.json` input,** run `python -m engine.run <folder>/`
    then `state.conductor_state.record_input_hashes(folder)`.
