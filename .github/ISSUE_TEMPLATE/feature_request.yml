@@ -1,0 +1,50 @@
+name: Feature request
+description: Suggest an improvement to the methodology, engine, agents, or skills.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Good feature requests explain the problem first, not just the solution. What are you trying to do, and why does the current methodology not support it?
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the gap or friction you're hitting during an engagement.
+      placeholder: "Example: When an opportunity spans multiple processes, there is no structured way to record that relationship in the opportunity file."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you address it? Be as concrete or as high-level as fits.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: What workarounds have you tried or considered?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the plugin does this touch?
+      options:
+        - Methodology / skill files
+        - Agent prompts
+        - Deterministic math engine
+        - Tests
+        - Documentation
+        - CI / release automation
+        - Other
+      multiple: true
+    validations:
+      required: false
