@@ -61,9 +61,9 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
   for f in <name>/grc/OPP-*.md; do
     header=$(grep "^<!-- index:" "$f" | head -1)
     id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
-    status=$(echo "$header" | grep -o 'status=[^ >]*' | cut -d= -f2)
+    gstatus=$(echo "$header" | grep -o 'status=[^ >]*' | cut -d= -f2)  # not 'status': read-only in zsh
     cond=$(echo "$header" | grep -o 'conditions=[^ >]*' | cut -d= -f2)
-    echo "| $id | $status | $cond |" >> <name>/grc/_index.md
+    echo "| $id | $gstatus | $cond |" >> <name>/grc/_index.md
   done
   ```
   Verify: `ls <name>/grc/OPP-*.md | wc -l`

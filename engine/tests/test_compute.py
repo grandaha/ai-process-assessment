@@ -86,6 +86,20 @@ def test_wave1_aggregate_empty_list_is_pending():
     assert wave1_aggregate([]) == PENDING
 
 
+from engine.compute import wave1_point
+
+
+def test_wave1_point_sums_member_totals():
+    # Point estimate = sum of member totals; equals the midpoint of the ±50% band.
+    assert wave1_point([310_500.0, 144_900.0]) == 455_400.0
+
+
+def test_wave1_point_skips_pending_members_but_empty_is_pending():
+    assert wave1_point([PENDING, PENDING]) == PENDING
+    assert wave1_point([]) == PENDING
+    assert wave1_point([310_500.0, PENDING]) == 310_500.0
+
+
 from engine.compute import payback
 
 

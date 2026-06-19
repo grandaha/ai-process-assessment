@@ -199,6 +199,32 @@ Captured across Sofia (approver) in Round 2 and Greg (finance) above; consultant
 
 **Sofia's operator view (from her 05-12 interview):** "Honestly most timesheets are fine. Maybe **5%** need a fix when I approve them." *(Conflict C: contradicts the 18% Polaris audit Greg cites.)*
 
+## PROC-07 — Project Financial Forecasting (EAC)
+
+**Participant:** Sofia Reyes, Senior Project Manager — **2026-05-12** — Topics: EAC update walkthrough, data sources, effort, accuracy (continued from her PROC-03 interview).
+
+**Trigger:** Monthly forecasting cadence (and ad hoc when a project's burn looks off); each active project produces an updated Estimate-at-Completion.
+
+**Steps as actually executed:**
+1. PM pulls actuals-to-date (hours burned, expenses) from **Polaris**.
+2. PM pulls revenue/cost recognized from **NetSuite** — but only month-end close is trustworthy, so mid-month the PM falls back to a **personal spreadsheet tracker** to approximate intra-month position.
+3. PM estimates remaining effort (ETC) per workstream from memory and the plan.
+4. PM computes EAC (actuals + ETC) and compares to budget/SOW to flag margin erosion.
+5. PM updates the forecast in Polaris and surfaces material variances in the status report / to the practice lead.
+
+**Decision points:** ETC judgment per workstream (how much work is really left), whether a variance is signal or noise, when to escalate a margin slip.
+
+**Exceptions:** scope changes mid-engagement, fixed-fee milestone timing, late-landing expenses, projects where the PM distrusts the NetSuite number and forecasts entirely off the personal tracker.
+
+**Baseline (Sofia, estimated from the PM forecasting cadence):**
+- **Volume:** ~**180 EAC updates/month** (≈ one per active project).
+- **Cycle time (effort):** **median 3 hours** per project forecast, **P90 1.5 business days** for complex multi-workstream projects.
+- **Error/exception rate:** **28% of forecasts are off by more than 10%** by the time the project closes *(matches Marcus's R3 figure — see below)*.
+- **FTE effort:** ~**3.0 FTE-equivalent** of PM time across the portfolio.
+- **Source confidence:** Medium (EAC update counts from Polaris; accuracy from Marcus's close-variance figure; effort is Sofia's estimate).
+
+Sofia: "The forecast is only as good as my intra-month number, and I don't trust it until close. So I keep my own sheet, which means the 'official' forecast and my real one drift. By the time NetSuite tells the truth at close, the margin's already gone — it's a visibility problem, not a math problem."
+
 ---
 
 # ROUND 3 — Adjacent (upstream / downstream)
