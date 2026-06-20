@@ -96,13 +96,14 @@ def main(argv=None):
     if "--no-workbook" not in flags:
         try:
             from engine.workbook import write_workbook
-            write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
         except ImportError:
             print(
                 "note: openpyxl not available — skipped financial-model.xlsx "
                 "(every number is in model/results.json)",
                 file=sys.stderr,
             )
+        else:
+            write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
     return 0
 
 

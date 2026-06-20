@@ -45,7 +45,7 @@ from engine.run import main
 rc = main([{str(tmp_path)!r}, "--no-workbook"])
 assert rc == 0, rc
 import json
-r = json.load(open({str(model / "results.json")!r}))
+r = json.load(open({str(model / "results.json")!r}, encoding="utf-8"))
 assert r["wave1_aggregate"]["investment_point"] is not None
 print("OK")
 '''
