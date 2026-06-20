@@ -10,6 +10,9 @@ import json
 import sys
 from pathlib import Path
 
+if __package__ in (None, ""):  # invoked as a script by absolute path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from state.phases import GATES, MODEL_INPUTS, PHASES
 
 

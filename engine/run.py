@@ -8,6 +8,9 @@ import json
 import sys
 from pathlib import Path
 
+if __package__ in (None, ""):  # invoked as a script by absolute path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from engine.compute import (
     AACE_CLASS5_LABEL, cost_structure, initiative_rom, payback,
     score_composite, value_range, wave1_aggregate, wave1_point,
