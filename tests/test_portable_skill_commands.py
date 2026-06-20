@@ -39,3 +39,36 @@ def test_conductor_resolves_and_reconciles_engine_root():
     body = _body("conducting-engagement")
     assert "engine_root" in body
     assert "reconcile_engine_root" in body
+
+
+NUMERIC_SKILLS = [
+    "identifying-opportunities",
+    "building-business-case",
+    "scoring-opportunities",
+    "building-checkpoint",
+]
+
+
+def test_numeric_skills_have_no_module_command_form():
+    offenders = []
+    for name in NUMERIC_SKILLS:
+        body = _body(name)
+        for bad in ("python -m engine.run", "python -m state.state",
+                    "python3 -m engine.run", "python3 -m state.state"):
+            if bad in body:
+                offenders.append(f"{name}: {bad}")
+    assert not offenders, offenders
+
+
+def test_numeric_skills_resolve_engine_root_at_session_start():
+    for name in NUMERIC_SKILLS:
+        body = _body(name)
+        assert "engine_root" in body, name
+
+
+def test_skills_invoking_engine_use_absolute_path_form():
+    # Skills that actually run the engine must use the absolute-path form.
+    for name in ("identifying-opportunities", "building-business-case",
+                 "building-checkpoint"):
+        body = _body(name)
+        assert "python3 <engine_root>/engine/run.py" in body, name

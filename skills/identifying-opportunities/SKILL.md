@@ -11,6 +11,10 @@ This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read `processes/_index.md` and `tech-inventory.md` — confirm each exists. Confirm no `Unavailable` entries in `processes/_index.md` before proceeding (each process without baselines must have been remediated or explicitly scoped out).
 
+**Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
+from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
+`python3 <engine_root>/engine/run.py …`.
+
 Gate condition: `processes/_index.md` must be present before proceeding.
 
 ## Role in the system
@@ -41,7 +45,7 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 
 ## Value range (engine-computed)
 
-The value hypothesis is written *before* the number (hypothesis-before-value discipline is unchanged). The numeric range itself is **not** multiplied in prose. Record `{"opp_id": "...", "improvement_low": x, "improvement_high": y, "process_id": "PROC-NN", "volume_fraction": f, "rate": r}` to the engagement's `model/value.json`. Do **not** restate a `volume`: the engine resolves it as `baselines.<process_id>.volume × volume_fraction`, so volume is never hand-copied. Set `volume_fraction` to `1.0` when the opportunity addresses the whole process; use a smaller fraction (with a one-line rationale in `opportunities/OPP-NNN.md`) when it addresses only a slice. `process_id` must name a process that exists in `model/baselines.json`, and `rate` must trace to a sourced figure. Then run `python -m engine.run <engagement-folder>/` and cite the resulting `results.json` `value.<OPP-ID>` range in `opportunities/OPP-NNN.md`.
+The value hypothesis is written *before* the number (hypothesis-before-value discipline is unchanged). The numeric range itself is **not** multiplied in prose. Record `{"opp_id": "...", "improvement_low": x, "improvement_high": y, "process_id": "PROC-NN", "volume_fraction": f, "rate": r}` to the engagement's `model/value.json`. Do **not** restate a `volume`: the engine resolves it as `baselines.<process_id>.volume × volume_fraction`, so volume is never hand-copied. Set `volume_fraction` to `1.0` when the opportunity addresses the whole process; use a smaller fraction (with a one-line rationale in `opportunities/OPP-NNN.md`) when it addresses only a slice. `process_id` must name a process that exists in `model/baselines.json`, and `rate` must trace to a sourced figure. Then run `python3 <engine_root>/engine/run.py <engagement-folder>/` and cite the resulting `results.json` `value.<OPP-ID>` range in `opportunities/OPP-NNN.md`.
 
 **Unit convention — `rate` carries the period (the engine does not annualize).** The engine computes `value = improvement × (baselines.volume × volume_fraction) × rate` and the Wave-1 roll-up is reported as *annual* value — but `baselines.volume` is the **raw measured volume at whatever cadence the baseline was sourced** (e.g. "720 reports/month"), and there is **no annualization step in the engine**. So `rate` must carry both the period and the per-unit dollar basis needed to make the product land in annual dollars. Pick the basis that matches the value lever and **state its derivation in one line in `opportunities/OPP-NNN.md`** (the derivation is documented in prose; the multiplication still happens only in the engine):
 
