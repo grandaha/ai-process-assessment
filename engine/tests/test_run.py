@@ -101,17 +101,10 @@ def test_missing_cost_input_renders_pending(tmp_path):
     assert res["costs"]["OPP-001"]["rom"] == "PENDING"
 
 
-def test_no_workbook_flag_skips_xlsx_but_writes_results(tmp_path):
+def test_run_writes_results_and_never_an_xlsx(tmp_path):
     eng = tmp_path / "engagement"
     shutil.copytree(FIXTURE, eng / "model")
-    rc = main([str(eng), "--no-workbook"])
+    rc = main([str(eng)])
     assert rc == 0
     assert (eng / "model" / "results.json").exists()
-    assert not (eng / "financial-model.xlsx").exists()
-
-
-def test_default_run_still_writes_workbook(tmp_path):
-    eng = tmp_path / "engagement"
-    shutil.copytree(FIXTURE, eng / "model")
-    main([str(eng)])
-    assert (eng / "financial-model.xlsx").exists()
+    assert list(eng.glob("*.xlsx")) == []
