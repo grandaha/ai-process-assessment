@@ -1,5 +1,6 @@
 import json
 
+from state.conductor_state import write_conductor
 from state.state import read_state
 
 
@@ -128,9 +129,6 @@ def test_model_results_parsed_when_present(engagement):
 def test_model_results_none_when_corrupt(engagement):
     root = engagement(**{"model/results.json": "{not json"})
     assert read_state(root)["model"]["results"] is None
-
-
-from state.conductor_state import write_conductor
 
 
 def test_snapshot_surfaces_engine_root(engagement):
