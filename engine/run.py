@@ -1,4 +1,4 @@
-"""CLI / module entry: read model/*.json -> compute -> write results.json + .xlsx.
+"""CLI / module entry: read model/*.json -> compute -> write results.json.
 
 This is the only I/O boundary. Usage: python -m engine.run <engagement-folder>/
 """
@@ -84,26 +84,14 @@ def build_results(model_dir) -> dict:
 
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
-    flags = {a for a in argv if a.startswith("--")}
     positional = [a for a in argv if not a.startswith("--")]
     if not positional:
-        print("usage: python -m engine.run <engagement-folder>/ [--no-workbook]", file=sys.stderr)
+        print("usage: python -m engine.run <engagement-folder>/", file=sys.stderr)
         return 2
     engagement = Path(positional[0])
     model_dir = engagement / "model"
     results = build_results(model_dir)
     (model_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-    if "--no-workbook" not in flags:
-        try:
-            from engine.workbook import write_workbook
-        except ImportError:
-            print(
-                "note: openpyxl not available — skipped financial-model.xlsx "
-                "(every number is in model/results.json)",
-                file=sys.stderr,
-            )
-        else:
-            write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
     return 0
 
 

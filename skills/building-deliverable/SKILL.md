@@ -228,7 +228,7 @@ Because `section-renderer-executive` returns three blocks and `section-renderer-
 
 ## Financial model artifact
 
-Link `financial-model.xlsx` as a downloadable artifact in the HTML deliverable (e.g. in the investment/roadmap section), and pull all headline figures from `model/results.json` — renderers cite computed results, they never recompute. The workbook lets a skeptical reviewer inspect and flex the math.
+Pull all headline figures from `model/results.json` — renderers cite computed results, they never recompute. A skeptical reviewer can re-run the deterministic engine against `model/*.json` to verify every figure.
 
 ## Rationalization table
 

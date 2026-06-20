@@ -96,7 +96,7 @@ The composite is **not** computed by the scorer agent. After all agents complete
 
 The `_index.md` is always generated last — after stamping — so it never contains `PENDING` or agent-estimated values.
 
-Note: `python -m engine.run` is **not** called in Phase 6. The full engine run (which produces `model/results.json` and `financial-model.xlsx`) happens in Phase 9 once value, cost, and initiative inputs are available.
+Note: `python -m engine.run` is **not** called in Phase 6. The full engine run (which produces `model/results.json`) happens in Phase 9 once value, cost, and initiative inputs are available.
 
 ## Build/Buy/Partner Classification
 

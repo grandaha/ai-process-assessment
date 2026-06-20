@@ -99,7 +99,7 @@ After writing, show the user:
 
 ## Recording captured costs for the engine
 
-As each cost actual is confirmed, record it in structured form in the engagement's `model/costs.json` (one object per Wave-1 OPP-ID with `labor_hours`, `labor_rate`, `tech_cost`, `integration_cost`, `change_mgmt_pct`, `contingency_pct`). Any value not yet collected is recorded as `null` — it will render as PENDING in the business case and the workbook until supplied. Do not enter placeholder or estimated numbers in place of `null`. `cost-actuals.md` remains the human-readable record; `model/costs.json` is the engine's input.
+As each cost actual is confirmed, record it in structured form in the engagement's `model/costs.json` (one object per Wave-1 OPP-ID with `labor_hours`, `labor_rate`, `tech_cost`, `integration_cost`, `change_mgmt_pct`, `contingency_pct`). Any value not yet collected is recorded as `null` — it will render as PENDING in the business case until supplied. Do not enter placeholder or estimated numbers in place of `null`. `cost-actuals.md` remains the human-readable record; `model/costs.json` is the engine's input.
 
 ## Output format of `cost-actuals.md`
 

@@ -83,7 +83,7 @@ Then click **Install** on the `ai-process-assessment` plugin. (Alternatively, **
 
 ### 3. Use it
 
-Type `/` or click the **+** button in a Cowork (or chat) session to see the methodology's skills. Start with **"scope this engagement"**, or **"run the sample engagement"** for the demo. Because Cowork can execute code and touch local files, the deterministic math engine and the `financial-model.xlsx` workbook work fully here.
+Type `/` or click the **+** button in a Cowork (or chat) session to see the methodology's skills. Start with **"scope this engagement"**, or **"run the sample engagement"** for the demo. Because Cowork can execute code and touch local files, the deterministic math engine works fully here.
 
 ---
 
@@ -179,7 +179,7 @@ Every engagement produces files in sequence under `<name>/` at the project root:
 | 7 — Prioritization & Roadmap | `roadmap.md` |
 | 8 — Use Case Packaging | `usecase-briefs/` (`_index.md` + `UC-NNN.md` per opportunity) |
 | 8.5 — Cost Actuals | `cost-actuals.md` |
-| 9 — Business Case | `business-case.md`, `model/` (inputs + `results.json`), `financial-model.xlsx` |
+| 9 — Business Case | `business-case.md`, `model/` (inputs + `results.json`) |
 | 10 — Executive Summary | `executive-summary.md` |
 | 11 — Deliverable | `deliverable.html` |
 | Running log | `evidence-log.md` |
@@ -206,11 +206,11 @@ Subagents operate without shared session context — they receive only the docum
 The methodology computes every number with a deterministic Python engine (`engine/`). Set it up once:
 
 ```bash
-pip install -r requirements.txt   # openpyxl, pytest, formulas
+pip install -r requirements.txt   # pytest, pyyaml
 python -m pytest engine/tests -q  # verify the golden-number suite passes
 ```
 
-Each numeric phase writes structured inputs to the engagement's `model/*.json`, then runs `python -m engine.run <engagement-folder>/` to produce `model/results.json` and `financial-model.xlsx`. Without a code-execution environment the methodology still runs, but figures render "pending engine."
+Each numeric phase writes structured inputs to the engagement's `model/*.json`, then runs `python -m engine.run <engagement-folder>/` to produce `model/results.json`. Without a code-execution environment the methodology still runs, but figures render "pending engine."
 
 ---
 

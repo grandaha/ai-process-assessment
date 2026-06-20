@@ -28,7 +28,7 @@ After install, start an engagement by saying **"scope this engagement"**, or **"
 
 ## Deterministic math engine
 
-The methodology performs **no arithmetic in prose**. Every number is either a directly-sourced input recorded in the engagement's `model/*.json` files, or a value computed by the deterministic Python engine in `engine/` (`python -m engine.run <engagement-folder>/`) and read back from `model/results.json`. The engine also emits `financial-model.xlsx`, an auditable workbook with live formulas that opens and recomputes in Excel, Google Sheets, and Apple Numbers. `model/*.json` is the single source of truth; the deliverable-gate enforces that every figure in the markdown deliverables equals its `results.json` value. A missing input renders as **PENDING**, never a fabricated number. See [INSTALL.md](INSTALL.md) for engine setup.
+The methodology performs **no arithmetic in prose**. Every number is either a directly-sourced input recorded in the engagement's `model/*.json` files, or a value computed by the deterministic Python engine in `engine/` (`python -m engine.run <engagement-folder>/`) and read back from `model/results.json`. `model/*.json` is the single source of truth; the deliverable-gate enforces that every figure in the markdown deliverables equals its `results.json` value. A missing input renders as **PENDING**, never a fabricated number. See [INSTALL.md](INSTALL.md) for engine setup.
 
 ---
 
@@ -91,7 +91,7 @@ ai-process-assessment/
 │   ├── executive-summary-reviewer.md ← Phase 10: independent exec-summary reviewer
 │   └── section-renderer-*.md         ← Phase 11: parallel HTML section renderers
 │       (executive · problem · portfolio · roadmap · evidence)
-├── engine/                         ← deterministic math engine (model, compute, workbook, run + tests)
+├── engine/                         ← deterministic math engine (model, compute, run + tests)
 ├── templates/                      ← reusable templates (e.g. cost-actuals worksheet)
 ├── samples/                        ← bundled Lattice Consulting sample engagement (intake + README)
 ├── hooks/                          ← session-start hooks (auto-load the keystone)
@@ -100,7 +100,7 @@ ai-process-assessment/
 ├── INSTALL.md                      ← full install guide (Claude Code / Cowork / Claude.ai)
 ├── CHANGELOG.md                    ← version history (Keep a Changelog)
 ├── improvement-log.md              ← cross-engagement rationalization escape log
-├── requirements.txt                ← engine deps (openpyxl, formulas, pytest, pyyaml)
+├── requirements.txt                ← engine deps (pytest, pyyaml)
 └── pytest.ini                      ← static test suite config
 ```
 
