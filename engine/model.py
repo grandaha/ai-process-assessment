@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # Sentinel for a result that cannot be computed because an input is missing.
-# Never replaced by a fabricated number — surfaced as-is in results.json and the workbook.
+# Never replaced by a fabricated number — surfaced as-is in results.json.
 PENDING = "PENDING"
 
 

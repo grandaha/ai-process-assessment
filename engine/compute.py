@@ -49,8 +49,8 @@ def cost_structure(labor_hours, labor_rate, tech_cost, integration_cost,
             change_mgmt_pct, contingency_pct)
     if any(a is None for a in args):
         return PENDING
-    # Round at each step from rounded predecessors so the workbook (whose cells
-    # reference other rounded cells) reproduces these figures exactly.
+    # Round at each step from rounded predecessors so each displayed total
+    # equals the sum of the rounded line items above it (no penny drift).
     labor = _money(labor_hours * labor_rate)
     change_mgmt = _money(labor * change_mgmt_pct)
     subtotal = _money(labor + tech_cost + integration_cost + change_mgmt)

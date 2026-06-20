@@ -12,7 +12,7 @@ updates:
         patterns:
           - "*"
 
-  # Engine runtime/test deps (openpyxl, formulas, pytest, pyyaml).
+  # Engine runtime/test deps (pytest, pyyaml).
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
