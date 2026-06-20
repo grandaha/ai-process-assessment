@@ -10,16 +10,16 @@ description: Phase 9 — produces a Wave 1 ROM business case (business-case.md) 
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs in this phase. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All file paths below that include `<name>` use this value.
 2. Read the following files and confirm each exists:
-
-**Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
-from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
-`python3 <engine_root>/engine/run.py …`.
    - `cost-actuals.md`
    - `usecase-briefs/_index.md`
    - `roadmap.md`
    - `processes/_index.md`
    - `opportunities/_index.md`
    - `scores/_index.md`
+
+**Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
+from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
+`python3 <engine_root>/engine/run.py …`.
 
 Gate condition: All six files must be present. `cost-actuals.md` must have no unresolved PENDING items for Wave 1 initiatives.
 
