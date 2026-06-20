@@ -19,19 +19,24 @@ On any natural-language opener that means "assess / find AI opportunities / eval
 automation" for a team, client, process, or use case. You become the front door — no
 magic phrase required.
 
-## Prerequisites (first run on a host)
+## Prerequisites
 
-The drive loop shells out to `python` for the state helpers and the engine. Those
-modules need third-party deps — `state.conductor_state`/`overrides`/`staleness` import
-`pyyaml`. A bare `python`/`python3` without it will fail at first contact. Once per machine:
+The state helpers and the engine are pure Python **standard library** — no venv, no
+`pip install`, no third-party deps. Any `python3` runs them. You need exactly one
+durable value: the **plugin root** — the absolute path to this installed plugin.
 
-```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-```
+- **Cold first session:** the session-start hook injects it as a `Plugin root: <path>`
+  line, with the engine/state command forms. Use that path.
+- **Every session after:** it is stamped in the engagement's `.conductor.md` as
+  `engine_root` and surfaced in the `state.state` snapshot's `engine_root` field.
 
-Then run every command below with the venv interpreter (`.venv/bin/python -m state.state …`,
-`.venv/bin/python -m engine.run …`). `.venv/` is already gitignored. If `python` already
-resolves to an interpreter with these deps installed, you can use it directly.
+Throughout this skill, `<engine_root>` denotes that path. Every engine/state command is
+invoked by absolute path: `python3 <engine_root>/engine/run.py <folder>/` and
+`python3 <engine_root>/state/state.py <folder>/`.
+
+(Contributors running the test suite additionally need the packages in
+`requirements.txt`; those are development dependencies, not prerequisites for running an
+assessment.)
 
 ## Intake (first contact only)
 
@@ -46,9 +51,10 @@ resolves to an interpreter with these deps installed, you can use it directly.
 3. **Run Phase 1** inline (`ai-process-assessment:scoping-engagement`) — this creates the
    engagement folder, `scope.md`, and the gitignore entry.
 4. **Stamp `.conductor.md`** with `register`, `autonomy.should_confirm`,
-   `methodology_version` (read from `.claude-plugin/plugin.json`), and empty
+   `methodology_version` (read from `.claude-plugin/plugin.json`), `engine_root`
+   (the absolute plugin root from the session-start note), and empty
    `open_decisions` / `deferred_processes`. Use:
-   `python -c "from state.conductor_state import write_conductor; ..."`.
+   `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import write_conductor; ..."`.
 
 ## The drive loop
 
@@ -56,7 +62,14 @@ Repeat until Phase 11 is done and Gate B is cleared:
 
 0. **Resolve the active engagement:** the folder containing a `.conductor.md` whose work
    is incomplete. None → run Intake. More than one incomplete → ask which.
-1. **Read state:** `python -m state.state <folder>` → JSON snapshot.
+0a. **Resolve `engine_root`:** take the live plugin root from the session-start note
+   (injected fresh every session start). This is the value all commands below use.
+1. **Read state:** `python3 <engine_root>/state/state.py <folder>` → JSON snapshot.
+   Then **reconcile:** compare the snapshot's `engine_root` to the live root from the
+   session-start note; if they differ (plugin upgraded to a new cache path, or the
+   engagement was copied to another machine), re-stamp via
+   `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import reconcile_engine_root; reconcile_engine_root('<folder>', '<engine_root>')"`.
+   The live value always wins.
 2. **Reconcile overrides:** apply `state.overrides.parse_overrides(CLAUDE.md)` +
    `reconcile(...)` so authorized skips don't block. An override row only fires if its
    Override cell contains the phase's output filename (e.g. `context.md`) or skill dir
@@ -76,8 +89,9 @@ Repeat until Phase 11 is done and Gate B is cleared:
    `grc.status == "required"`, run Gate A first (step 8). Reading only `phases` here would
    skip Gate A.
 5. **Gather gaps, then execute** per the execution model below.
-6. **After a step that wrote a `model/*.json` input,** run `python -m engine.run <folder>/`
-   then `state.conductor_state.record_input_hashes(folder)`.
+6. **After a step that wrote a `model/*.json` input,** run
+   `python3 <engine_root>/engine/run.py <folder>/` then
+   `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import record_input_hashes; record_input_hashes('<folder>')"`.
 7. **At a checkpoint insertion point** (per the `building-checkpoint` registry: after
    Phase 2 `scope`, Phase 4 `baseline`, Phase 7 `portfolio`): offer to generate it
    (should-confirm); its stakeholder **outcome** is must-ask.
@@ -148,7 +162,7 @@ overwrite. Entry template:
 
 ## Staleness
 
-When `changed_inputs` is non-empty: re-run `python -m engine.run <folder>/`, then
+When `changed_inputs` is non-empty: re-run `python3 <engine_root>/engine/run.py <folder>/`, then
 re-drive every portfolio phase downstream of the change. Any human ratification given
 against the now-superseded numbers is recorded `invalidated-by-staleness` in the decision
 log and re-surfaced per its touchpoint class — never silently kept. After a clean

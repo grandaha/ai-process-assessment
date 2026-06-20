@@ -12,6 +12,10 @@ This skill runs as a standalone session. At session start:
 2. Read `opportunities/_index.md` and confirm it exists.
 3. Check `grc/_index.md` — confirm any flagged opportunities have status `Cleared` or `Cleared-with-Conditions` (no `Blocked` entries). Note: the status column uses the hyphenated extraction form. If `grc/_index.md` does not exist, no opportunities were GRC-flagged and scoring can proceed.
 
+**Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
+from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
+`python3 <engine_root>/engine/run.py …`.
+
 Gate condition: `opportunities/_index.md` present; any non-Green GRC flags resolved in `grc/_index.md` (no `Blocked` status).
 
 ## Role in the system
@@ -96,7 +100,7 @@ The composite is **not** computed by the scorer agent. After all agents complete
 
 The `_index.md` is always generated last — after stamping — so it never contains `PENDING` or agent-estimated values.
 
-Note: `python -m engine.run` is **not** called in Phase 6. The full engine run (which produces `model/results.json`) happens in Phase 9 once value, cost, and initiative inputs are available.
+Note: `python3 <engine_root>/engine/run.py` is **not** called in Phase 6. The full engine run (which produces `model/results.json`) happens in Phase 9 once value, cost, and initiative inputs are available.
 
 ## Build/Buy/Partner Classification
 

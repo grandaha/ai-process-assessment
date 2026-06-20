@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stdlib JSON (was pyyaml), and the unused `formulas` dependency was removed. This
   lets the auditable numbers run in any code sandbox (Claude Code, Cowork,
   Claude.ai). Guarded by `engine/tests/test_stdlib_core.py`.
+- **Runs from any install path.** The engine and state CLIs (`engine/run.py`,
+  `state/state.py`) now self-locate, so they run by absolute path from any working
+  directory (no more `ModuleNotFoundError` outside the repo root). The session-start
+  hook injects the plugin root as a front-door note (always-fire; set
+  `AI_ASSESSMENT_SILENT=1` to opt out), `.conductor.md` records `engine_root`
+  (surfaced in the `state.state` snapshot and reconciled via `reconcile_engine_root`
+  when the install path changes), and the four standalone numeric skills resolve it
+  at their own Session Start.
+- **Operator prerequisite is bare `python3`.** The five operational skills now invoke
+  every engine/state command by absolute path
+  (`python3 <engine_root>/engine/run.py <folder>/`), and the Conductor's
+  prerequisites describe pure stdlib — no venv, no `pip install` (the prior
+  venv/`pyyaml` setup note from 2.17.0 is gone; `pyyaml`/`pytest` are dev/test-only
+  deps). Guarded by `tests/test_portable_skill_commands.py`.
 
 ## [2.17.0] — 2026-06-19
 

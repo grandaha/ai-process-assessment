@@ -17,6 +17,10 @@ This skill runs as a standalone session. At session start:
    - `opportunities/_index.md`
    - `scores/_index.md`
 
+**Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
+from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
+`python3 <engine_root>/engine/run.py …`.
+
 Gate condition: All six files must be present. `cost-actuals.md` must have no unresolved PENDING items for Wave 1 initiatives.
 
 ## Deterministic math (engine-computed — no prose arithmetic)
@@ -24,7 +28,7 @@ Gate condition: All six files must be present. `cost-actuals.md` must have no un
 Phase 9 performs **no arithmetic in prose** and **writes no input files**. Every numeric input was already structured by its owning phase: `value.json` (Phase 5), `costs.json` (Phase 8.5), `initiatives.json` (Phase 7), `baselines.json` (Phase 4), `scores.json` (Phase 6). Phase 9 reads them, runs the engine, and cites the results.
 
 1. **Verify the inputs exist — do not create or re-write them.** Confirm `model/value.json`, `model/costs.json`, `model/initiatives.json`, `model/baselines.json`, and `model/scores.json` are present in the engagement folder. If any is missing, halt and name the owning phase that must produce it (value → Phase 5; costs → Phase 8.5; initiatives → Phase 7; baselines → Phase 4; scores → Phase 6). Do not transcribe figures from prose into a missing file — return to the owning phase. A figure recorded as `null` in an existing file is expected (it renders PENDING); a missing *file* is a gate failure.
-2. **Run the engine:** `python -m engine.run <engagement-folder>/`. This reads the input files and writes `model/results.json`.
+2. **Run the engine:** `python3 <engine_root>/engine/run.py <engagement-folder>/`. This reads the input files and writes `model/results.json`.
 3. Populate every figure in `business-case.md` by citing `results.json` (per-initiative `costs.*.rom`, `value.*`, and `wave1_aggregate.investment` / `investment_point` / `value` / `payback_years`). The ROM label `AACE Class 5 (±50%)` comes from `results.json` `rom_label`.
 4. Any `results.json` value equal to `"PENDING"` renders as **PENDING** in the business case with a note on what input is missing — never a fabricated number.
 
@@ -125,7 +129,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 - [ ] Confirm cost-actuals.md exists in the engagement folder — halt and invoke Phase 8.5 if absent
 - [ ] Confirm all five source files exist
 - [ ] Verify `model/{value,costs,initiatives,baselines,scores}.json` exist (do NOT write them — they are owned by Phases 5/8.5/7/4/6); halt naming the owning phase if any file is missing
-- [ ] Run `python -m engine.run <engagement-folder>/` to produce `model/results.json`
+- [ ] Run `python3 <engine_root>/engine/run.py <engagement-folder>/` to produce `model/results.json`
 - [ ] Dispatch one `business-case-analyst` subagent per Wave 1 initiative in a single parallel batch (or run in main context if agent definition not yet present)
 - [ ] Collect returned cost/value blocks
 - [ ] Read the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` — engine-computed, never summed in prose
@@ -140,7 +144,7 @@ Per-initiative cost and value analysis is independent across Wave 1 initiatives 
 1. Confirm preconditions: `usecase-briefs/_index.md` exists and reviewer cleared.
 2. Confirm `cost-actuals.md` exists in the engagement folder. If absent: halt. Do not proceed. Invoke `ai-process-assessment:collecting-cost-actuals` (Phase 8.5) and complete it before returning to this phase.
 3. Confirm all five source files present.
-4. Verify `model/value.json`, `model/costs.json`, `model/initiatives.json`, `model/baselines.json`, and `model/scores.json` exist (owned by Phases 5/8.5/7/4/6 respectively) — do NOT write or re-write them. If any is missing, halt and name the owning phase. Then run `python -m engine.run <engagement-folder>/` to produce `model/results.json`. Then, for each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data; the agent cites its figures from `model/results.json`.
+4. Verify `model/value.json`, `model/costs.json`, `model/initiatives.json`, `model/baselines.json`, and `model/scores.json` exist (owned by Phases 5/8.5/7/4/6 respectively) — do NOT write or re-write them. If any is missing, halt and name the owning phase. Then run `python3 <engine_root>/engine/run.py <engagement-folder>/` to produce `model/results.json`. Then, for each Wave 1 initiative from `roadmap.md`, dispatch one `business-case-analyst` subagent. Pass only that initiative's data; the agent cites its figures from `model/results.json`.
 5. Collect returned blocks. In main context: verify mandatory labels, read the Wave 1 aggregate (investment, value, payback) from `model/results.json` `wave1_aggregate` (the engine sums the low/high ranges and computes payback — never compute in prose), compile Key Assumptions from all initiative blocks.
 6. Add the three cannot-do statements to Key Assumptions.
 7. Add What Would Tighten This Estimate — list specific missing inputs (vendor quotes for Buy/Partner initiatives, internal labor rate, integration complexity from IT).
