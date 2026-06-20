@@ -54,7 +54,6 @@ print("OK")
     assert "OK" in res.stdout
 
 
-
 def test_conductor_state_needs_no_yaml(tmp_path):
     script = f'''
 from pathlib import Path
