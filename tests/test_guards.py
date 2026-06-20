@@ -269,9 +269,10 @@ def test_keystone_states_no_prose_arithmetic_rule():
     assert "model/" in keystone  # engagement folder convention includes model/
 
 
-def test_deliverable_links_workbook():
+def test_deliverable_has_no_workbook_reference():
     deliv = (REPO_ROOT / "skills" / "building-deliverable" / "SKILL.md").read_text()
-    assert "financial-model.xlsx" in deliv
+    assert "financial-model.xlsx" not in deliv
+    assert "workbook" not in deliv.lower()
 
 
 def test_pytest_includes_engine_tests():
