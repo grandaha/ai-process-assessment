@@ -81,6 +81,26 @@ class TestClassifyPaths:
         c = gate.classify_paths(["scripts/helper.py"])
         assert c["python_only"] is True
 
+    def test_state_dir_is_allowlisted(self):
+        c = gate.classify_paths(["state/state.py", "state/tests/test_state.py"])
+        assert c["python_only"] is True
+
+    def test_hooks_dir_is_allowlisted(self):
+        # The session-start hook + its tests live under hooks/ and tests/.
+        c = gate.classify_paths(["hooks/session-start.sh", "hooks/session-start.ps1"])
+        assert c["python_only"] is True
+
+    def test_portability_core_fileset_is_allowlisted(self):
+        # The exact PR #93 fileset must classify as auto-merge-eligible.
+        c = gate.classify_paths([
+            "engine/run.py", "engine/tests/test_portability.py",
+            "hooks/session-start.ps1", "hooks/session-start.sh",
+            "state/conductor_state.py", "state/state.py",
+            "state/tests/test_conductor_state.py", "state/tests/test_state.py",
+            "tests/test_session_start_hook.py",
+        ])
+        assert c["python_only"] is True
+
     def test_markdown_flagged(self):
         c = gate.classify_paths(["skills/scoping-engagement/SKILL.md"])
         assert c["touches_markdown"] is True
@@ -142,6 +162,19 @@ class TestDecide:
         d = self._decide(changed_files=["skills/x/SKILL.md"])
         assert d["decision"] == "human"
         assert "markdown" in d["reason"].lower()
+
+    def test_approved_state_or_hooks_only_merges(self):
+        # state/ and hooks/ are now on the allowlist — a green, approved PR
+        # touching only them must auto-merge (regression for PR #93's hold).
+        assert self._decide(changed_files=["state/state.py"])["decision"] == "merge"
+        assert self._decide(changed_files=["hooks/session-start.sh"])["decision"] == "merge"
+
+    def test_approved_unlisted_nonmarkdown_reason_is_honest(self):
+        # A non-markdown path outside the allowlist must NOT be reported as markdown.
+        d = self._decide(changed_files=["src/whatever.py"])
+        assert d["decision"] == "human"
+        assert "markdown" not in d["reason"].lower()
+        assert "allowlist" in d["reason"].lower()
 
     def test_unknown_verdict_never_merges(self):
         d = self._decide(verdict="UNKNOWN")
