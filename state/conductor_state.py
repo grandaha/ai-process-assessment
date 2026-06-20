@@ -49,3 +49,18 @@ def record_input_hashes(root: Path) -> dict:
     data["model_input_hashes"] = hash_inputs(root)
     write_conductor(root, data)
     return data
+
+
+def reconcile_engine_root(root: Path, live_root: str) -> str:
+    """Self-heal the stamped plugin root against the live hook-injected one.
+
+    The live value wins: if the stamped engine_root is absent or differs (plugin
+    upgraded to a new version-stamped cache path, or the engagement was copied to
+    another machine), re-stamp to live_root. No rewrite when already correct.
+    Returns the authoritative root (always live_root).
+    """
+    data = read_conductor(root)
+    if data.get("engine_root") != live_root:
+        data["engine_root"] = live_root
+        write_conductor(root, data)
+    return live_root

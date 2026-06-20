@@ -1,5 +1,6 @@
 import json
 
+from state.conductor_state import write_conductor
 from state.state import read_state
 
 
@@ -128,3 +129,15 @@ def test_model_results_parsed_when_present(engagement):
 def test_model_results_none_when_corrupt(engagement):
     root = engagement(**{"model/results.json": "{not json"})
     assert read_state(root)["model"]["results"] is None
+
+
+def test_snapshot_surfaces_engine_root(engagement):
+    root = engagement()
+    write_conductor(root, {"engine_root": "/install/path"})
+    snap = read_state(root)
+    assert snap["engine_root"] == "/install/path"
+
+
+def test_snapshot_engine_root_is_none_when_unstamped(engagement):
+    snap = read_state(engagement())
+    assert snap["engine_root"] is None
