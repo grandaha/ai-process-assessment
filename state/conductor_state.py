@@ -4,12 +4,14 @@ Interaction context only — never engagement content. Content state is always
 derived from the engagement files via state.state.read_state(); this file holds
 register, autonomy, version stamp, deferred processes, and the model-input hashes
 that power staleness detection (state.staleness).
+
+The frontmatter body is JSON (stdlib only) fenced by '---' lines, so the core
+runs without third-party deps in any code sandbox.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
-
-import yaml
 
 from state.staleness import hash_inputs
 
@@ -21,16 +23,24 @@ def read_conductor(root: Path) -> dict:
     if not path.exists():
         return {}
     text = path.read_text()
-    if not text.startswith("---"):
+    if not text.startswith("---\n"):
         return {}
-    parts = text.split("---", 2)
-    if len(parts) < 3:
+    rest = text[len("---\n"):]
+    end = rest.rfind("\n---")
+    if end == -1:
         return {}
-    return yaml.safe_load(parts[1]) or {}
+    body = rest[:end].strip()
+    if not body:
+        return {}
+    try:
+        loaded = json.loads(body)
+    except json.JSONDecodeError:
+        return {}  # legacy/corrupt frontmatter — treat as empty; caller re-stamps
+    return loaded if isinstance(loaded, dict) else {}
 
 
 def write_conductor(root: Path, data: dict) -> None:
-    body = yaml.safe_dump(data, sort_keys=False).strip()
+    body = json.dumps(data, indent=2)
     (Path(root) / CONDUCTOR_FILE).write_text(f"---\n{body}\n---\n")
 
 

@@ -13,7 +13,6 @@ from engine.compute import (
     score_composite, value_range, wave1_aggregate, wave1_point,
 )
 from engine.model import PENDING, Range, load_inputs
-from engine.workbook import write_workbook
 
 
 def _range_out(r):
@@ -95,7 +94,16 @@ def main(argv=None):
     results = build_results(model_dir)
     (model_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     if "--no-workbook" not in flags:
-        write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
+        try:
+            from engine.workbook import write_workbook
+        except ImportError:
+            print(
+                "note: openpyxl not available — skipped financial-model.xlsx "
+                "(every number is in model/results.json)",
+                file=sys.stderr,
+            )
+        else:
+            write_workbook(load_inputs(model_dir), results, engagement / "financial-model.xlsx")
     return 0
 
 
