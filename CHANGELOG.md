@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- Excel/CFO workbook export (`financial-model.xlsx`) and the `openpyxl` dependency. Correctness is proven by the deterministic engine plus the audit chain; every figure lives in `model/results.json`. The `--no-workbook` flag is gone (a stray `--no-workbook` is now a silently-ignored no-op).
+
 ### Changed
 - **Engine + state core is now stdlib-only.** `engine.run` (compute path) and all
   `state/` helpers run with no third-party imports: `.conductor.md` is stored as

@@ -23,8 +23,7 @@ magic phrase required.
 
 The drive loop shells out to `python` for the state helpers and the engine. Those
 modules need third-party deps — `state.conductor_state`/`overrides`/`staleness` import
-`pyyaml`; `engine.run`/`engine.workbook` import `openpyxl` + `formulas`. A bare
-`python`/`python3` without them will fail at first contact. Once per machine:
+`pyyaml`. A bare `python`/`python3` without it will fail at first contact. Once per machine:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt

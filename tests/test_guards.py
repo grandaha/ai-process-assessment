@@ -419,3 +419,23 @@ def test_eliciting_phase_skills_check_sample_run_marker(methodology):
             ss_block = ss_block[:len("## Session Start") + nxt.start()]
         assert SAMPLE_RUN_MARKER in ss_block, \
             f"{sid} Session Start missing .sample-run.md check"
+
+
+def test_methodology_docs_have_no_workbook_references():
+    targets = [
+        "README.md", "INSTALL.md", "system-prompt.md",
+        "skills/using-methodology/SKILL.md",
+        "skills/building-business-case/SKILL.md",
+        "skills/collecting-cost-actuals/SKILL.md",
+        "skills/conducting-engagement/SKILL.md",
+        "skills/identifying-opportunities/SKILL.md",
+        "skills/scoring-opportunities/SKILL.md",
+    ]
+    for rel in targets:
+        text = (REPO_ROOT / rel).read_text()
+        assert "financial-model.xlsx" not in text, rel
+        assert "--no-workbook" not in text, rel
+
+
+def test_openpyxl_not_a_dependency():
+    assert "openpyxl" not in (REPO_ROOT / "requirements.txt").read_text()
