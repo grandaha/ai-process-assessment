@@ -91,7 +91,7 @@ Repeat until Phase 11 is done and Gate B is cleared:
 5. **Gather gaps, then execute** per the execution model below.
 6. **After a step that wrote a `model/*.json` input,** run
    `python3 <engine_root>/engine/run.py <folder>/` then
-   `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import record_input_hashes; record_input_hashes('<folder>')"``.
+   `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import record_input_hashes; record_input_hashes('<folder>')"`.
 7. **At a checkpoint insertion point** (per the `building-checkpoint` registry: after
    Phase 2 `scope`, Phase 4 `baseline`, Phase 7 `portfolio`): offer to generate it
    (should-confirm); its stakeholder **outcome** is must-ask.
