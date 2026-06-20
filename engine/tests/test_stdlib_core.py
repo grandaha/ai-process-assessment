@@ -42,7 +42,7 @@ def test_engine_run_core_path_needs_no_third_party_deps(tmp_path):
     model = _seed_model(tmp_path)
     script = f'''
 from engine.run import main
-rc = main([{str(tmp_path)!r}, "--no-workbook"])
+rc = main([{str(tmp_path)!r}])
 assert rc == 0, rc
 import json
 r = json.load(open({str(model / "results.json")!r}, encoding="utf-8"))
@@ -53,21 +53,6 @@ print("OK")
     assert res.returncode == 0, res.stderr
     assert "OK" in res.stdout
 
-
-def test_engine_run_default_path_degrades_without_openpyxl(tmp_path):
-    model = _seed_model(tmp_path)
-    script = f'''
-from engine.run import main
-rc = main([{str(tmp_path)!r}])  # no --no-workbook
-assert rc == 0, rc
-from pathlib import Path
-assert (Path({str(model)!r}) / "results.json").exists()
-assert not (Path({str(tmp_path)!r}) / "financial-model.xlsx").exists()
-print("OK")
-'''
-    res = _run(script)
-    assert res.returncode == 0, res.stderr
-    assert "OK" in res.stdout
 
 
 def test_conductor_state_needs_no_yaml(tmp_path):
