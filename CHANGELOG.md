@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Engine + state core is now stdlib-only.** `engine.run` (compute path) and all
+  `state/` helpers run with no third-party imports: `.conductor.md` is stored as
+  stdlib JSON (was pyyaml), the Excel workbook is imported lazily and skipped
+  gracefully when `openpyxl` is absent (numbers still land in `model/results.json`),
+  and the unused `formulas` dependency was removed. This lets the auditable numbers
+  run in any code sandbox (Claude Code, Cowork, Claude.ai). The workbook still
+  generates where `openpyxl` is installed. Guarded by `engine/tests/test_stdlib_core.py`.
+
 ## [2.17.0] — 2026-06-19
 
 ### Added
