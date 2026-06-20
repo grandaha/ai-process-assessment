@@ -42,7 +42,7 @@ def parse_verdict(structured_output: str | None, review_text: str | None) -> str
 
 # --- path classification ---
 
-ALLOWED_PREFIXES = ("engine/", "tests/", "scripts/")
+ALLOWED_PREFIXES = ("engine/", "state/", "hooks/", "tests/", "scripts/")
 MARKDOWN_SUFFIXES = (".md",)
 # Never auto-merge changes to the loop's own machinery, even though they live
 # under allowed prefixes. claude-code-action also cannot edit .github/ files,
@@ -116,7 +116,11 @@ def decide(
         if not changed_files:
             return {"decision": "human", "reason": "no changed files detected — failing closed"}
         if not paths["python_only"]:
-            return {"decision": "human", "reason": "approved, but touches markdown — ready for you to merge"}
+            cause = (
+                "touches markdown" if paths["touches_markdown"]
+                else "touches files outside the auto-merge allowlist"
+            )
+            return {"decision": "human", "reason": f"approved, but {cause} — ready for you to merge"}
         return {"decision": "merge", "reason": "python-only, approved, CI green"}
 
     if verdict == "NO":
