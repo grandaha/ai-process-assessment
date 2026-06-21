@@ -16,6 +16,7 @@ from engine.compute import (
     score_composite, value_range, wave1_aggregate, wave1_point,
 )
 from engine.model import PENDING, Range, load_inputs
+from engine.trace import build_trace
 
 
 def _range_out(r):
@@ -95,6 +96,8 @@ def main(argv=None):
     model_dir = engagement / "model"
     results = build_results(model_dir)
     (model_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    (model_dir / "trace.json").write_text(
+        json.dumps(build_trace(model_dir), indent=2), encoding="utf-8")
     return 0
 
 

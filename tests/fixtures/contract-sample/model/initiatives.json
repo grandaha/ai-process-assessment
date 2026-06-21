@@ -1,0 +1,10 @@
+[
+  {"opp_id": "OPP-003", "name": "Point-of-Entry Time Validation", "wave": 1},
+  {"opp_id": "OPP-001", "name": "Status Report Assembly Assistant", "wave": 1},
+  {"opp_id": "OPP-005", "name": "Governed AI SOW Drafting", "wave": 1},
+  {"opp_id": "OPP-002", "name": "Assisted Invoice Reconciliation", "wave": 2},
+  {"opp_id": "OPP-004", "name": "Automated Mechanical Pre-QA", "wave": 2},
+  {"opp_id": "OPP-006", "name": "Staffing Shortlist Augmentation", "wave": 2},
+  {"opp_id": "OPP-007", "name": "Intra-Month Margin Early-Warning", "wave": 2},
+  {"opp_id": "OPP-008", "name": "Clean-Entry to Clean-Invoice Chain", "wave": 3}
+]

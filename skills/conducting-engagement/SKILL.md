@@ -119,7 +119,7 @@ Repeat until Phase 11 is done and Gate B is cleared:
 | Class | Behavior | Examples |
 |---|---|---|
 | Must-ask | Always stop, every mode | Sponsoring question, decision-maker, scope boundaries, out-of-scope process additions, cost actuals, checkpoint outcomes, gate dispositions, Build/Buy/Partner |
-| Should-confirm | Guided: pause to approve. (Autonomous batching is Slice 2.) | Context map, opportunity log, scoring rationale, roadmap sequencing |
+| Should-confirm | Guided: pause to approve. (Autonomous batching is Slice 2.) | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
 | Can-infer | Never ask | Run the engine, derive state, pick next phase, assemble deliverable HTML |
 
 ## Elastic processes & convergence

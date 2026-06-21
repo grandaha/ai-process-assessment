@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Verifiable data contract + on-demand artifacts.** The engine now emits `model/trace.json` — per-figure provenance (`inputs × formula = result` + source) for every number in `results.json`, documented as a versioned public contract (`docs/data-contract.md`, v1.0). A new `generate-artifact` skill renders any requested artifact (CFO show-your-work audit, one-pager, CSV) from that contract under a mechanical no-new-arithmetic guard; binary formats (`.xlsx`/`.pptx`/`.docx`/`.pdf`) are produced by the host surface, so the plugin stays pure-stdlib.
+
 ### Removed
 - Excel/CFO workbook export (`financial-model.xlsx`) and the `openpyxl` dependency. Correctness is proven by the deterministic engine plus the audit chain; every figure lives in `model/results.json`. The `--no-workbook` flag is gone (a stray `--no-workbook` is now a silently-ignored no-op).
 
