@@ -1,0 +1,8 @@
+[
+  {"value": 280000, "path": "costs.OPP-001.labor"},
+  {"value": 70000, "path": "costs.OPP-001.change_mgmt"},
+  {"value": 580000, "path": "costs.OPP-001.subtotal"},
+  {"value": 174000, "path": "costs.OPP-001.contingency"},
+  {"value": 754000, "path": "costs.OPP-001.total"},
+  {"value": 1305460, "path": "wave1_aggregate.investment_point"}
+]
