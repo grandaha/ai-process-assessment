@@ -10,9 +10,11 @@ REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "engine" / "tests" / "fixtures" / "lattice" / "model"
 CONTRACT_DOC = REPO / "docs" / "data-contract.md"
 
-SAMPLE_MODEL = REPO / "sample-pso-delivery" / "model"
-SAMPLE_AUDIT = REPO / "sample-pso-delivery" / "artifacts" / "cfo-audit.md"
-SAMPLE_MANIFEST = REPO / "sample-pso-delivery" / "artifacts" / "cfo-audit.manifest.json"
+# A tracked fixture (the bundled sample-pso-delivery/ engagement is gitignored, so it
+# is absent in CI — the end-to-end audit test must own its inputs + expected artifact).
+SAMPLE_MODEL = REPO / "tests" / "fixtures" / "contract-sample" / "model"
+SAMPLE_AUDIT = REPO / "tests" / "fixtures" / "contract-sample" / "cfo-audit.md"
+SAMPLE_MANIFEST = REPO / "tests" / "fixtures" / "contract-sample" / "cfo-audit.manifest.json"
 
 
 def test_contract_doc_lists_all_results_keys():

@@ -1,0 +1,5 @@
+[
+  {"opp_id": "OPP-003", "labor_hours": 600, "labor_rate": 185, "tech_cost": 50000, "integration_cost": 40000, "change_mgmt_pct": 0.20, "contingency_pct": 0.30},
+  {"opp_id": "OPP-001", "labor_hours": 1400, "labor_rate": 200, "tech_cost": 80000, "integration_cost": 150000, "change_mgmt_pct": 0.25, "contingency_pct": 0.30},
+  {"opp_id": "OPP-005", "labor_hours": 500, "labor_rate": 185, "tech_cost": 60000, "integration_cost": 30000, "change_mgmt_pct": 0.20, "contingency_pct": 0.30}
+]

@@ -1,0 +1,10 @@
+[
+  {"opp_id": "OPP-001", "improvement_low": 0.50, "improvement_high": 0.65, "process_id": "PROC-003", "volume_fraction": 1.0, "rate": 993.06},
+  {"opp_id": "OPP-002", "improvement_low": 0.30, "improvement_high": 0.45, "process_id": "PROC-006", "volume_fraction": 1.0, "rate": 866.67},
+  {"opp_id": "OPP-003", "improvement_low": 0.30, "improvement_high": 0.50, "process_id": "PROC-004", "volume_fraction": 1.0, "rate": 232.14},
+  {"opp_id": "OPP-004", "improvement_low": 0.30, "improvement_high": 0.45, "process_id": "PROC-005", "volume_fraction": 1.0, "rate": 1300.0},
+  {"opp_id": "OPP-005", "improvement_low": 0.30, "improvement_high": 0.45, "process_id": "PROC-002", "volume_fraction": 1.0, "rate": 14300.0},
+  {"opp_id": "OPP-006", "improvement_low": 0.20, "improvement_high": 0.35, "process_id": "PROC-001", "volume_fraction": 1.0, "rate": 3250.0},
+  {"opp_id": "OPP-007", "improvement_low": 0.15, "improvement_high": 0.30, "process_id": "PROC-007", "volume_fraction": 1.0, "rate": 2166.67},
+  {"opp_id": "OPP-008", "improvement_low": 0.10, "improvement_high": 0.18, "process_id": "PROC-006", "volume_fraction": 0.5, "rate": 866.67}
+]
