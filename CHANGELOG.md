@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Conversational onboarding.** On a fresh session the assistant now greets you and offers to start a new assessment, continue an existing one, or run the bundled sample — no commands or methodology vocabulary required. The session-start front door names the same three paths. (`conducting-engagement` first-contact flow.)
 - **Verifiable data contract + on-demand artifacts.** The engine now emits `model/trace.json` — per-figure provenance (`inputs × formula = result` + source) for every number in `results.json`, documented as a versioned public contract (`docs/data-contract.md`, v1.0). A new `generate-artifact` skill renders any requested artifact (CFO show-your-work audit, one-pager, CSV) from that contract under a mechanical no-new-arithmetic guard; binary formats (`.xlsx`/`.pptx`/`.docx`/`.pdf`) are produced by the host surface, so the plugin stays pure-stdlib.
 
 ### Removed

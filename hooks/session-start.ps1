@@ -19,7 +19,8 @@ Interpreter: $py
 Engine command form: $py $root/engine/run.py <engagement-folder>/
 State command form:  $py $root/state/state.py <engagement-folder>/
 
-If you're resuming an assessment I'll pick up where we left off; if you're starting fresh,
-just tell me what you'd like to assess — you don't need to know any commands or phase names.
+If you're resuming an assessment I'll pick up where we left off; if you're starting fresh
+I'll greet you with your options — start a new one, continue an existing one, or run a sample.
+You don't need to know any commands or phase names.
 </EXTREMELY_IMPORTANT>
 "@

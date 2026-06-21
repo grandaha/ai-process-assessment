@@ -51,3 +51,18 @@ def test_note_is_wrapped_for_standing_context():
     out = _run({}).stdout
     assert "<EXTREMELY_IMPORTANT>" in out
     assert "</EXTREMELY_IMPORTANT>" in out
+
+
+def test_note_offers_the_three_first_contact_paths():
+    out = _run({}).stdout.lower()
+    assert "continue an existing one" in out
+    assert "run a sample" in out
+
+
+def test_ps1_twin_carries_the_same_offer():
+    # The .sh hook is exercised by subprocess above; the .ps1 twin can't run on the CI
+    # linux runner, so guard its content statically to keep the two in sync.
+    ps1 = (REPO / "hooks" / "session-start.ps1").read_text(encoding="utf-8").lower()
+    assert "continue an existing one" in ps1
+    assert "run a sample" in ps1
+    assert "you don't need to know any commands or phase names" in ps1
