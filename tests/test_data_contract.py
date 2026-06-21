@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from engine.run import build_results
-from engine.trace import CONTRACT_VERSION, build_trace
+from engine.trace import CONTRACT_VERSION
 
 REPO = Path(__file__).resolve().parent.parent
 FIXTURE = REPO / "engine" / "tests" / "fixtures" / "lattice" / "model"

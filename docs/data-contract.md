@@ -65,7 +65,7 @@ string `"PENDING"` when inputs are incomplete.
 ```
 
 Each entry is a float (arithmetic mean of the six readiness dimensions, rounded
-to one decimal) or `"PENDING"`.
+to two decimal places) or `"PENDING"`.
 
 ### `costs`
 
@@ -82,7 +82,7 @@ Full entry (all inputs present):
     "contingency": 43125,
     "total": 330625,
     "rom": { "low": 165312.5, "high": 495937.5 },
-    "rom_label": "AACE Class 5"
+    "rom_label": "ROM estimate, AACE Class 5 (±50%)"
   }
 }
 ```
@@ -91,7 +91,7 @@ Sparse entry (any required input is `null`):
 
 ```json
 {
-  "OPP-002": { "total": "PENDING", "rom": "PENDING", "rom_label": "AACE Class 5" }
+  "OPP-002": { "total": "PENDING", "rom": "PENDING", "rom_label": "ROM estimate, AACE Class 5 (±50%)" }
 }
 ```
 
@@ -191,6 +191,14 @@ Fields:
 ```
 
 Emitted when at least one required input is `null`.
+
+> **Cost-block PENDING shape.** For `costs.<OPP>` entries, PENDING is emitted at
+> the per-subkey level, not for the block as a whole. When a cost block is PENDING
+> (any required cost input is `null`), `trace.json` contains a dict where each
+> subfield (`labor`, `change_mgmt`, `subtotal`, `contingency`, `total`,
+> `tech_cost`, `integration_cost`, `rom`) carries its own
+> `{"formula": "cost_structure", "result": "PENDING"}` entry. There is no single
+> top-level PENDING entry for the whole cost block.
 
 #### Passthrough entry
 
