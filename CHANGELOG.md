@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Phase 5 opportunity assembly now uses the portable stdlib `state.assembly` layer instead of inline `awk`, so it runs on Python-only surfaces and is deterministic regardless of subagent completion order (#100).
+
 ## [2.18.0] - 2026-06-21
 
 _Foundation milestone: cross-surface stdlib runtime, Excel removal, verifiable data contract + on-demand artifacts, and conversational onboarding._

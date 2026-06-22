@@ -439,3 +439,15 @@ def test_methodology_docs_have_no_workbook_references():
 
 def test_openpyxl_not_a_dependency():
     assert "openpyxl" not in (REPO_ROOT / "requirements.txt").read_text()
+
+
+# --- Portable-assembly guards (defends: shell assemblers replaced by state.assembly, #100) ---
+
+def test_phase5_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
+    # The portable layer is invoked …
+    assert "from state.assembly import" in body
+    assert "renumber_sequential" in body
+    # … and the legacy shell assembler is gone.
+    assert "awk '/^## TEMP-" not in body
+    assert "for f in" not in body
