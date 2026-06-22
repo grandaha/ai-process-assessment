@@ -61,44 +61,26 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - **When:** After `processes/_index.md` is confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
 - **Pass to each subagent:** engagement folder path, process ID (PROC-NNN), the absolute path to `processes/PROC-NNN.md` for that process, and staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. The agent reads its own `processes/PROC-NNN.md` (which contains both process map data and baseline metrics) and the relevant `tech-inventory.md` sections. Do not pass file content to the subagent.
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
-- **Assembly:** After all agents complete, assemble with Bash:
-  ```bash
-  mkdir -p <name>/opportunities
-  # Split staging files into per-OPP files, assign canonical OPP-NNN IDs,
-  # and replace temp IDs throughout (heading, extraction header, and prose).
-  # Lines before the first ## TEMP- heading are intentionally discarded (f is unset).
-  awk '/^## TEMP-/{
-    n++
-    opp_id = sprintf("OPP-%03d", n)
-    temp_id = $2
-    f = sprintf("<name>/opportunities/%s.md", opp_id)
-    sub(/^## TEMP-[^ ]+/, "## " opp_id)
-    print > f
-    next
-  }
-  f {
-    gsub(temp_id, opp_id)
-    print > f
-  }' <name>/_staging/phase5/proc-*.md
-  ```
-  Then generate the index by reading extraction headers:
-  ```bash
-  echo "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |" > <name>/opportunities/_index.md
-  echo "|--------|---------|------|-------------|----------------|-----|------------|" >> <name>/opportunities/_index.md
-  for f in <name>/opportunities/OPP-*.md; do
-    header=$(grep "^<!-- index:" "$f" | head -1)
-    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
-    proc=$(echo "$header" | grep -o 'process=[^ >]*' | cut -d= -f2)
-    type=$(echo "$header" | grep -o 'type=[^ >]*' | cut -d= -f2)
-    feas=$(echo "$header" | grep -o 'feasibility=[^ >]*' | cut -d= -f2)
-    data=$(echo "$header" | grep -o 'data=[^ >]*' | cut -d= -f2)
-    grc=$(echo "$header" | grep -o 'grc=[^ >]*' | cut -d= -f2)
-    struct=$(echo "$header" | grep -o 'struct=[^ >]*' | cut -d= -f2)
-    echo "| $id | $proc | $type | $feas | $data | $grc | $struct |" >> <name>/opportunities/_index.md
-  done
-  ```
-  Verify with: `ls <name>/opportunities/OPP-*.md | wc -l`
-  Cleanup: `rm -rf <name>/_staging/phase5`
+
+**Assembly (portable):** After all agents complete, assemble with one call into the tested `state.assembly` layer. `<engine_root>` is the absolute plugin root resolved at Session Start.
+
+```bash
+PYTHONPATH="<engine_root>" python3 -c "
+from state.assembly import collect_staged, renumber_sequential, index_from_headers, cleanup
+staged = collect_staged('<name>/_staging/phase5')
+ids = renumber_sequential(staged, '<name>/opportunities', 'OPP')
+index_from_headers(
+    ['<name>/opportunities/%s.md' % i for i in ids],
+    '<name>/opportunities/_index.md',
+    [('OPP-ID', 'id'), ('Process', 'process'), ('Type', 'type'),
+     ('Feasibility', 'feasibility'), ('Data Readiness', 'data'),
+     ('GRC', 'grc'), ('Structural', 'struct')],
+)
+cleanup('<name>/_staging/phase5')
+"
+```
+
+`renumber_sequential` splits each staged `proc-*.md` at its `## TEMP-<token>` headings, assigns global `OPP-NNN` ids in staged-file order (which equals process order — `proc-001`, `proc-002`, … sort to `PROC-001`, `PROC-002`, …), and remaps each opportunity's provisional token to its final id throughout its block. `index_from_headers` rebuilds `opportunities/_index.md` from the `<!-- index: -->` headers — reading each attribute key (`id=`, `process=`, `type=`, `feasibility=`, `data=`, `grc=`, `struct=`) in order and emitting a markdown table row. The resulting index has columns: `| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |`. Output is byte-identical regardless of subagent completion order.
 - **What stays in main context:** The one-line summaries from each agent (process ID, counts, GRC flags), the OPP headings from the grep verification, the GRC-flag branch decision, and cross-process consistency review of headings only.
 
 ## Phase checklist

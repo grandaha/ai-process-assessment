@@ -439,3 +439,41 @@ def test_methodology_docs_have_no_workbook_references():
 
 def test_openpyxl_not_a_dependency():
     assert "openpyxl" not in (REPO_ROOT / "requirements.txt").read_text()
+
+
+# --- Portable-assembly guards (defends: shell assemblers replaced by state.assembly, #100) ---
+
+def test_phase5_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
+    # The portable layer is invoked …
+    assert "from state.assembly import" in body
+    assert "renumber_sequential" in body
+    # … and the legacy shell assembler is gone.
+    assert "awk '/^## TEMP-" not in body
+    assert "for f in" not in body
+
+
+def test_phase6_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:scoring-opportunities"].body
+    assert "from state.assembly import" in body
+    assert "promote(" in body
+    # Legacy file-move and index loop gone …
+    assert "mv <name>/_staging/phase6" not in body
+    assert "for f in <name>/scores/OPP-*.md" not in body
+    # … but the engine composite math stays (model/scores.json still written here).
+    assert "model/scores.json" in body
+
+
+def test_gate_a_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:governance-risk-gate"].body
+    assert "from state.assembly import" in body
+    assert "promote(" in body
+    assert "mv <name>/_staging/grc" not in body
+    assert "for f in <name>/grc/OPP-*.md" not in body
+
+
+def test_phase4_index_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "from state.assembly import" in body
+    assert "index_from_fields" in body
+    assert "for f in <name>/processes/PROC-*.md" not in body

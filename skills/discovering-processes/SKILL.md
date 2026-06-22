@@ -127,19 +127,28 @@ One file per process. Contains both process map fields and baseline fields in a 
 
 **Assembly — after all synthesis is complete, generate the index:**
 ```bash
-mkdir -p <name>/processes
-echo "| PROC-ID | Process Name | Baseline |" > <name>/processes/_index.md
-echo "|---------|--------------|----------|" >> <name>/processes/_index.md
-for f in <name>/processes/PROC-*.md; do
-  id=$(basename "$f" .md)
-  proc_name=$(grep -m1 "^## PROC-" "$f" | sed 's/^## PROC-[0-9][0-9][0-9] — //')
-  baseline=$(grep "^<!-- index:" "$f" | grep -o 'baseline=[^ >]*' | cut -d= -f2)
-  baseline=${baseline:-Unavailable}
-  echo "| $id | $proc_name | $baseline |" >> <name>/processes/_index.md
-done
+PYTHONPATH="<engine_root>" python3 -c "
+import re
+from pathlib import Path
+from state.assembly import index_from_fields, cleanup
+
+def extract(path):
+    text = Path(path).read_text(encoding='utf-8')
+    m = re.search(r'^## PROC-\d+ — (.+)\$', text, re.M)
+    hm = re.search(r'baseline=([^\s>]*)', text)
+    return {
+        'id': Path(path).stem,
+        'name': m.group(1).strip() if m else '',
+        'baseline': hm.group(1) if hm and hm.group(1) else 'Unavailable',
+    }
+
+files = sorted(Path('<name>/processes').glob('PROC-*.md'))
+index_from_fields(files, '<name>/processes/_index.md',
+                  [('PROC-ID', 'id'), ('Process Name', 'name'), ('Baseline', 'baseline')], extract)
+cleanup('<name>/_staging/phase4')
+"
 ```
 Verify: `ls <name>/processes/PROC-*.md | wc -l`
-Cleanup: `rm -rf <name>/_staging/phase4`
 
 ## Stakeholder Interview Log
 
