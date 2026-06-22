@@ -462,3 +462,11 @@ def test_phase6_assembly_uses_portable_layer(methodology):
     assert "for f in <name>/scores/OPP-*.md" not in body
     # … but the engine composite math stays (model/scores.json still written here).
     assert "model/scores.json" in body
+
+
+def test_gate_a_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:governance-risk-gate"].body
+    assert "from state.assembly import" in body
+    assert "promote(" in body
+    assert "mv <name>/_staging/grc" not in body
+    assert "for f in <name>/grc/OPP-*.md" not in body

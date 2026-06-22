@@ -51,20 +51,15 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
 - [ ] Record the clearance status for each OPP from the one-line summaries (Cleared / Cleared with Conditions / Blocked)
 - [ ] Assemble GRC reviews to canonical folder via Bash:
   ```bash
-  mkdir -p <name>/grc
-  mv <name>/_staging/grc/OPP-*.md <name>/grc/
-  ```
-  Then generate the index from extraction headers:
-  ```bash
-  echo "| OPP-ID | Status | Conditions |" > <name>/grc/_index.md
-  echo "|--------|--------|------------|" >> <name>/grc/_index.md
-  for f in <name>/grc/OPP-*.md; do
-    header=$(grep "^<!-- index:" "$f" | head -1)
-    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
-    gstatus=$(echo "$header" | grep -o 'status=[^ >]*' | cut -d= -f2)  # not 'status': read-only in zsh
-    cond=$(echo "$header" | grep -o 'conditions=[^ >]*' | cut -d= -f2)
-    echo "| $id | $gstatus | $cond |" >> <name>/grc/_index.md
-  done
+  PYTHONPATH="<engine_root>" python3 -c "
+  from pathlib import Path
+  from state.assembly import promote, index_from_headers, cleanup
+  promote('<name>/_staging/grc', '<name>/grc')
+  files = sorted(Path('<name>/grc').glob('OPP-*.md'))
+  index_from_headers(files, '<name>/grc/_index.md',
+                     [('OPP-ID', 'id'), ('Status', 'status'), ('Conditions', 'conditions')])
+  cleanup('<name>/_staging/grc')
+  "
   ```
   Verify: `ls <name>/grc/OPP-*.md | wc -l`
 - [ ] For Cleared with Conditions, update the GRC flag line in `opportunities/OPP-NNN.md` using the inline conditions from the one-line summary — no staging file read required. Format: `**GRC flag:** Yellow — [original basis] | Cleared with Conditions: (1) <condition>, (2) <condition>`
@@ -72,7 +67,6 @@ This skill creates the `grc/` folder with per-OPP GRC review files and `grc/_ind
 - [ ] For Cleared, no update to `opportunities/OPP-NNN.md` is required
 
 **Output rule:** Do NOT reproduce OPP entry content in this response. Summarize GRC outcomes as a table: OPP-ID | Status | Condition count. Do not echo full OPP content.
-- [ ] Cleanup: `rm -rf <name>/_staging/grc`
 
 ## Rationalization Table
 
