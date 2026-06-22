@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Phase 5 opportunity assembly now uses the portable stdlib `state.assembly` layer instead of inline `awk`, so it runs on Python-only surfaces and is deterministic regardless of subagent completion order (#100).
+- Phase 6 score assembly now promotes and indexes scored files via the portable `state.assembly` layer; the engine composite-math step is unchanged (#100).
 
 ## [2.18.0] - 2026-06-21
 

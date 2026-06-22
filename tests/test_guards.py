@@ -451,3 +451,14 @@ def test_phase5_assembly_uses_portable_layer(methodology):
     # … and the legacy shell assembler is gone.
     assert "awk '/^## TEMP-" not in body
     assert "for f in" not in body
+
+
+def test_phase6_assembly_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:scoring-opportunities"].body
+    assert "from state.assembly import" in body
+    assert "promote(" in body
+    # Legacy file-move and index loop gone …
+    assert "mv <name>/_staging/phase6" not in body
+    assert "for f in <name>/scores/OPP-*.md" not in body
+    # … but the engine composite math stays (model/scores.json still written here).
+    assert "model/scores.json" in body

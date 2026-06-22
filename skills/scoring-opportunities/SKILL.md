@@ -128,10 +128,9 @@ This phase already runs two subagents. This section names the pattern so it read
 - **Reviewer dispatch (`opportunity-reviewer`):** One subagent over the fully assembled `scores/` folder draft, for independent cross-OPP calibration and consistency review. Pass to the reviewer: engagement folder path. The reviewer reads the `scores/` folder itself. Do not pass document content. Return: The reviewer appends findings to `<engagement-folder>/evidence-log.md` directly. Returns one-line summary to main context: "N Critical, N Important, N Minor findings." The orchestrator does NOT receive full review content.
 - **Assembly:** After all scorer agents complete, run the following sequence in order:
 
-  **Step 1 — Move staged files:**
+  **Step 1 — Move staged files (portable layer):**
   ```bash
-  mkdir -p <name>/scores
-  mv <name>/_staging/phase6/OPP-*.md <name>/scores/
+  PYTHONPATH="<engine_root>" python3 -c "from state.assembly import promote; promote('<name>/_staging/phase6', '<name>/scores')"
   ```
 
   **Step 2 — Compute composites, stamp files, write `model/scores.json`:**
@@ -159,27 +158,20 @@ This phase already runs two subagents. This section names the pattern so it read
   "
   ```
 
-  **Step 3 — Generate `_index.md` from stamped files:**
+  **Step 3 — Generate `_index.md` from stamped files and clean up (portable layer):**
   ```bash
-  echo "| OPP-ID | Composite | Horizon | B/B/P |" > <name>/scores/_index.md
-  echo "|--------|-----------|---------|-------|" >> <name>/scores/_index.md
-  for f in <name>/scores/OPP-*.md; do
-    header=$(grep "^<!-- index:" "$f" | head -1)
-    id=$(echo "$header" | grep -o 'id=[^ >]*' | cut -d= -f2)
-    comp=$(echo "$header" | grep -o 'composite=[^ >]*' | cut -d= -f2)
-    horiz=$(echo "$header" | grep -o 'horizon=[^ >]*' | cut -d= -f2)
-    bbp=$(echo "$header" | grep -o 'bbp=[^ >]*' | cut -d= -f2)
-    echo "| $id | $comp | $horiz | $bbp |" >> <name>/scores/_index.md
-  done
+  PYTHONPATH="<engine_root>" python3 -c "
+  from pathlib import Path
+  from state.assembly import index_from_headers, cleanup
+  files = sorted(Path('<name>/scores').glob('OPP-*.md'))
+  index_from_headers(files, '<name>/scores/_index.md',
+                     [('OPP-ID', 'id'), ('Composite', 'composite'), ('Horizon', 'horizon'), ('B/B/P', 'bbp')])
+  cleanup('<name>/_staging/phase6')
+  "
   ```
 
   Verify with: `ls <name>/scores/OPP-*.md | wc -l`
   Confirm no PENDING values remain: `grep -l PENDING <name>/scores/OPP-*.md` (expect no output)
-
-  Cleanup (non-fatal — sandbox may restrict deletion of empty directories):
-  ```bash
-  rm -rf <name>/_staging/phase6 || echo "Cleanup skipped (sandbox restriction) — directory is empty"
-  ```
 - **What stays in main context:** One-line summaries from each scorer agent (OPP-NNN, composite score, B/B/P), resolution of reviewer Critical findings, and the save + evidence-log clearance. Do not re-derive scores or B/B/P inline.
 
 See the Phase checklist and Workflow sections for the authoritative step sequence and ordering.
