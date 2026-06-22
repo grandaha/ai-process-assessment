@@ -61,6 +61,7 @@ Per-process opportunity identification is offloaded to subagents. Each mapped pr
 - **When:** After `processes/_index.md` is confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.
 - **Pass to each subagent:** engagement folder path, process ID (PROC-NNN), the absolute path to `processes/PROC-NNN.md` for that process, and staging file path: `<engagement-folder>/_staging/phase5/proc-<process-id>.md`. The agent reads its own `processes/PROC-NNN.md` (which contains both process map data and baseline metrics) and the relevant `tech-inventory.md` sections. Do not pass file content to the subagent.
 - **Return:** One-line summary only: process ID, opportunity count, GRC flag counts (Green/Yellow/Red). Full OPP content is written to the staging file by the agent — it does NOT flow back to main context.
+
 **Assembly (portable):** After all agents complete, assemble with one call into the tested `state.assembly` layer. `<engine_root>` is the absolute plugin root resolved at Session Start.
 
 ```bash
