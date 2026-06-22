@@ -470,3 +470,10 @@ def test_gate_a_assembly_uses_portable_layer(methodology):
     assert "promote(" in body
     assert "mv <name>/_staging/grc" not in body
     assert "for f in <name>/grc/OPP-*.md" not in body
+
+
+def test_phase4_index_uses_portable_layer(methodology):
+    body = methodology.skills["ai-process-assessment:discovering-processes"].body
+    assert "from state.assembly import" in body
+    assert "index_from_fields" in body
+    assert "for f in <name>/processes/PROC-*.md" not in body
