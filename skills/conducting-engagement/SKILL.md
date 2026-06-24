@@ -313,6 +313,24 @@ This governs only *applying the correction the user explicitly stated*. The down
 the re-drive re-opens still follow the existing **touchpoint taxonomy** and **autonomy preset**
 unchanged (guided pauses on should-confirm; batching of those is **Chunk C**, not here).
 
+**Log both parties.** Record every correction in the decision log, append-only — never overwrite
+the original proposal (it is the override corpus the improvement flywheel mines):
+
+- Correcting an AI draft (AI proposed X, human says Y): `proposed_by: agent`,
+  `decided_by: human-overrode`, `disposition: overridden→Y`.
+- A fresh user-supplied fact (no prior AI claim, or correcting a placeholder): `proposed_by: human`,
+  `decided_by: human-ratified`, `disposition: edited`.
+
+("Override" here is the decision-log sense — distinct from the CLAUDE.md methodology overrides in
+the reconcile step; this is not that.)
+
+**Narrate the delta** in plain language — no step names, file names, or internal ids:
+
+<!-- edit-delta-narration:start -->
+> Done — I updated that and re-ran the numbers. The business case moved from $1.4M to $1.1M, and
+> the status-assembly opportunity shifted from this year to next. Want me to walk through why?
+<!-- edit-delta-narration:end -->
+
 ## Failure & rejection handling
 
 - Phase subagent fails or `engine.run` errors → stop, surface the error (must-ask). Never

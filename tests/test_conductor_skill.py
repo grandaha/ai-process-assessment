@@ -105,3 +105,27 @@ def test_conductor_edit_confirm_gate():
     assert "touchpoint taxonomy" in sec
     assert "autonomy preset" in sec
     assert "Chunk C" in sec
+
+
+def test_conductor_edit_logs_both_parties():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # AI-draft correction mapping.
+    assert "human-overrode" in sec
+    assert "overridden→" in sec
+    # Fresh user-fact mapping.
+    assert "human-ratified" in sec
+    assert "edited" in sec
+    # Append-only, never overwrite the AI proposal.
+    assert "append-only" in sec
+
+
+def test_conductor_edit_delta_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- edit-delta-narration:start -->")
+    end = text.find("<!-- edit-delta-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "delta narration must be wrapped in <!-- edit-delta-narration:start --> ... :end -->"
+    narration = text[start:end]
+    forbidden = ["OPP-", "model/", "_staging", "renumber"] + [f"Phase {n}" for n in range(1, 12)]
+    for token in forbidden:
+        assert token not in narration, f"delta narration leaks jargon: {token!r}"
