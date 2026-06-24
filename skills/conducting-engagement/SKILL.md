@@ -374,6 +374,13 @@ inline and you apply the agreed changes through the audited pipeline.
 
 The register sets how much you explain (operator vs consultant voice).
 
+Narrate the offer jargon-free — no file names, ids, or step numbers:
+
+<!-- step-review-narration:start -->
+> Here's what this step produced, pulled together so it's easy to read in one place. Take a
+> look whenever you like — and just tell me if anything should change before I build on it.
+<!-- step-review-narration:end -->
+
 ### Working through comments
 
 The operator annotates the review **inline** — a blockquote led by `> 💬`, anchored to the
@@ -426,13 +433,6 @@ the method; the operator decides, and any override is logged in the decision log
   log: name it ("you decided X earlier — override it?") and log the override if they confirm.
 - **Conflicting comments** — two comments in the same pass that contradict each other:
   surface both and ask which governs.
-
-Narrate jargon-free — no file names, ids, or step numbers:
-
-<!-- step-review-narration:start -->
-> Here's what this step produced, pulled together so it's easy to read in one place. Take a
-> look whenever you like — and just tell me if anything should change before I build on it.
-<!-- step-review-narration:end -->
 
 ## Status on demand
 
