@@ -260,8 +260,7 @@ labeled so the human can correct any single one. Nothing is silently skipped —
 audit trail — and nothing pauses them mid-flow.
 
 **The line that never moves.** must-ask never collapses — in any mode, under any pressure, whatever
-autonomy the human has set: scope boundaries, out-of-scope process additions, cost actuals,
-checkpoint outcomes, gate dispositions, Build/Buy/Partner. A per-class setting can tighten a
+autonomy the human has set. The canonical floor is the **must-ask row of the *Touchpoint taxonomy*** above — every item there, no exceptions. A per-class setting can tighten a
 should-confirm item to `ask` or relax a should-confirm item to `auto`; it can **never** relax a must-ask. "Just do everything, don't ask me" speeds up should-confirm and can-infer and never
 touches the floor.
 

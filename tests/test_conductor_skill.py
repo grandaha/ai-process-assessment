@@ -157,6 +157,11 @@ def test_conductor_must_ask_invariant():
     assert "must-ask never collapses" in sec
     assert "any pressure" in sec
     assert "never** relax a must-ask" in sec or "never relax a must-ask" in sec
+    assert "Touchpoint taxonomy" in sec
+    # Validate that the canonical taxonomy floor carries the trust-critical categories.
+    text = SKILL.read_text()
+    for item in ("scope boundaries", "decision-maker", "cost actuals", "gate dispositions", "Build/Buy/Partner"):
+        assert item in text, f"must-ask taxonomy floor missing: {item!r}"
 
 
 def test_conductor_holding_the_line():
