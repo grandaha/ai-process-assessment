@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Parallel per-process opportunity identification (Slice 2 Chunk A, #87).** On a
+  multi-process engagement the conductor now finds opportunities across all processes
+  concurrently — one per-process pass each, merged in process order into a single
+  byte-identical result — including cross-process automation chains. Degrades to sequential
+  where concurrent dispatch is unavailable; a single process's failure re-runs only that
+  process. No engine/math change; reuses the portable assembly layer.
+
 ### Changed
 - Phase 5 opportunity assembly now uses the portable stdlib `state.assembly` layer instead of inline `awk`, so it runs on Python-only surfaces and is deterministic regardless of subagent completion order (#100).
 - Phase 6 score assembly now promotes and indexes scored files via the portable `state.assembly` layer; the engine composite-math step is unchanged (#100).

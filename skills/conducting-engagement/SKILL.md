@@ -152,7 +152,7 @@ Repeat until Phase 11 is done and Gate B is cleared:
 - **Interview-heavy phases run inline in your own context:** Phase 1 (scoping), Phase 4
   (discovery), Phase 8.5 (cost actuals). Conduct their questioning yourself, write the
   output file, then drop the transcript and keep only the state snapshot.
-- **Headless phases you dispatch to a subagent:** Phases 2, 3, 5, 6, 7, 9, 10, 11, the
+- **Headless phases you dispatch to a subagent:** Phases 2, 3, 6, 7, 9, 10, 11, the
   checkpoints, and the GRC/deliverable gates. A subagent cannot ask the human, so before
   dispatch you must have every input it needs on disk. Hand the subagent the engagement
   folder path and the phase skill to run; receive a one-line confirmation; re-read state.
@@ -160,6 +160,62 @@ Repeat until Phase 11 is done and Gate B is cleared:
   exist and gather any human-supplied value it needs via a targeted inline question — a
   **must-ask** if it's a decision (e.g., Build/Buy/Partner), a **should-confirm** if it's
   draftable.
+- **Phase 5 (opportunity identification) is special:** with ≥2 ready processes you own a
+  per-process fan-out rather than a single headless dispatch — see *Parallel per-process
+  fan-out (Phase 5)*. With one process it runs once, whole-portfolio.
+
+## Parallel per-process fan-out (Phase 5)
+
+When the next step is Phase 5 (opportunity identification) and **≥2** in-scope processes
+have `Baseline = Ready`, **you own the fan-out** — do not dispatch Phase 5 as a single
+headless subagent. (Convergence already requires the full discovered set before Phase 6,
+so every in-scope process is ready before this runs.)
+
+- **Dispatch:** dispatch **one subagent per process**, each running
+  `ai-process-assessment:identifying-opportunities` scoped to a single `PROC-NNN`, in one
+  concurrent batch. Give each the engagement folder, `engine_root`, and its one `PROC-NNN`.
+  Each writes only `<name>/_staging/phase5/proc-<process-id>.md` and returns a one-line
+  summary (process id, opportunity count, GRC flag counts) — never opportunity content.
+- **Merge (you, after the full set is staged):** assemble with the portable layer, identical
+  to the Phase 5 skill's whole-portfolio assembly:
+
+  ```bash
+  PYTHONPATH="<engine_root>" python3 -c "
+  from state.assembly import collect_staged, renumber_sequential, index_from_headers, cleanup
+  staged = collect_staged('<name>/_staging/phase5')
+  ids = renumber_sequential(staged, '<name>/opportunities', 'OPP')
+  index_from_headers(
+      ['<name>/opportunities/%s.md' % i for i in ids],
+      '<name>/opportunities/_index.md',
+      [('OPP-ID', 'id'), ('Process', 'process'), ('Type', 'type'),
+       ('Feasibility', 'feasibility'), ('Data Readiness', 'data'),
+       ('GRC', 'grc'), ('Structural', 'struct')],
+  )
+  cleanup('<name>/_staging/phase5')
+  "
+  ```
+
+  `renumber_sequential` assigns global `OPP-NNN` in staged-file (process) order, so concurrent
+  and sequential fan-out yield **byte-identical** `opportunities/` (for a fixed in-scope process set; adding a process later re-numbers `OPP-NNN` globally, exactly as the sequential path does).
+- **Then** run the cross-process **chain-detection** scan over the merged `opportunities/`
+  (see *Elastic processes & convergence*), then proceed to convergence / Phase 6.
+- **Degradation:** on a surface without concurrent dispatch, run the same per-process
+  invocations **sequentially** into the same staging layout — same merge, same ids, identical
+  result. Fan-out is an optimization; the sequential path is the invariant.
+- **Failure:** if one process's subagent fails, **re-dispatch only that process**; retain the
+  others' staged outputs; **do not merge until the full set is staged** (convergence already
+  demands every in-scope process). A merge error → stop, surface (must-ask), never advance on a
+  failed merge.
+
+N<2 → run Phase 5 once, whole-portfolio, exactly as before (the sequential spine).
+
+When you begin the fan-out, narrate it in plain language — no step names, file names, or
+internal ids:
+
+<!-- fanout-narration:start -->
+> I've mapped all your processes — now I'm finding opportunities across them together, so I
+> can catch the wins that only show up when the whole picture is in view.
+<!-- fanout-narration:end -->
 
 ## Touchpoint taxonomy
 

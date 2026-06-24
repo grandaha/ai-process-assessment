@@ -56,6 +56,17 @@ If `baseline.volume` is monthly and you forget the period, the result is ~12× t
 
 ## Subagent Dispatch
 
+**Invocation modes.** This skill runs in one of two modes:
+
+- **Single-process (conductor-driven fan-out).** When the conductor invokes this skill
+  scoped to a single `PROC-NNN`, act as the typer for that one process: read only its
+  `processes/PROC-NNN.md` (and the relevant `tech-inventory.md` sections), write only that
+  process's opportunities to `<engagement-folder>/_staging/phase5/proc-<process-id>.md` with
+  provisional `## TEMP-` ids, return the one-line summary, and **do not assemble** — the
+  conductor merges every process's staging into the canonical `opportunities/`.
+- **Whole-portfolio (direct invocation or a single-process engagement).** Dispatch the
+  per-process batch and assemble, exactly as described below.
+
 Per-process opportunity identification is offloaded to subagents. Each mapped process is independent for typing purposes, so they parallelize cleanly.
 
 - **When:** After `processes/_index.md` is confirmed present, dispatch one `opportunity-typer` subagent per mapped process in a single parallel tool-call batch.

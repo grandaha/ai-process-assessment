@@ -453,6 +453,17 @@ def test_phase5_assembly_uses_portable_layer(methodology):
     assert "for f in" not in body
 
 
+def test_phase5_supports_single_process_scope(methodology):
+    """Conductor-driven fan-out invokes Phase 5 one process at a time: stage only,
+    no assemble. (Slice 2 Chunk A.)"""
+    body = methodology.skills["ai-process-assessment:identifying-opportunities"].body
+    assert "Single-process" in body
+    assert "scoped to a single" in body
+    assert "do not assemble" in body
+    # The whole-portfolio assembly path must still exist for direct/N=1 invocation.
+    assert "renumber_sequential" in body
+
+
 def test_phase6_assembly_uses_portable_layer(methodology):
     body = methodology.skills["ai-process-assessment:scoring-opportunities"].body
     assert "from state.assembly import" in body

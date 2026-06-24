@@ -13,8 +13,11 @@
 # The bundled sample run lives here:
 sample-pso-delivery/
 
-# Internal planning and design docs
-docs/superpowers/
+# Internal planning and design docs (specs + plans are tracked so they travel
+# with the repo; any other local-only content under docs/superpowers/ stays ignored).
+docs/superpowers/*
+!docs/superpowers/specs/
+!docs/superpowers/plans/
 
 # Subagent staging area
 _staging/
