@@ -48,7 +48,13 @@ def status_view(root) -> dict:
     if current_step is None and deliverable_status != "done":
         gates_due.append("deliverable")
 
-    stale = changed_inputs(root, conductor.get("model_input_hashes", {}))
+    # Staleness needs a recorded baseline. With no recorded hashes (a fresh
+    # engagement, or a legacy/unparseable .conductor.md that read_conductor maps
+    # to {}), nothing is known-stale — flagging every input as "stale" would be a
+    # false alarm on this read-only surface. The conductor records hashes after
+    # each model phase, so real staleness is still caught in a driven engagement.
+    recorded = conductor.get("model_input_hashes") or {}
+    stale = changed_inputs(root, recorded) if recorded else []
     partial = [
         {"kind": i.kind, "target": i.target, "repair": i.repair, "detail": i.detail}
         for i in check_integrity(root)

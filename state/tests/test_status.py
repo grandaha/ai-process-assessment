@@ -95,6 +95,18 @@ def test_attention_stale_inputs(engagement):
     assert "baselines" in v["attention"]["stale_inputs"]
 
 
+def test_no_recorded_hashes_means_no_stale_alarm(engagement):
+    # Inputs + results present but no model_input_hashes recorded (fresh, or a
+    # legacy/unparseable .conductor.md that read_conductor maps to {}) -> no false
+    # "stale" alarm on the read-only status surface.
+    root = engagement(**{
+        "model/baselines.json": "[]", "model/value.json": "[]",
+        "model/results.json": "{}",
+    })  # no write_conductor -> read_conductor returns {}
+    v = status_view(root)
+    assert v["attention"]["stale_inputs"] == []
+
+
 def test_attention_partial_state_carries_detail(engagement):
     root = engagement(**{"scope.md": "   "})  # whitespace-only -> empty_output
     v = status_view(root)
