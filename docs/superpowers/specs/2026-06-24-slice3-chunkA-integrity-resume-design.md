@@ -1,0 +1,170 @@
+# Slice 3 · Chunk A — Messy/partial-state handling + resume hardening
+
+**Part of:** Epic #85 → Slice 3 (#88), spec §3.E (`docs/superpowers/specs/2026-06-19-public-ai-first-distribution-design.md`).
+**Date:** 2026-06-24.
+
+## 1. Problem
+
+The state layer judges a phase **done** purely by output-file existence
+([`state/state.py`](../../../state/state.py) `_phase_status`: `(root / phase.output).exists()`).
+**Existence ≠ completeness.** Real engagements accumulate mess the drive loop currently
+sails straight past:
+
+- A phase output is created but **empty or truncated** — an interrupted write leaves a
+  zero-byte `scope.md`, or a fan-out crash leaves `opportunities/_index.md` present but
+  half-written. The drive loop reads "done" and advances on garbage.
+- An **index drifts from its item files** — a per-process Phase 5 fan-out wrote 2 of 5
+  `OPP-NNN.md` bodies before crashing, or `_index.md` lists `OPP-007` whose body file was
+  never written (or was hand-deleted). The index and the folder disagree.
+- A `model/*.json` input is **malformed** (hand-edited to invalid JSON). The engine will
+  fail opaquely later instead of being caught at resume.
+- `model/results.json` is **absent while inputs exist** — the engine never ran, or the
+  output was deleted. (The *changed-inputs* case — inputs edited after a clean run — is
+  already owned by `state/staleness.py` and is **out of scope here**, to avoid redundant
+  detection.)
+
+These are exactly the "half-written files, manual edits, interrupted phases" the slice
+calls out. Today none of them is detected; the Conductor trusts existence.
+
+## 2. Goal
+
+A **pure-Python integrity checker** that, given an engagement folder, returns a
+deterministic, classified list of partial-state inconsistencies — each labelled
+**auto-repairable** (deterministically re-derivable from sources) or **must-surface**
+(needs human content). A Conductor section wires it into the drive loop so resume
+**self-heals what is safely derivable and surfaces the rest** (the approved repair
+stance), keeping every number's provenance intact (AC-3).
+
+Non-goals: no new file formats; no LLM in the checker (it is a pure function of the
+filesystem → testable, reproducible); no duplication of staleness (changed-inputs) or of
+the `engine_root` reconcile (both already exist).
+
+## 3. Design
+
+### 3.1 New unit — `state/integrity.py`
+
+Pure functions of the filesystem. No network, no subprocess, no mutation. Mirrors the
+discipline of `state/state.py` and `state/staleness.py`.
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Issue:
+    kind: str      # machine id (see catalogue below)
+    target: str    # repo-relative path or phase id the issue concerns
+    repair: str    # "auto" | "surface"
+    detail: str    # plain-language explanation, for Conductor narration
+
+def check_integrity(root) -> list[Issue]:
+    """Detect partial-state inconsistencies in an engagement folder.
+    Pure; deterministic. Returns Issues sorted by (target, kind)."""
+```
+
+`check_integrity` **detects and classifies only — it never repairs.** Repair is performed
+by the Conductor using primitives that already exist (`state/assembly.py` for indexes,
+`engine/run.py` for results). This keeps the checker pure and avoids it importing or
+shelling the engine.
+
+### 3.2 Issue catalogue
+
+Driven by `state/phases.py` (`PHASES`, `MODEL_INPUTS`) and the folder convention
+(per-item phases: `processes/` `PROC-`, `opportunities/` `OPP-`, `scores/` `OPP-`,
+`usecase-briefs/` `UC-`; gate folder `grc/` `OPP-`).
+
+| kind | Trigger | repair | Repair path (Conductor) |
+|---|---|---|---|
+| `empty_output` | A `PHASES` output file exists but is empty / whitespace-only | `surface` | Re-drive that phase (its content is gone). |
+| `index_orphan_items` | Item files exist in a phase folder but are absent from / inconsistent with `_index.md` | `auto` | Rebuild index via `assembly.index_from_headers`. |
+| `index_missing_item` | `_index.md` references an item id with no matching body file | `surface` | Re-drive that phase (the body content is gone). |
+| `bad_json` | A present `model/<stem>.json` (stem ∈ `MODEL_INPUTS`) fails `json.loads` | `surface` | Ask the human for the correct value; re-record. |
+| `results_missing` | `model/*.json` inputs exist but `model/results.json` is absent | `auto` | Run `engine/run.py`, then `record_input_hashes`. |
+
+**Deliberately not flagged** (already owned elsewhere — reconciliation principle):
+- changed model inputs after a clean run → `state/staleness.py`.
+- corrupt/absent `.conductor.md` → `read_conductor` returns `{}` + drive-loop re-stamp /
+  `reconcile_engine_root`.
+
+Detection details:
+- *empty/whitespace*: `path.read_text().strip() == ""`.
+- *index drift*: parse the `_index.md` table's id column (first cell of each `|`-row that
+  is not header/separator) into a set; glob the folder for `PREFIX-*.md` (excluding
+  `_index.md`) into a set. Items-not-in-index → `index_orphan_items` (auto). Index-ids
+  with-no-file → `index_missing_item` (surface). Both can fire for one folder.
+- *bad_json*: attempt `json.loads(path.read_text())`; `JSONDecodeError` → `bad_json`.
+- *results_missing*: any `MODEL_INPUTS` stem file present **and** `model/results.json`
+  absent.
+
+Ordering: results sorted by `(target, kind)` so output is stable across runs and
+filesystems (no mtime, matching the staleness rationale).
+
+### 3.3 CLI entry
+
+`python3 <engine_root>/state/integrity.py <folder>` prints the Issue list as JSON
+(same invocation shape as `state/state.py`), so the Conductor reads it by absolute path
+with no third-party deps. Exit `0` always when the folder is valid (issues are data, not
+errors); exit `2` if the path is not a directory (mirrors `state.state.main`).
+
+### 3.4 Conductor wiring — drive-loop step 1
+
+A new subsection of `skills/conducting-engagement/SKILL.md`, **"Resuming into a messy
+state,"** invoked as part of drive-loop step 1 (read state), **before** staleness (step 3)
+and step-selection (step 4):
+
+1. Run `state/integrity.py <folder>`.
+2. **Auto-repair** every `repair: "auto"` issue silently, using the existing primitive
+   (`index_from_headers` for `index_orphan_items`; `engine/run.py` + `record_input_hashes`
+   for `results_missing`). These are deterministic re-derivations from sources — no human
+   input, fully reproducible, so no confirmation needed.
+3. **Surface** every `repair: "surface"` issue as a single batched **must-ask** in plain
+   language (no file/phase names leaked): name what looks incomplete and that you need to
+   re-do that part with them. Do not advance past a `surface` issue.
+4. Re-run integrity after auto-repairs to confirm the auto set cleared; only `surface`
+   issues should remain.
+
+Narration block (jargon-free), fenced for the guard like the existing narration blocks:
+
+```
+<!-- resume-recovery-narration:start -->
+> Picking up where we left off. A couple of things look half-finished from last time —
+> I've tidied up what I could re-build automatically. One part (the team's process notes)
+> didn't get saved completely; let's redo that quickly together before we go on.
+<!-- resume-recovery-narration:end -->
+```
+
+## 4. Files
+
+- **Create** `state/integrity.py` — `Issue`, `check_integrity`, `main` (CLI).
+- **Create** `state/tests/test_integrity.py` — unit tests for every `kind` and the
+  classification, plus the CLI exit codes and deterministic ordering.
+- **Modify** `skills/conducting-engagement/SKILL.md` — add the "Resuming into a messy
+  state" subsection + narration block; reference it from drive-loop step 1.
+- **Modify** `tests/test_conductor_skill.py` — static string-presence guards for the new
+  section (section present, references integrity, distinguishes auto vs surface, narration
+  block fenced, wired before staleness/step-4).
+
+## 5. Testing strategy
+
+- **`state/tests/test_integrity.py`** (the trust core): build tiny engagement folders in
+  `tmp_path`, assert the exact `Issue` set per scenario — clean folder → `[]`; empty
+  `scope.md` → one `empty_output`; orphan `OPP-003.md` not in index → `index_orphan_items`
+  (auto); index lists `OPP-009` with no file → `index_missing_item` (surface); malformed
+  `model/value.json` → `bad_json`; inputs present + no `results.json` → `results_missing`;
+  a folder with several issues → sorted, complete set. Plus: CLI prints JSON & exit 0;
+  non-dir → exit 2; deferral — a *changed* (not absent) input produces **no** integrity
+  issue (staleness owns it).
+- **`tests/test_conductor_skill.py`**: static guards over the new SKILL.md section using
+  the existing `_section`/`methodology` fixture convention.
+- Full suite (`.venv/bin/python -m pytest`) stays green.
+
+## 6. Reconciliation (checked against existing machinery)
+
+- **No redundancy with `staleness.py`**: integrity flags only *absent* results, never
+  *changed* inputs — that boundary is explicit in the catalogue.
+- **No redundancy with `conductor_state` reconcile**: `.conductor.md` health is already
+  self-healed; integrity does not touch it.
+- **Reuses `assembly.index_from_headers`** for index repair rather than re-deriving — same
+  primitive the fan-out merge uses, so a rebuilt index is byte-identical to a freshly
+  assembled one.
+- **Matches existing CLI/purity conventions** of `state/state.py` and `state/staleness.py`
+  (pure function + thin `main`, JSON out, absolute-path invocation).
