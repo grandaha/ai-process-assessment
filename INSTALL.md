@@ -241,6 +241,13 @@ git config core.hooksPath .githooks
 It uses `.venv/bin/python` if present, skips gracefully if pytest isn't
 installed, and can be bypassed for a one-off with `git push --no-verify`.
 
+The hook also prints a **non-blocking GitHub Actions availability** line (it never
+affects the push): if the latest completed Actions run executed zero steps — the
+signature of exhausted Actions minutes — it warns that Actions is BLOCKED, so the
+local gate above is your backstop (admin-merge / cut releases manually until it's
+back); otherwise it confirms Actions is AVAILABLE and normal CI runs on push. This
+needs the `gh` CLI authenticated; without it, the line is silently skipped.
+
 ---
 
 ## Troubleshooting

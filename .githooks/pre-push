@@ -1,10 +1,16 @@
 #!/bin/sh
-# Local test gate: block a push if the suite fails. Enable once per clone with
-#   git config core.hooksPath .githooks
-# Substitutes for branch protection on the Free plan (see INSTALL.md).
+# Local pre-push gate. Two parts:
+#   (a) BLOCKING test gate — runs this repo's CI check (pytest) locally so
+#       "local green" means "CI would be green". Substitutes for branch
+#       protection on the Free plan (see INSTALL.md).
+#   (b) NON-BLOCKING GitHub Actions availability check — tells you whether
+#       Actions is actually running, so you have a zero-minutes backstop and
+#       know when to resume the normal CI flow. Never affects the push.
+# Enable once per clone:  git config core.hooksPath .githooks
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT" || exit 1
 
+# --- (a) blocking test gate (mirrors .github/workflows/test.yml: pytest -q) ---
 if [ -x ".venv/bin/python" ]; then
   PY=".venv/bin/python"
 else
@@ -14,11 +20,33 @@ fi
 # Don't block on missing tooling — only on actual test failures.
 if [ -z "$PY" ] || ! "$PY" -c "import pytest" >/dev/null 2>&1; then
   echo "pre-push: pytest unavailable (no .venv?) — skipping local test gate." >&2
-  exit 0
+else
+  echo "pre-push: running $PY -m pytest -q ..."
+  if ! "$PY" -m pytest -q; then
+    echo "pre-push: tests failed — push aborted. Use 'git push --no-verify' to override." >&2
+    exit 1
+  fi
 fi
 
-echo "pre-push: running $PY -m pytest -q ..."
-if ! "$PY" -m pytest -q; then
-  echo "pre-push: tests failed — push aborted. Use 'git push --no-verify' to override." >&2
-  exit 1
+# --- (b) non-blocking GitHub Actions availability check ---
+# When an account's Actions minutes are exhausted (or billing fails), a run ends
+# with conclusion=failure but its jobs execute ZERO steps. So "total steps across
+# the latest COMPLETED run == 0" reliably means Actions is blocked, and > 0 means
+# it ran for real. Needs no special token scope. Degrades silently without gh /
+# network / runs. This never changes the push exit status.
+if command -v gh >/dev/null 2>&1; then
+  rid=$(gh run list --limit 5 --json databaseId,status \
+        --jq 'map(select(.status=="completed")) | .[0].databaseId' 2>/dev/null)
+  if [ -n "$rid" ] && [ "$rid" != "null" ]; then
+    steps=$(gh run view "$rid" --json jobs \
+            --jq '[.jobs[].steps | length] | add // 0' 2>/dev/null)
+    if [ "${steps:-0}" -gt 0 ] 2>/dev/null; then
+      echo "pre-push: GitHub Actions AVAILABLE (latest run executed steps) — normal CI on push."
+    else
+      echo "pre-push: GitHub Actions appears BLOCKED (latest completed run ran 0 steps — likely out of minutes)." >&2
+      echo "pre-push: the local test gate above is your backstop; admin-merge / cut releases manually until it's back." >&2
+    fi
+  fi
 fi
+
+exit 0
