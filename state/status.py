@@ -77,3 +77,18 @@ def status_view(root) -> dict:
         "complete": (current_step is None and grc_status != "required"
                      and deliverable_status == "done"),
     }
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(prog="state.status")
+    parser.add_argument("engagement", type=Path, help="path to the engagement folder")
+    args = parser.parse_args(argv)
+    if not args.engagement.is_dir():
+        print(f"not a directory: {args.engagement}", file=sys.stderr)
+        return 2
+    print(json.dumps(status_view(args.engagement), indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
