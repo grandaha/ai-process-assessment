@@ -273,6 +273,45 @@ number is what makes the $1.3M defensible — 30 seconds and it's yours"). Be **
 never refuse-and-quote**: do not cite phase names, rules, or the methodology at the human. Holding
 the line is the shortest honest path, never a wall.
 
+## Improvement flywheel — auto-flagging escapes
+
+When *holding the line* (above) catches you reaching for a methodology shortcut, don't just
+refuse it — record it, so the method itself gets sharper over time.
+
+1. **Detect (with a false-positive guard).** Watch your own reasoning for the master-table
+   rationalizations in `using-methodology` (skip-a-step, compute-a-number-inline,
+   reuse-prior-answers, optimize-around-not-root, …). Flag **only** when you would actually
+   have taken the shortcut **and** the methodology does not explicitly permit the action
+   here. A permitted reuse is not an escape.
+2. **Refuse + auto-capture (RED).** Do not take the shortcut. Write a RED entry to the active
+   engagement's `improvement-log.md` (the engagement folder resolved at drive-loop step 0,
+   by absolute path):
+   `PYTHONPATH="<engine_root>" python3 -c "from state.improvement_log import Escape, prepend_entry; prepend_entry('<engagement>/improvement-log.md', Escape(date='<today>', phase='<n>', skill='<skill>', engagement='<name>', shortcut='<caught shortcut>', would_produce='<avoided consequence>', why_uncaught='<which row, or \"no row existed\">', reframe='<canonical reframe from the matched row, or \"pending\">'))"`.
+   Supply `<today>` yourself (the module keeps no clock). Use the canonical reframe from the
+   matched master-table row, or `pending` when no row existed. This RED capture is the only
+   automatic step.
+3. **On write failure, don't claim success.** If the call raises (e.g. a pre-existing log
+   without an `## Entries` header, or a path error), tell the human plainly that you caught
+   the shortcut but couldn't write the note, and why — never narrate a record that doesn't
+   exist.
+4. **Surface GREEN/REFACTOR (human-approved), as two distinct asks.** After a successful
+   write, tell the human you caught and logged it, and ask — distinguishing the two —
+   whether to **GREEN** (add the rationalization row to the relevant skill) and/or
+   **REFACTOR** (tighten the gate/checklist step). These edit skills/keystone and are
+   **never** automatic.
+
+This composes with *holding the line*: that section is the refusal; this is the durable
+record. The must-ask floor and autonomy presets are unchanged.
+
+Narrate jargon-free — no step, file, or method-internal names:
+
+<!-- flywheel-narration:start -->
+> Heads-up: I nearly took a shortcut there — reusing last time's answers instead of
+> re-deriving them for your situation. I didn't, and I've noted it so the method gets a
+> little sharper. Want me to fold that lesson into how I work, add a guardrail so it can't
+> slip again — either, both, or neither and just keep going?
+<!-- flywheel-narration:end -->
+
 ## Elastic processes & convergence
 
 - An engagement is one portfolio holding 1..N processes; N=1 is the same spine with one
