@@ -92,3 +92,16 @@ def test_conductor_edit_splicing_intake_and_routes():
     # Delta report hookup to the Task 1 helper.
     assert "state.results_diff" in sec
     assert "diff_results" in sec
+
+
+def test_conductor_edit_confirm_gate():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # Act-then-show default.
+    assert "act-then-show" in sec
+    # The two confirm-first exceptions.
+    assert "ambiguous" in sec
+    assert "must-ask" in sec
+    # Downstream re-surfacing defers to the existing contract; no new batching here.
+    assert "touchpoint taxonomy" in sec
+    assert "autonomy preset" in sec
+    assert "Chunk C" in sec

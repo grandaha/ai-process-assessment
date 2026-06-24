@@ -300,6 +300,19 @@ compute the delta with `PYTHONPATH="<engine_root>" python3 -c "from state.result
 diff_results; ..."` (comparing the before-snapshot to the new `results.json`) and narrate the
 salient changes (see the delta narration below).
 
+**Confirm gate (act-then-show).** A correction is cheap and reversible (a value edit plus an
+append-only log entry), and the delta report is the confirmation after the fact — so the default is
+**act-then-show**: apply the correction, then report what changed. Confirm *first* only when:
+
+- the mapping is **ambiguous** — ask which field they mean ("the cost rate or the value-improvement
+  rate?"), an interpretation question, not a permission question; or
+- the correction re-opens a **human-only must-ask** — scope boundary, Build/Buy/Partner, cost
+  actuals — which are always must-ask, every mode.
+
+This governs only *applying the correction the user explicitly stated*. The downstream ratifications
+the re-drive re-opens still follow the existing **touchpoint taxonomy** and **autonomy preset**
+unchanged (guided pauses on should-confirm; batching of those is **Chunk C**, not here).
+
 ## Failure & rejection handling
 
 - Phase subagent fails or `engine.run` errors → stop, surface the error (must-ask). Never
