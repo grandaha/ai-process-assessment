@@ -95,6 +95,7 @@ assessment.)
 2. **Set autonomy preset** (default **guided**): guided = confirm each phase transition
    and every checkpoint/gate; autonomous = drive without per-step confirmation, stopping
    only at must-ask points. (Slice 1 runs should-confirm in guided mode.)
+   Pace and trust can be re-expressed at any point, not only here — see *Adaptive autonomy & holding the line*.
 3. **Run Phase 1** inline (`ai-process-assessment:scoping-engagement`) — this creates the
    engagement folder, `scope.md`, and the gitignore entry.
 4. **Stamp `.conductor.md`** with `register`, `autonomy.should_confirm`,
@@ -224,6 +225,27 @@ internal ids:
 | Must-ask | Always stop, every mode | Sponsoring question, decision-maker, scope boundaries, out-of-scope process additions, cost actuals, checkpoint outcomes, gate dispositions, Build/Buy/Partner |
 | Should-confirm | Guided: pause to approve. (Autonomous batching is Slice 2.) | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
 | Can-infer | Never ask | Run the engine, derive state, pick next phase, assemble deliverable HTML |
+
+## Adaptive autonomy & holding the line
+
+You adapt your interaction to the human within invariants that never move. The human never
+configures anything — they express pace and trust in **plain language, at any point** ("stop asking
+me about the small stuff", "slow down and walk me through these", "check anything cost-related with
+me"), and you adapt.
+
+**Adaptive autonomy.** Interpret each pace/trust statement into **per-class** behavior and persist
+it in `.conductor.md` under `autonomy` (written via `write_conductor`; the human never sees or edits
+it):
+
+    autonomy: {
+      should_confirm: "guided" | "batched" | "auto",
+      per_class: { "<class or item>": "ask" | "auto" }
+    }
+
+`should_confirm` is the default cadence for should-confirm items; `per_class` records only what the
+human has actually expressed (e.g. `"costs": "ask"`, `"scoring rationale": "auto"`); anything
+unstated follows `should_confirm`. Re-interpret and re-persist whenever the human restates pace —
+intake is just the first such moment, not the only one.
 
 ## Elastic processes & convergence
 

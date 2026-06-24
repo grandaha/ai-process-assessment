@@ -9,6 +9,7 @@ REQUIRED_HEADINGS = [
     "## Execution model",
     "## Parallel per-process fan-out",
     "## Touchpoint taxonomy",
+    "## Adaptive autonomy & holding the line",
     "## Elastic processes & convergence",
     "## Decision log",
     "## Staleness",
@@ -129,3 +130,14 @@ def test_conductor_edit_delta_narration_is_jargon_free():
     forbidden = ["OPP-", "model/", "_staging", "renumber"] + [f"Phase {n}" for n in range(1, 12)]
     for token in forbidden:
         assert token not in narration, f"delta narration leaks jargon: {token!r}"
+
+
+def test_conductor_adaptive_autonomy():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    # Plain-language interface, any time.
+    assert "plain language" in sec
+    # Interpreted into per-class behavior and persisted (conductor-maintained).
+    assert "per-class" in sec
+    assert "per_class" in sec
+    assert "write_conductor" in sec
+    assert "never sees or edits" in sec
