@@ -150,3 +150,17 @@ def test_conductor_should_confirm_batching():
     assert "silently skipped" in sec
     # The taxonomy placeholder is replaced by the implemented behavior.
     assert "Autonomous batching is Slice 2" not in text
+
+
+def test_conductor_must_ask_invariant():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    assert "must-ask never collapses" in sec
+    assert "any pressure" in sec
+    assert "never** relax a must-ask" in sec or "never relax a must-ask" in sec
+
+
+def test_conductor_holding_the_line():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    assert "firm and teaching" in sec
+    assert "never refuse-and-quote" in sec
+    assert "shortest honest path" in sec

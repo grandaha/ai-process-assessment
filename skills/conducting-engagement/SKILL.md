@@ -253,6 +253,19 @@ a class is `auto`), do not pause on each should-confirm item. Accumulate them an
 labeled so the human can correct any single one. Nothing is silently skipped — the digest is the
 audit trail — and nothing pauses them mid-flow.
 
+**The line that never moves.** must-ask never collapses — in any mode, under any pressure, whatever
+autonomy the human has set: scope boundaries, out-of-scope process additions, cost actuals,
+checkpoint outcomes, gate dispositions, Build/Buy/Partner. A per-class setting can tighten a
+should-confirm item to `ask` or relax a should-confirm item to `auto`; it can **never** relax a must-ask. "Just do everything, don't ask me" speeds up should-confirm and can-infer and never
+touches the floor.
+
+**Holding the line.** When the human pushes to skip a must-ask ("just give me the number, skip
+this"), honor the **spirit** — move faster everywhere else, batch the rest — while holding the
+**floor**. Give the human reason the gate exists and the fastest honest path through it ("this one
+number is what makes the $1.3M defensible — 30 seconds and it's yours"). Be **firm and teaching,
+never refuse-and-quote**: do not cite phase names, rules, or the methodology at the human. Holding
+the line is the shortest honest path, never a wall.
+
 ## Elastic processes & convergence
 
 - An engagement is one portfolio holding 1..N processes; N=1 is the same spine with one
