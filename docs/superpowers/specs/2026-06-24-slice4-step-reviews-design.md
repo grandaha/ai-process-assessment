@@ -68,10 +68,16 @@ every correction; sourcing the history from it means it cannot drift from the au
 and it keeps the review document fully derived (body from source + history from the decision
 log). It regenerates with the document.
 
-For the render to show the "original comment," comment-driven decision-log entries must
-capture the operator's **verbatim comment** as the correction's rationale (the entry is
-already timestamped and tagged by item id). That is the one small addition to the existing
-"log both parties" step (§4.2 / Slice 2 Chunk B).
+For the render to show "original comment → what changed → when," comment-driven decision-log
+entries carry a **distinct `comment:` field** holding the operator's verbatim comment —
+*separate* from `rationale:`. They are not the same thing: on a pushback+override the
+`rationale` is the conductor's counter-argument while `comment` is what the operator
+originally asked for. The renderer reads `comment:` for the "original comment", `disposition`
+/ `decision` for "what changed", and the entry's heading datetime for "when". This is a
+small but real **schema addition to the decision-log entry template** (in SKILL.md), and a
+contract change other decision-log consumers (the flywheel) must tolerate — a new optional
+field, so existing entries without it remain valid. The entry is already timestamped and
+tagged by item id, so filtering by step is unchanged.
 
 ### 3.2 New unit — `state/step_review.py`
 
@@ -81,8 +87,16 @@ Pure functions of the filesystem, stdlib + `state.*` only (matches `state/status
 ```python
 def render_review(root, phase_id) -> str:
     """Consolidate a fragmented phase's _index.md + per-item files into one readable
-    review document (each item a section with its id anchor). Pure; deterministic.
-    Raises ValueError for a non-fragmented phase_id (those use their source doc)."""
+    review document (each item a section with its id anchor), followed by the
+    Change-history section (§3.3). Pure; deterministic. Raises ValueError for a
+    non-fragmented phase_id (those use their source doc).
+
+    Comment-preserving (the mechanism behind §5's invariant): if a review target
+    already exists at review_path(phase_id), render_review reads it, runs
+    extract_comments over it, and re-injects every *unresolved* comment at its anchor
+    in the fresh render. An unresolved comment whose anchor no longer exists in the
+    fresh body is appended under an 'Unanchored comments' subsection rather than
+    dropped, so a comment is never lost to a structural change."""
 
 def review_path(phase_id) -> str:
     """Relative path of the review render target for a fragmented phase,
@@ -90,11 +104,20 @@ def review_path(phase_id) -> str:
     source path.)"""
 ```
 
+**Per-phase extraction.** The renderer is parameterized over how each fragmented phase's
+ids/items are read — these are *not* uniform (this is the same split Slice 3 Chunk A's
+`header_based` flag captures): Phases 5/6 carry `<!-- index: id=OPP-NNN -->` extraction
+headers; Phase 4 (`processes/`) is field-based (no `id=` header — ids come from the
+`## PROC-NNN` headings); Phase 8 (`usecase-briefs/`) is hand-assembled with markdown-link id
+cells (`[UC-001](UC-001.md)`). `render_review` reads `header_based` and uses the matching id
+extraction per phase; `processes/` and `usecase-briefs/` get bespoke heading/link parsing,
+not `index_from_headers`. The chunk plan enumerates the four extraction strategies.
+
 A thin CLI (`python3 <engine_root>/state/step_review.py <folder> <phase_id>`) writes the
 render target and prints its path — same invocation/exit-code contract as the other
 `state/*` tools. **Regeneration is unconditional** from source when invoked (the
-`generate-artifact` discipline: never trust a stale cache) — but see §5 for the
-comment-aware lifecycle that prevents regeneration from clobbering pending comments.
+`generate-artifact` discipline: never trust a stale cache), and **comment-preserving** as
+specified above — see §5 for the full lifecycle.
 
 ## 4. Inline comments
 
@@ -156,6 +179,16 @@ Invariants:
   the conductor applies the edit and **strips the resolved inline comment** in the same edit.
   Its history still renders from the decision log (the single-doc surface gets the same
   Change-history view appended).
+- **Drain-before-overwrite (closes the staleness silent-loss path).** A single-document
+  surface is *also* rewritten out-of-band when a **staleness cascade re-drives that phase**
+  (e.g. a scope change re-drives `scope.md`) — a path that does not go through `render_review`.
+  Invariant: **no write — review regeneration *or* a staleness re-drive — overwrites a
+  surface that carries unresolved comments without first draining them.** Before a re-drive
+  touches a single-doc surface, the conductor extracts its unresolved comments, and either
+  processes them first or, if the operator chooses to proceed, re-injects them at their
+  anchors in the re-driven document (orphaned anchors surface, never silently dropped) — the
+  same preservation `render_review` gives the fragmented targets. The conductor must check a
+  surface for unresolved comments at the top of any staleness re-drive of a single-doc phase.
 
 ## 6. Conflict pushback
 
@@ -176,12 +209,18 @@ Conflict classes:
 | **Prior decision** | a comment reversing a decision already in the decision log | "You decided X earlier — override it?" (logged as an override). |
 | **Intra-batch** | two comments in the same pass that contradict each other | Surface both; ask which governs. |
 
-Detectable-deterministically conflicts (evidence/computed-vs-input, cascade, prior-decision,
-intra-batch) are flagged by composing existing machinery (the deliverable-gate's
-markdown↔results discipline, `state.staleness`, the decision log, the data contract). The
-methodology/rationalization class reuses *holding the line* + the master rationalization
-table + the flywheel auto-flag. **No new conflict engine** — this is a composition layer in
-the conductor over capabilities Slices 2 and 3 already provide.
+Two of these are **deterministic compositions** of existing code: evidence/grounding
+(computed-vs-input is exactly the classification Slice 2 Chunk B already makes; the
+deliverable-gate's markdown↔results discipline defines what may not be overwritten) and
+cascade (the dependency that `state.staleness` already tracks). The other three are
+**conductor reasoning, not code** — honest to say so: prior-decision is the conductor reading
+the decision log and reasoning about it (there is no `conflicts_with_prior_decision()`
+function); intra-batch is the conductor comparing the `extract_comments` list pairwise after
+extraction; methodology/rationalization reuses *holding the line* + the master rationalization
+table, and its auto-log to the improvement flywheel requires **Slice 3 Chunk C** (already
+merged, #111 — so available; *holding the line* is available regardless). **No new conflict
+engine** — the deterministic classes compose Slice 2/3 code; the reasoning classes are new
+conductor *behavior* (prose + guards), not new Python.
 
 ## 7. Boundary surfacing — AI-native, lightweight
 
@@ -228,14 +267,19 @@ Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow u
   CLI; comment extraction (explicit + positional anchor, multiple, none); comment-preserving
   regeneration; Change-history render from a fixture decision log (scoped/filtered, ordered,
   shows verbatim comment + disposition + timestamp).
-- **Modify** `skills/conducting-engagement/SKILL.md` — add "Step reviews" (boundary
-  surfacing + lifecycle + Change history) and the conflict-pushback handling; record the
-  operator's verbatim comment in the decision-log entry when routing a comment; reference
-  from the drive loop.
+- **Modify** `skills/conducting-engagement/SKILL.md` — this is the bulk of Chunk B and is
+  non-trivial conductor *behavior* (not just prose around code): the "Step reviews" section
+  (boundary surfacing + the full comment-aware lifecycle including drain-before-overwrite +
+  Change history), all five conflict-pushback classes with their response posture, and the
+  jargon-free narration. Reference it from the drive loop, and add the staleness-re-drive
+  drain check (§5) to the Staleness section.
+- **Modify** `skills/conducting-engagement/SKILL.md` decision-log entry template — add the
+  `comment:` field (verbatim operator comment) for comment-driven entries, separate from
+  `rationale:`. (Schema/contract change, not just prose.)
 - **Modify** `tests/test_conductor_skill.py` — guards for the new sections (present,
-  references `state/step_review.py`, lifecycle protects comments + resolved→history,
-  verbatim-comment captured in the decision log, conflict-pushback classes, jargon-free
-  narration sweep).
+  references `state/step_review.py`, lifecycle protects comments + resolved→history +
+  drain-before-overwrite, `comment:` field in the decision-log template, the five
+  conflict-pushback classes, jargon-free narration sweep).
 
 ## 11. Testing strategy
 
@@ -246,9 +290,14 @@ Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow u
   none; ignores non-comment blockquotes. Comment-preserving regeneration: a render that
   carries an unresolved comment re-emits it at its anchor. **Change history**: given a
   fixture `decision-log.md`, the renderer's history section includes only entries scoped to
-  this step's item ids, in order, each showing the verbatim comment, disposition, and
-  timestamp; an unrelated entry (another step's id) is excluded. CLI: writes the target,
-  prints the path, exit 0; non-dir → exit 2.
+  this step's item ids, in order, each showing the `comment:` field, disposition, and
+  timestamp; an unrelated entry (another step's id) is excluded; an entry **without** a
+  `comment:` field (a non-comment decision) still renders its disposition without crashing;
+  a **malformed heading** (bad date or id position) is skipped, not fatal (returns the rest
+  of the history). Comment-preservation: a render whose existing target carries an unresolved
+  comment re-emits it at its anchor, and an unresolved comment whose anchor is gone lands in
+  the 'Unanchored comments' subsection (never dropped). CLI: writes the target, prints the
+  path, exit 0; non-dir → exit 2.
 - **`tests/test_conductor_skill.py`** (static guards): the step-review and conflict-pushback
   sections present; references the renderer; states the no-silent-clobber + comment-preserving
   invariants; enumerates the conflict classes; narration jargon-free (forbidden-token sweep).
@@ -256,9 +305,13 @@ Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow u
 
 ## 12. Reconciliation
 
-- **Composition, not new engines.** The renderer/extractor are the only new code; the
-  revision path is edit-splicing (Slice 2 B), the cascade is staleness (Slice 3), conflict
-  pushback is holding-the-line + gates + decision log + flywheel.
+- **Composition for the Python; real new behavior in the conductor.** The only new *code* is
+  the renderer/extractor (`state/step_review.py`); the revision path is edit-splicing
+  (Slice 2 B), the cascade is staleness (Slice 3), the deterministic conflict classes compose
+  Slice 2/3. But Chunk B is meaningful new *conductor behavior* (the comment-aware lifecycle,
+  drain-before-overwrite, the three reasoning-based conflict classes, the narration) carried
+  in SKILL.md and enforced by static guards — sized accordingly in the plan, not treated as
+  "just prose around existing code."
 - **Distinct from checkpoints and the deliverable.** Step reviews are the *operator* tier
   (internal, lightweight); the 3 checkpoints stay the *client* validation tier; the final
   deliverable stays the client hand-off. No overlap.
