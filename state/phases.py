@@ -15,6 +15,7 @@ class Phase:
     skill: str
     output: str            # relative path whose existence means the phase is done
     predecessor: str | None  # relative path that must exist for the phase to be available
+    header_based: bool = False  # _index.md built from <!-- index: id=... --> headers
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,7 @@ class Gate:
     id: str
     name: str
     output: str            # relative path whose existence means the gate has run
+    header_based: bool = False
 
 
 PHASES: list[Phase] = [
@@ -29,10 +31,10 @@ PHASES: list[Phase] = [
     Phase("2", "Context", "ai-process-assessment:mapping-context", "context.md", "scope.md"),
     Phase("3", "Tech & Data", "ai-process-assessment:inventorying-tech-data", "tech-inventory.md", "context.md"),
     Phase("4", "Discovery", "ai-process-assessment:discovering-processes", "processes/_index.md", "tech-inventory.md"),
-    Phase("5", "Opportunities", "ai-process-assessment:identifying-opportunities", "opportunities/_index.md", "processes/_index.md"),
-    Phase("6", "Scoring", "ai-process-assessment:scoring-opportunities", "scores/_index.md", "opportunities/_index.md"),
+    Phase("5", "Opportunities", "ai-process-assessment:identifying-opportunities", "opportunities/_index.md", "processes/_index.md", header_based=True),
+    Phase("6", "Scoring", "ai-process-assessment:scoring-opportunities", "scores/_index.md", "opportunities/_index.md", header_based=True),
     Phase("7", "Roadmap", "ai-process-assessment:prioritizing-roadmap", "roadmap.md", "scores/_index.md"),
-    Phase("8", "Use-Case Briefs", "ai-process-assessment:packaging-usecases", "usecase-briefs/_index.md", "roadmap.md"),
+    Phase("8", "Use-Case Briefs", "ai-process-assessment:packaging-usecases", "usecase-briefs/_index.md", "roadmap.md", header_based=True),
     Phase("8.5", "Cost Actuals", "ai-process-assessment:collecting-cost-actuals", "cost-actuals.md", "usecase-briefs/_index.md"),
     Phase("9", "Business Case", "ai-process-assessment:building-business-case", "business-case.md", "cost-actuals.md"),
     Phase("10", "Executive Summary", "ai-process-assessment:building-executive-summary", "executive-summary.md", "business-case.md"),
@@ -40,7 +42,7 @@ PHASES: list[Phase] = [
 ]
 
 GATES: list[Gate] = [
-    Gate("grc", "Governance & Risk (Gate A)", "grc/_index.md"),
+    Gate("grc", "Governance & Risk (Gate A)", "grc/_index.md", header_based=True),
     Gate("deliverable", "Deliverable Gate (Gate B)", "evidence-log.md"),
 ]
 

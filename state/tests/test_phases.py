@@ -38,3 +38,20 @@ def test_phase_is_frozen_dataclass():
     p = PHASES[0]
     with pytest.raises(dataclasses.FrozenInstanceError):
         p.id = "x"
+
+
+def test_header_based_flag_marks_extraction_header_folders():
+    from state.phases import PHASES, GATES
+    by_id = {p.id: p for p in PHASES}
+    # Phases whose _index.md is built from <!-- index: id=... --> headers.
+    assert by_id["5"].header_based is True
+    assert by_id["6"].header_based is True
+    assert by_id["8"].header_based is True
+    # Phase 4 (processes/) is field-based: index_from_fields, no id= header.
+    assert by_id["4"].header_based is False
+    # Non-folder phases default False.
+    assert by_id["1"].header_based is False
+    grc = next(g for g in GATES if g.id == "grc")
+    deliverable = next(g for g in GATES if g.id == "deliverable")
+    assert grc.header_based is True
+    assert deliverable.header_based is False
