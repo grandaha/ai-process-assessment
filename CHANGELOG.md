@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   byte-identical result — including cross-process automation chains. Degrades to sequential
   where concurrent dispatch is unavailable; a single process's failure re-runs only that
   process. No engine/math change; reuses the portable assembly layer.
+- **Edit & interruption splicing (Slice 2 Chunk B, #87).** The user can correct anything in plain
+  language at any point — a number, a classification, or a decision. The conductor routes the
+  correction to the right audited mechanism, re-runs the pipeline, and reports exactly what changed
+  (backed by the new deterministic `state/results_diff.py`). Replaces the old spreadsheet "what-if",
+  stricter because it re-runs the audited engine. No engine/math change.
 
 ### Changed
 - Phase 5 opportunity assembly now uses the portable stdlib `state.assembly` layer instead of inline `awk`, so it runs on Python-only surfaces and is deterministic regardless of subagent completion order (#100).

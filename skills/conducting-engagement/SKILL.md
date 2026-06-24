@@ -172,7 +172,7 @@ headless subagent. (Convergence already requires the full discovered set before 
 so every in-scope process is ready before this runs.)
 
 - **Dispatch:** dispatch **one subagent per process**, each running
-  `ai-process-assessment:identifying-opportunities` scoped to a single `PROC-NNN`, in one
+  `ai-process-assessment:identifying-opportunities` scoped to a single `PROC-NNN` (**single-process mode**), in one
   concurrent batch. Give each the engagement folder, `engine_root`, and its one `PROC-NNN`.
   Each writes only `<name>/_staging/phase5/proc-<process-id>.md` and returns a one-line
   summary (process id, opportunity count, GRC flag counts) — never opportunity content.
@@ -270,6 +270,66 @@ re-drive every portfolio phase downstream of the change. Any human ratification 
 against the now-superseded numbers is recorded `invalidated-by-staleness` in the decision
 log and re-surfaced per its touchpoint class — never silently kept. After a clean
 re-drive, call `record_input_hashes` so outputs read clean again.
+
+## Edit & interruption splicing
+
+The user can interrupt at any point to correct something in plain language — a number, a
+classification, or a decision. Recognize the correction, fix the **owning artifact**, re-run the
+audited pipeline, and report what changed. Never free-edit an arbitrary file: route every
+correction through one of the three owning-artifact mechanisms below, so every number still traces
+`results.json` → tested formula → sourced input.
+
+**Intake.** Treat a plain-language correction ("no, our rate is $200", "that's augmentation, not
+automation", "actually billing is out of scope") as an edit, not a new instruction. Handle it at
+the next **drive-loop boundary**: apply, re-drive, then resume where you left off.
+
+**Classify & route** the correction to exactly one owning artifact:
+
+- **Numeric assumption** (rate, volume, value range) → edit the owning `model/*.json` field
+  (located via `docs/data-contract.md`'s field/source map), then re-run the engine. The Staleness
+  rule re-drives everything downstream.
+- **Structural** (opportunity type, roadmap sequencing) → **re-run the owning phase**. For an
+  opportunity re-type, re-drive only that process's Phase 5 (**single-process mode**, see *Parallel
+  per-process fan-out (Phase 5)*) and re-merge; the Staleness rule carries the change into scoring, roadmap,
+  and business case.
+- **Human-only decision** (scope boundary, Build/Buy/Partner) → **re-open that must-ask**
+  touchpoint; do not silently apply it.
+
+**Report what changed.** Snapshot `results.json` before applying the edit; after the re-drive,
+compute the delta with `PYTHONPATH="<engine_root>" python3 -c "from state.results_diff import
+diff_results; ..."` (comparing the before-snapshot to the new `results.json`) and narrate the
+salient changes (see the delta narration below).
+
+**Confirm gate (act-then-show).** A correction is cheap and reversible (a value edit plus an
+append-only log entry), and the delta report is the confirmation after the fact — so the default is
+**act-then-show**: apply the correction, then report what changed. Confirm *first* only when:
+
+- the mapping is **ambiguous** — ask which field they mean ("the cost rate or the value-improvement
+  rate?"), an interpretation question, not a permission question; or
+- the correction re-opens a **human-only must-ask** — scope boundary, Build/Buy/Partner, cost
+  actuals — which are always must-ask, every mode.
+
+This governs only *applying the correction the user explicitly stated*. The downstream ratifications
+the re-drive re-opens still follow the existing **touchpoint taxonomy** and **autonomy preset**
+unchanged (guided pauses on should-confirm; batching of those is **Chunk C**, not here).
+
+**Log both parties.** Record every correction in the decision log, append-only — never overwrite
+the original proposal (it is the override corpus the improvement flywheel mines):
+
+- Correcting an AI draft (AI proposed X, human says Y): `proposed_by: agent`,
+  `decided_by: human-overrode`, `disposition: overridden→Y`.
+- A fresh user-supplied fact (no prior AI claim, or correcting a placeholder): `proposed_by: human`,
+  `decided_by: human-ratified`, `disposition: edited`.
+
+("Override" here is the decision-log sense — distinct from the CLAUDE.md methodology overrides in
+the reconcile step; this is not that.)
+
+**Narrate the delta** in plain language — no step names, file names, or internal ids:
+
+<!-- edit-delta-narration:start -->
+> Done — I updated that and re-ran the numbers. The business case moved from $1.4M to $1.1M, and
+> the status-assembly opportunity shifted from this year to next. Want me to walk through why?
+<!-- edit-delta-narration:end -->
 
 ## Failure & rejection handling
 

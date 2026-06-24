@@ -12,6 +12,7 @@ REQUIRED_HEADINGS = [
     "## Elastic processes & convergence",
     "## Decision log",
     "## Staleness",
+    "## Edit & interruption splicing",
     "## Failure & rejection handling",
 ]
 
@@ -76,3 +77,55 @@ def test_fanout_narration_is_jargon_free():
         assert token not in narration, f"narration leaks methodology jargon: {token!r}"
     # It states the 'whole board at once' promise in plain language.
     assert "together" in narration.lower()
+
+
+def test_conductor_edit_splicing_intake_and_routes():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # Universal plain-language intake, handled at the drive-loop boundary.
+    assert "plain language" in sec
+    assert "drive-loop boundary" in sec
+    # Three routes.
+    assert "model/*.json" in sec          # numeric route
+    assert "re-run the owning phase" in sec  # structural route
+    assert "single-process mode" in sec      # structural re-type reuses Chunk A
+    assert "re-open that must-ask" in sec     # human-only route
+    # Delta report hookup to the Task 1 helper.
+    assert "state.results_diff" in sec
+    assert "diff_results" in sec
+
+
+def test_conductor_edit_confirm_gate():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # Act-then-show default.
+    assert "act-then-show" in sec
+    # The two confirm-first exceptions.
+    assert "ambiguous" in sec
+    assert "must-ask" in sec
+    # Downstream re-surfacing defers to the existing contract; no new batching here.
+    assert "touchpoint taxonomy" in sec
+    assert "autonomy preset" in sec
+    assert "Chunk C" in sec
+
+
+def test_conductor_edit_logs_both_parties():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # AI-draft correction mapping.
+    assert "human-overrode" in sec
+    assert "overridden→" in sec
+    # Fresh user-fact mapping.
+    assert "human-ratified" in sec
+    assert "edited" in sec
+    # Append-only, never overwrite the AI proposal.
+    assert "append-only" in sec
+
+
+def test_conductor_edit_delta_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- edit-delta-narration:start -->")
+    end = text.find("<!-- edit-delta-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "delta narration must be wrapped in <!-- edit-delta-narration:start --> ... :end -->"
+    narration = text[start:end]
+    forbidden = ["OPP-", "model/", "_staging", "renumber"] + [f"Phase {n}" for n in range(1, 12)]
+    for token in forbidden:
+        assert token not in narration, f"delta narration leaks jargon: {token!r}"
