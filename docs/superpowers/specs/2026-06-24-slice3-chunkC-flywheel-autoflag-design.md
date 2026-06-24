@@ -43,6 +43,13 @@ the plugin root. Rationale:
   GREEN/REFACTOR. `using-methodology`'s human RED step (repo-root) is unchanged; this adds
   the Conductor's automatic engagement-local capture.
 
+**Discovery is a manual maintainer step (v1).** There is no automatic aggregation across
+engagements — promotion upstream is a periodic maintainer action, not triggered by the
+auto-flag. The primary v1 driver is dogfooding (the engagement folder is in this repo, so
+entries are captured in-tree). The narration (below) names that a note was written so at
+least the human in the session knows it exists. Cross-engagement aggregation is a possible
+later enhancement, explicitly out of scope here.
+
 ### 3.2 New unit — `state/improvement_log.py`
 
 ```python
@@ -57,15 +64,21 @@ class Escape:
     shortcut: str        # the rationalization the Conductor caught itself reaching for
     would_produce: str   # the consequence it avoided
     why_uncaught: str    # which table row should have caught it (or "no row existed")
-    reframe: str         # the correct reframe (from the master table) — the proposed GREEN
+    reframe: str         # canonical reframe (reused from the matched master-table row),
+                         # or "pending" when why_uncaught == "no row existed" — see below
 
 def render_entry(escape: Escape) -> str:
     """Render one RED entry in the canonical Entry Format (newest-first block)."""
 
 def prepend_entry(log_path, escape: Escape) -> None:
-    """Prepend a RED entry under the '## Entries' header of log_path, creating the
-    file with the standard scaffold if absent. Append-only: never edits or reorders
-    existing entries. Pure given (log_path contents, escape) — no clock, no network."""
+    """Prepend a RED entry under the '## Entries' header of log_path.
+
+    Non-destructive prepend: inserts the new block immediately after '## Entries';
+    existing entries are never edited or reordered. If log_path is absent, scaffold
+    it (title + prepend-only note + '## Entries'). If log_path EXISTS but has no
+    '## Entries' header, raise ValueError (never guess an insert point). If multiple
+    '## Entries' lines exist, insert after the first. Pure given (file contents,
+    escape) — no clock, no network."""
 ```
 
 - **No clock in the module.** `Escape.date` is passed in (the Conductor supplies the
@@ -75,30 +88,51 @@ def prepend_entry(log_path, escape: Escape) -> None:
   `improvement-log.md` (heading `### [date] Phase N — skill`, the bold fields, the
   `| Rationalization | Correct Reframe |` row, and `Keystone updated: pending` /
   `Checklist/gate step updated: pending` — pending because GREEN/REFACTOR await the human).
-- `prepend_entry` scaffolds a new `improvement-log.md` (title + prepend-only note +
-  `## Entries`) when absent, then inserts the rendered block immediately after the
-  `## Entries` line. Existing entries are never touched (append-only invariant).
+- **`reframe` is reuse, not generation.** When the caught shortcut matches an existing
+  master-table row, `reframe` is that row's canonical text (copied, not invented). When
+  `why_uncaught == "no row existed"`, `reframe` is `"pending"` — the human authors the
+  canonical reframe at GREEN. This keeps the auto-RED entry a pure capture and never
+  auto-writes proto-GREEN methodology content.
+- **Invariant — non-destructive prepend (existing entries immutable):** the helper only ever
+  inserts a new block and rewrites the scaffold; it never mutates, reorders, or drops a prior
+  entry. (Distinct from the human RED step's "append" wording in `using-methodology`.)
+- **`## Entries` contract** (the main correctness risk): absent file → scaffold; existing
+  file with the header → insert after the first occurrence; existing file **without** the
+  header → `ValueError` (the Conductor surfaces it rather than mis-writing). Tested.
 - `Keystone updated` / `Checklist/gate step updated` render as `pending` (not yes/no) for an
   auto-RED entry — the human resolves them at GREEN/REFACTOR. This is a deliberate, narrow
-  extension of the Entry Format's `yes / no` for the auto-captured state.
+  extension of the Entry Format's `yes / no`; the canonical Entry-Format docs in
+  `improvement-log.md` are updated to recognize `pending` (see §4).
+- **Concurrency (known v1 limitation):** the helper is a read-modify-write with no file lock;
+  two parallel Conductor instances could race (TOCTOU). Acceptable for v1 single-agent drive;
+  noted, not solved here.
 
 ### 3.3 Conductor wiring — "Improvement flywheel — auto-flagging escapes"
 
 A new section in `skills/conducting-engagement/SKILL.md`:
 
-- **Detect.** While driving, watch your own reasoning for the master-table rationalizations
-  (the table in `using-methodology` — skip-a-step, compute-inline, reuse-prior-answers,
-  optimize-around-not-root, etc.). The trigger is *catching yourself reaching for one* — the
-  same moment as *holding the line* (see *Adaptive autonomy & holding the line*).
-- **Refuse + capture.** Do not take the shortcut. Auto-write a RED entry to the engagement's
-  `improvement-log.md` via
-  `state.improvement_log.prepend_entry(<engagement>/improvement-log.md, Escape(...))`,
-  filling the shortcut you caught and its canonical reframe from the master table. This is
-  the only auto-step.
-- **Surface for GREEN/REFACTOR (human-approved).** Tell the human in plain language that you
-  caught and logged the shortcut, and ask whether to (GREEN) add the rationalization row to
-  the relevant skill and/or (REFACTOR) tighten the gate. These edits touch skills/keystone
-  and are **never** automatic.
+- **Detect (with a false-positive guard).** While driving, watch your own reasoning for the
+  master-table rationalizations (the table in `using-methodology` — skip-a-step,
+  compute-inline, reuse-prior-answers, optimize-around-not-root, etc.). Flag **only** when
+  you would actually have taken the shortcut **and** the methodology does not explicitly
+  permit the action in this context (mirroring the nuance in *holding the line*). A permitted
+  reuse is not an escape. The trigger is the same catch-moment as *holding the line* (see
+  *Adaptive autonomy & holding the line*).
+- **Refuse + capture.** Do not take the shortcut. Auto-write a RED entry via
+  `state.improvement_log.prepend_entry(<engagement>/improvement-log.md, Escape(...))`, where
+  `<engagement>` is the **active engagement folder resolved at drive-loop step 0** (absolute
+  path — the same folder the drive loop operates on; never a guessed or relative path). Fill
+  `reframe` from the matched master-table row, or `"pending"` if no row existed. This is the
+  only auto-step.
+- **Write-failure path.** If `prepend_entry` raises (e.g. `ValueError` for a pre-existing
+  log without `## Entries`, or a path error), **do not** narrate that it was logged — tell
+  the human plainly that you caught the shortcut but couldn't write the note, and why. Never
+  claim a durable record that does not exist.
+- **Surface for GREEN/REFACTOR (human-approved), as two distinct asks.** After a successful
+  write, tell the human you caught and logged the shortcut, and ask — distinguishing the two
+  — whether to (GREEN) add the rationalization row to the relevant skill, and/or (REFACTOR)
+  tighten the gate/checklist step. These edits touch skills/keystone and are **never**
+  automatic.
 - **Jargon-free narration**, fenced for the guard:
 
 ```
@@ -116,7 +150,10 @@ durable record of it. The must-ask floor and autonomy presets are unchanged.
 
 - **Create** `state/improvement_log.py` — `Escape`, `render_entry`, `prepend_entry`.
 - **Create** `state/tests/test_improvement_log.py` — render format, scaffold-on-absent,
-  prepend-only (existing entries preserved), determinism.
+  non-destructive prepend (existing entries preserved), `ValueError` on missing-header,
+  `reframe="pending"` rendering, determinism.
+- **Modify** `improvement-log.md` — extend the Entry-Format docs to recognize `pending` as a
+  valid auto-RED value for `Keystone updated` / `Checklist/gate step updated`.
 - **Modify** `skills/conducting-engagement/SKILL.md` — add the flywheel section + narration.
 - **Modify** `tests/test_conductor_skill.py` — guards for the new section.
 
@@ -125,11 +162,14 @@ durable record of it. The must-ask floor and autonomy presets are unchanged.
 - **`state/tests/test_improvement_log.py`**:
   - `render_entry` contains the date/phase/skill heading, every bold field, the reframe row,
     and `pending` for keystone/checklist.
+  - `render_entry` with `why_uncaught == "no row existed"` renders `reframe` as `pending`
+    (no Conductor-invented canonical text).
   - `prepend_entry` on an absent file scaffolds the title + `## Entries` + the entry.
   - `prepend_entry` twice → newest entry appears first; the older entry is preserved verbatim
-    (append-only).
-  - a pre-existing hand-written entry below `## Entries` is preserved when a new one is
-    prepended.
+    (non-destructive prepend).
+  - a pre-existing hand-written entry below `## Entries` (with `yes`/`no` keystone fields) is
+    preserved verbatim — not corrupted — when a new one is prepended.
+  - `prepend_entry` on an existing file with **no** `## Entries` header raises `ValueError`.
   - determinism: same `Escape` + same file → same result.
 - **`tests/test_conductor_skill.py`**: guard the flywheel section — present, references
   `state.improvement_log` / `prepend_entry`, states GREEN/REFACTOR stay human-approved,
