@@ -149,3 +149,23 @@ def render_review(root, phase_id: str) -> str:
             parts += [f"> 💬 {c.body}", ""]
     parts += [render_change_history(root, ids), ""]
     return "\n".join(parts).rstrip() + "\n"
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(prog="state.step_review")
+    parser.add_argument("engagement", type=Path, help="path to the engagement folder")
+    parser.add_argument("phase_id", help="fragmented phase id (4, 5, 6, 8)")
+    args = parser.parse_args(argv)
+    if not args.engagement.is_dir():
+        print(f"not a directory: {args.engagement}", file=sys.stderr)
+        return 2
+    rel = review_path(args.phase_id)
+    out_path = args.engagement / rel
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(render_review(args.engagement, args.phase_id), encoding="utf-8")
+    print(str(rel))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
