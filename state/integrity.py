@@ -20,7 +20,7 @@ from pathlib import Path
 if __package__ in (None, ""):  # invoked as a script by absolute path
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from state.phases import PHASES
+from state.phases import MODEL_INPUTS, PHASES
 
 
 @dataclass(frozen=True)
@@ -45,6 +45,27 @@ def check_integrity(root) -> list[Issue]:
                 "empty_output", p.output, "surface",
                 f"The {p.name} step's output is there but empty — let's redo it.",
             ))
+
+    # model/*.json: malformed inputs (surface) + absent results with inputs (auto).
+    model = root / "model"
+    any_input = False
+    for stem in MODEL_INPUTS:
+        mp = model / f"{stem}.json"
+        if not mp.exists():
+            continue
+        any_input = True
+        try:
+            json.loads(mp.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            issues.append(Issue(
+                "bad_json", f"model/{stem}.json", "surface",
+                f"The {stem} figures you entered aren't readable — I need them again.",
+            ))
+    if any_input and not (model / "results.json").exists():
+        issues.append(Issue(
+            "results_missing", "model/results.json", "auto",
+            "The calculated numbers are missing — I can recompute them.",
+        ))
 
     issues.sort(key=lambda i: (i.target, i.kind))
     return issues
