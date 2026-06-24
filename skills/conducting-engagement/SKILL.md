@@ -347,8 +347,13 @@ overwrite. Entry template:
 - disposition: accepted | edited | overridden→<X> | invalidated-by-{staleness|checkpoint|gate}
 - decision: <what was decided>
 - rationale: <why>
+- comment: <verbatim operator review comment, when this entry was driven by a step-review comment; omit otherwise>
 - evidence: <file path + section/anchor, or model/*.json key>
 ```
+
+When an entry is driven by a step-review comment, record the operator's words **verbatim** in
+`comment:` — distinct from `rationale:` (which may be your counter-argument on an override).
+The step-review Change-history view reads `comment:` to show *original comment → what changed*.
 
 ## Step reviews
 

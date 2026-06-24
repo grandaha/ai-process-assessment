@@ -40,8 +40,22 @@ def test_skill_names_both_parties_in_decision_log():
 def _section(text: str, header: str) -> str:
     start = text.find(header)
     assert start != -1, f"missing section: {header!r}"
-    nxt = text.find("\n## ", start + len(header))
-    return text[start: nxt if nxt != -1 else len(text)]
+
+    # Find the next section header, skipping any embedded ## within code blocks
+    pos = start + len(header)
+    while True:
+        nxt = text.find("\n## ", pos)
+        if nxt == -1:
+            return text[start:]
+
+        # Check if this ## is inside a code block by counting ``` before it
+        code_fence_count = text[start:nxt].count("```")
+        # If even number of ```, we're outside code blocks; if odd, we're inside
+        if code_fence_count % 2 == 0:
+            return text[start:nxt]
+
+        # We're inside a code block, keep searching
+        pos = nxt + 1
 
 
 def test_conductor_owns_phase5_fanout():
@@ -280,3 +294,12 @@ def test_conductor_step_review_narration_is_jargon_free():
                   "render_review"] + [f"Phase {n}" for n in range(1, 12)])
     for token in forbidden:
         assert token not in narration, f"step-review narration leaks jargon: {token!r}"
+
+
+def test_decision_log_has_comment_field():
+    sec = _section(SKILL.read_text(), "## Decision log")
+    # The entry template carries a distinct verbatim-comment field for review-driven edits.
+    assert "comment:" in sec
+    assert "verbatim" in sec.lower()
+    # It is distinct from rationale (which may be the conductor's counter-argument).
+    assert "rationale:" in sec
