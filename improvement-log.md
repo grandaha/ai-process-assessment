@@ -22,8 +22,8 @@ Add entries under `## Entries` below, newest first.
 |---|---|
 | <shortcut text verbatim> | <correct reframe text verbatim> |
 
-**Keystone updated:** yes / no
-**Checklist/gate step updated:** yes / no — <which gate or checklist step, if yes>
+**Keystone updated:** yes / no / pending
+**Checklist/gate step updated:** yes / no / pending — <which gate or checklist step, if yes; "pending" for an auto-flagged RED entry awaiting GREEN/REFACTOR>
 
 ---
 
