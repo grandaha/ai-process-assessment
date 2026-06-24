@@ -48,6 +48,8 @@ def test_conductor_owns_phase5_fanout():
     # Merge reuses the portable assembly layer, in process order.
     assert "from state.assembly import" in sec
     assert "renumber_sequential" in sec
+    # Conductor's merge block carries the canonical index column tuple.
+    assert "('OPP-ID', 'id')" in sec
     # Cross-process chain-detection runs after the merge.
     assert "chain-detection" in sec
 

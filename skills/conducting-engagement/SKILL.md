@@ -196,7 +196,7 @@ so every in-scope process is ready before this runs.)
   ```
 
   `renumber_sequential` assigns global `OPP-NNN` in staged-file (process) order, so concurrent
-  and sequential fan-out yield **byte-identical** `opportunities/`.
+  and sequential fan-out yield **byte-identical** `opportunities/` (for a fixed in-scope process set; adding a process later re-numbers `OPP-NNN` globally, exactly as the sequential path does).
 - **Then** run the cross-process **chain-detection** scan over the merged `opportunities/`
   (see *Elastic processes & convergence*), then proceed to convergence / Phase 6.
 - **Degradation:** on a surface without concurrent dispatch, run the same per-process
