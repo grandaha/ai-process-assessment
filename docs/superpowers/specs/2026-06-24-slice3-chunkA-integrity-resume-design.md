@@ -72,12 +72,26 @@ Driven by `state/phases.py` (`PHASES`, `MODEL_INPUTS`) and the folder convention
 (per-item phases: `processes/` `PROC-`, `opportunities/` `OPP-`, `scores/` `OPP-`,
 `usecase-briefs/` `UC-`; gate folder `grc/` `OPP-`).
 
+**Header-based vs field-based folders.** Phases 5/6/8 and the `grc/` gate assemble their
+`_index.md` from each body's extraction header (`<!-- index: id=... -->`) via
+`assembly.index_from_headers`; their bodies are **header-based**. Phase 4 (`processes/`)
+is the lone exception: `discovering-processes` builds its index from content-derived
+fields via `assembly.index_from_fields` (the bodies carry `<!-- index: baseline=Ready -->`,
+*not* an `id=` header), so `PROC-NNN.md` files are **field-based**. The header-dependent
+checks below (`malformed_item`, and the header-based auto-repair of `index_orphan_items`)
+therefore apply **only to header-based folders**; running them on `processes/` would
+false-positive on every valid process file and, on repair, write empty-id rows. To encode
+this without hardcoding folder names in `integrity.py`, add a `header_based: bool` field to
+the `Phase` dataclass (`True` for 5/6/8 and the grc gate; `False` for Phase 4); the
+checker reads it. Header-agnostic checks (`empty_output`, `index_missing_item`, `bad_json`,
+`results_missing`) apply to all folders unchanged.
+
 | kind | Trigger | repair | Repair path (Conductor) |
 |---|---|---|---|
 | `empty_output` | A `PHASES` output file exists but is empty / whitespace-only | `surface` | Re-drive that phase (its content is gone). |
-| `index_orphan_items` | Body files exist in a phase folder but are absent from `_index.md` — **including the case where `_index.md` itself is absent** (bodies present, no index) — and every such body carries a valid extraction header | `auto` | Rebuild index via `assembly.index_from_headers` from the body files. |
+| `index_orphan_items` | *(header-based folders only)* Body files exist but are absent from `_index.md` — **including the case where `_index.md` itself is absent** (bodies present, no index) — guarded so it is withheld unless every such body has a valid header | `auto` | Rebuild index via `assembly.index_from_headers` from the body files. |
 | `index_missing_item` | `_index.md` references an item id with no matching body file | `surface` | Re-drive that phase (the body content is gone). |
-| `malformed_item` | A body file (`PREFIX-*.md`) is present but lacks a valid extraction header (`assembly._header_fields` → `{}`), whether or not it is indexed | `surface` | Re-drive that item (its header/content is incomplete). |
+| `malformed_item` | *(header-based folders only)* A body file (`PREFIX-*.md`) is present but lacks a valid extraction header (`assembly._header_fields` → `{}`), whether or not it is indexed | `surface` | Re-drive that item (its header/content is incomplete). |
 | `bad_json` | A present `model/<stem>.json` (stem ∈ `MODEL_INPUTS`) fails `json.loads` | `surface` | Ask the human for the correct value; re-record. |
 | `results_missing` | ≥1 `model/*.json` input exists but `model/results.json` is absent | `auto` | Run `engine/run.py`, then `record_input_hashes`. |
 
@@ -90,6 +104,14 @@ Driven by `state/phases.py` (`PHASES`, `MODEL_INPUTS`) and the folder convention
   owned by the fan-out merge, not durable engagement state. Flagged here so the next
   developer knows it is a conscious exclusion, not an oversight; a later chunk may add a
   `stale_staging` (auto: run the merge from present staged files, then verify).
+- **`processes/` (Phase 4) index drift** → *header-based orphan auto-repair deferred.*
+  Field-based folders get the header-agnostic checks (`empty_output`, `index_missing_item`,
+  `bad_json`) but **not** `malformed_item` or header-based `index_orphan_items` auto-repair,
+  because their correct rebuild needs `index_from_fields` with a Phase-4-specific `extract`
+  function (parsing the `## PROC-NNN — Name` heading), which is its own unit of work. A
+  later chunk can add a field-based `index_orphan_items` repair path. Until then, a Phase 4
+  orphan/absent-index surfaces only via the phase reading "not done" in `state.state` and
+  is re-driven — the pre-existing behavior, not a regression.
 
 Detection details:
 - *empty/whitespace*: `path.read_text().strip() == ""`.
@@ -98,12 +120,15 @@ Detection details:
   header/separator-skip heuristic of `state.state._count_non_green_grc`** (skip a `|`-row
   whose first cell lower-cases to the column header or is empty/`-`-only) so the two
   parsers never disagree. If `_index.md` is absent, the indexed set is empty.
-  - body-ids not in the indexed set → `index_orphan_items` (auto) **only if** every such
-    body has a valid header; any header-less body → `malformed_item` (surface) for that
-    file, and the orphan issue is withheld (we never auto-rebuild an empty-id row).
-  - indexed-ids with no body file → `index_missing_item` (surface).
-  - any body file (orphan or indexed) with `_header_fields(text) == {}` → `malformed_item`
-    (surface).
+  - indexed-ids with no body file → `index_missing_item` (surface). *(All folders.)*
+  - **header-based folders only** (`phase.header_based`):
+    - any body file (orphan or indexed) with `_header_fields(text) == {}` →
+      `malformed_item` (surface).
+    - body-ids not in the indexed set → `index_orphan_items` (auto), **withheld** for the
+      folder if any body produced a `malformed_item` above (we never auto-rebuild an
+      empty-id row).
+  - **field-based folders** (`processes/`): only `index_missing_item` applies here; orphan
+    and header checks are skipped (see "Deliberately not flagged").
   - More than one of these can fire for one folder.
 - *bad_json*: attempt `json.loads(path.read_text())`; `JSONDecodeError` → `bad_json`.
 - *results_missing*: ≥1 `MODEL_INPUTS` stem file present **and** `model/results.json`
@@ -160,6 +185,12 @@ Narration block (jargon-free), fenced for the guard like the existing narration 
 
 ## 4. Files
 
+- **Modify** `state/phases.py` — add a `header_based: bool` field to **both** `Phase` and
+  `Gate` (the grc folder is a `Gate`). `True` for phases 5/6/8 and the grc gate; `False`
+  for Phase 4 and all non-folder phases (the flag is only consulted for folder-bearing
+  entries, so its value is irrelevant for `scope.md`-style phases — default it `False`).
+  Update existing constructions; run the suite to confirm `state.state` (which reads these
+  by attribute) is unaffected.
 - **Create** `state/integrity.py` — `Issue`, `check_integrity`, `main` (CLI).
 - **Create** `state/tests/test_integrity.py` — unit tests for every `kind` and the
   classification, plus the CLI exit codes and deterministic ordering.
@@ -182,7 +213,11 @@ Narration block (jargon-free), fenced for the guard like the existing narration 
   `results_missing` (auto), i.e. partial inputs still fire**; a folder with several issues
   → sorted, complete set. Plus: CLI prints JSON & exit 0; non-dir → exit 2; deferral — a
   *changed* (not absent) input produces **no** integrity issue (staleness owns it); a
-  clean fully-complete engagement with `results.json` → `[]`.
+  clean fully-complete engagement with `results.json` → `[]`. **Field-based folder: a
+  `processes/PROC-002.md` with no `id=` header (valid Phase 4 state) produces no
+  `malformed_item` and no `index_orphan_items`** (header checks skipped for
+  `header_based=False`); but a `processes/` index referencing a `PROC` with no body file
+  still yields `index_missing_item`.
 - **`tests/test_conductor_skill.py`**: static guards over the new SKILL.md section using
   the existing `_section`/`methodology` fixture convention.
 - Full suite (`.venv/bin/python -m pytest`) stays green.
