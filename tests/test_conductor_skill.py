@@ -10,6 +10,7 @@ REQUIRED_HEADINGS = [
     "## Parallel per-process fan-out",
     "## Touchpoint taxonomy",
     "## Adaptive autonomy & holding the line",
+    "## Improvement flywheel — auto-flagging escapes",
     "## Elastic processes & convergence",
     "## Decision log",
     "## Status on demand",
@@ -224,3 +225,31 @@ def test_conductor_status_narration_is_jargon_free():
                  + [f"Phase {n}" for n in range(1, 12)])
     for token in forbidden:
         assert token not in narration, f"status narration leaks methodology jargon: {token!r}"
+
+
+def test_conductor_flywheel_section():
+    sec = _section(SKILL.read_text(), "## Improvement flywheel — auto-flagging escapes")
+    # Auto-RED capture via the helper.
+    assert "state.improvement_log" in sec or "prepend_entry" in sec
+    # Only RED is automatic; GREEN/REFACTOR stay human-approved.
+    assert "GREEN" in sec and "REFACTOR" in sec
+    assert "human" in sec.lower()
+    # Narration conditional on a successful write (failure path stated).
+    assert "could" in sec.lower() or "fail" in sec.lower() or "couldn't" in sec.lower()
+    # Fenced narration block.
+    assert "<!-- flywheel-narration:start -->" in sec
+    assert "<!-- flywheel-narration:end -->" in sec
+
+
+def test_conductor_flywheel_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- flywheel-narration:start -->")
+    end = text.find("<!-- flywheel-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "flywheel narration must be wrapped in <!-- flywheel-narration:start --> ... :end -->"
+    narration = text[start:end]
+    forbidden = (["OPP-", "PROC-", "improvement-log", "prepend_entry", "RED", "GREEN",
+                  "REFACTOR", "rationalization", "Escape("]
+                 + [f"Phase {n}" for n in range(1, 12)])
+    for token in forbidden:
+        assert token not in narration, f"flywheel narration leaks jargon: {token!r}"
