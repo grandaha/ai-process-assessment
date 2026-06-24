@@ -271,6 +271,35 @@ against the now-superseded numbers is recorded `invalidated-by-staleness` in the
 log and re-surfaced per its touchpoint class — never silently kept. After a clean
 re-drive, call `record_input_hashes` so outputs read clean again.
 
+## Edit & interruption splicing
+
+The user can interrupt at any point to correct something in plain language — a number, a
+classification, or a decision. Recognize the correction, fix the **owning artifact**, re-run the
+audited pipeline, and report what changed. Never free-edit an arbitrary file: route every
+correction through one of the three owning-artifact mechanisms below, so every number still traces
+`results.json` → tested formula → sourced input.
+
+**Intake.** Treat a plain-language correction ("no, our rate is $200", "that's augmentation, not
+automation", "actually billing is out of scope") as an edit, not a new instruction. Handle it at
+the next **drive-loop boundary**: apply, re-drive, then resume where you left off.
+
+**Classify & route** the correction to exactly one owning artifact:
+
+- **Numeric assumption** (rate, volume, value range) → edit the owning `model/*.json` field
+  (located via `docs/data-contract.md`'s field/source map), then re-run the engine. The Staleness
+  rule re-drives everything downstream.
+- **Structural** (opportunity type, roadmap sequencing) → **re-run the owning phase**. For an
+  opportunity re-type, re-drive only that process's Phase 5 (**single-process mode**, see *Parallel
+  per-process fan-out*) and re-merge; the Staleness rule carries the change into scoring, roadmap,
+  and business case.
+- **Human-only decision** (scope boundary, Build/Buy/Partner) → **re-open that must-ask**
+  touchpoint; do not silently apply it.
+
+**Report what changed.** Snapshot `results.json` before applying the edit; after the re-drive,
+compute the delta with `PYTHONPATH="<engine_root>" python3 -c "from state.results_diff import
+diff_results; ..."` (comparing the before-snapshot to the new `results.json`) and narrate the
+salient changes (see the delta narration below).
+
 ## Failure & rejection handling
 
 - Phase subagent fails or `engine.run` errors → stop, surface the error (must-ask). Never

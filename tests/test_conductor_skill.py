@@ -12,6 +12,7 @@ REQUIRED_HEADINGS = [
     "## Elastic processes & convergence",
     "## Decision log",
     "## Staleness",
+    "## Edit & interruption splicing",
     "## Failure & rejection handling",
 ]
 
@@ -76,3 +77,18 @@ def test_fanout_narration_is_jargon_free():
         assert token not in narration, f"narration leaks methodology jargon: {token!r}"
     # It states the 'whole board at once' promise in plain language.
     assert "together" in narration.lower()
+
+
+def test_conductor_edit_splicing_intake_and_routes():
+    sec = _section(SKILL.read_text(), "## Edit & interruption splicing")
+    # Universal plain-language intake, handled at the drive-loop boundary.
+    assert "plain language" in sec
+    assert "drive-loop boundary" in sec
+    # Three routes.
+    assert "model/*.json" in sec          # numeric route
+    assert "re-run the owning phase" in sec  # structural route
+    assert "single-process mode" in sec      # structural re-type reuses Chunk A
+    assert "re-open that must-ask" in sec     # human-only route
+    # Delta report hookup to the Task 1 helper.
+    assert "state.results_diff" in sec
+    assert "diff_results" in sec
