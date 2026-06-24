@@ -68,3 +68,57 @@ def test_render_review_deterministic(engagement):
         "scores/OPP-001.md": "## OPP-001 — S\n\nb\n",
     })
     assert render_review(root, "6") == render_review(root, "6")
+
+
+from state.step_review import render_change_history
+
+_LOG = (
+    "# Decision Log\n\n"
+    "## 2026-06-24T10:00 — type classification — OPP-001\n"
+    "- proposed_by: agent\n- decided_by: human-overrode\n"
+    "- disposition: overridden→Augmentation\n- decision: retype to Augmentation\n"
+    "- comment: this is augmentation, not automation\n\n"
+    "## 2026-06-24T11:00 — sequencing — PROC-009\n"   # different step, must be excluded
+    "- disposition: edited\n- comment: unrelated\n\n"
+)
+
+
+def test_change_history_scopes_to_ids(engagement):
+    root = engagement(**{"decision-log.md": _LOG})
+    out = render_change_history(root, {"OPP-001"})
+    assert "## Change history" in out
+    assert "this is augmentation, not automation" in out
+    assert "overridden→Augmentation" in out
+    assert "PROC-009" not in out and "unrelated" not in out
+
+
+def test_change_history_empty(engagement):
+    root = engagement(**{"opportunities/_index.md": "x"})
+    assert "No changes yet." in render_change_history(root, {"OPP-001"})
+
+
+def test_change_history_missing_comment_field(engagement):
+    log = ("## 2026-06-24T10:00 — sequencing — OPP-002\n"
+           "- decision: moved to wave 2\n")
+    root = engagement(**{"decision-log.md": log})
+    out = render_change_history(root, {"OPP-002"})
+    assert "moved to wave 2" in out  # change falls back to decision
+    assert "| — |" in out            # comment renders as em-dash placeholder
+
+
+def test_change_history_skips_malformed_heading(engagement):
+    log = "## not a real entry heading\n- disposition: edited\n"
+    root = engagement(**{"decision-log.md": log})
+    # no crash; nothing scoped in
+    assert "No changes yet." in render_change_history(root, {"OPP-001"})
+
+
+def test_render_review_includes_change_history(engagement):
+    root = engagement(**{
+        "opportunities/_index.md": "| OPP-ID |\n",
+        "opportunities/OPP-001.md": "## OPP-001 — X\n\nb\n",
+        "decision-log.md": _LOG,
+    })
+    out = render_review(root, "5")
+    assert "## Change history" in out
+    assert "this is augmentation, not automation" in out

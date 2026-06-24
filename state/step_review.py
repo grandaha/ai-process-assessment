@@ -73,6 +73,48 @@ def _item_bodies(folder: Path) -> list[Path]:
     )
 
 
+def _esc(cell: str) -> str:
+    return cell.replace("|", r"\|")
+
+
+def _decision_history(root, ids: set[str]) -> list[dict]:
+    path = Path(root) / "decision-log.md"
+    if not path.exists():
+        return []
+    out: list[dict] = []
+    cur: dict | None = None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            cur = None
+            fields = [s.strip() for s in line[3:].split(" — ")]
+            if len(fields) >= 3 and fields[-1] in ids:
+                cur = {"when": fields[0], "id": fields[-1], "comment": "—", "change": "—"}
+                out.append(cur)
+        elif cur is not None and line.startswith("- "):
+            key, _, val = line[2:].partition(":")
+            key, val = key.strip(), val.strip()
+            if key == "comment":
+                cur["comment"] = val or "—"
+            elif key == "disposition":
+                cur["change"] = val or "—"
+            elif key == "decision" and cur["change"] == "—":
+                cur["change"] = val or "—"
+    return out
+
+
+def render_change_history(root, ids: set[str]) -> str:
+    entries = _decision_history(root, ids)
+    lines = ["## Change history", ""]
+    if not entries:
+        lines.append("No changes yet.")
+        return "\n".join(lines)
+    lines += ["| When | Item | Original comment | What changed |", "|---|---|---|---|"]
+    for e in entries:
+        lines.append(f"| {_esc(e['when'])} | {_esc(e['id'])} | "
+                     f"{_esc(e['comment'])} | {_esc(e['change'])} |")
+    return "\n".join(lines)
+
+
 def render_review(root, phase_id: str) -> str:
     if phase_id not in _FRAGMENTED:
         raise ValueError(f"phase {phase_id} is not fragmented; use its source doc")
@@ -89,4 +131,6 @@ def render_review(root, phase_id: str) -> str:
         parts += ["## Summary", "", index.read_text(encoding="utf-8").rstrip(), ""]
     for p in _item_bodies(folder):
         parts += ["---", "", p.read_text(encoding="utf-8").rstrip(), ""]
+    ids = {p.stem for p in _item_bodies(folder)}
+    parts += [render_change_history(root, ids), ""]
     return "\n".join(parts).rstrip() + "\n"
