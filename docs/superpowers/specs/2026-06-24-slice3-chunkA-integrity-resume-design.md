@@ -128,7 +128,12 @@ Detection details:
   header/separator-skip heuristic of `state.state._count_non_green_grc`** (skip a `|`-row
   whose first cell lower-cases to the column header or is empty/`-`-only) so the two
   parsers never disagree. If `_index.md` is absent, the indexed set is empty.
-  - indexed-ids with no body file → `index_missing_item` (surface). *(All folders.)*
+  - indexed-ids with no body file → `index_missing_item` (surface). *(All folders, but
+    note the id parser matches only bare `<PREFIX>-<N>` cells; a hand-assembled index whose
+    id cells are markdown links — `usecase-briefs/` — yields an empty indexed set, so
+    `index_missing_item` is effectively inert there. That is intentional: such folders'
+    drift is deferred and re-driven via `state.state` reading "not done", per the deferral
+    note above.)*
   - **header-based folders only** (`phase.header_based`):
     - any body file (orphan or indexed) with `_header_fields(text) == {}` →
       `malformed_item` (surface).
