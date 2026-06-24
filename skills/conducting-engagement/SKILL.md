@@ -311,6 +311,34 @@ overwrite. Entry template:
 - evidence: <file path + section/anchor, or model/*.json key>
 ```
 
+## Status on demand
+
+When the user asks where things stand — "where are we?", "what's left?", "what do you need
+from me?", "status?" — read `python3 <engine_root>/state/status.py <folder>` and narrate it
+in plain language. This is **read-only**: surfacing status never advances the drive loop or
+mutates anything.
+
+The projection gives you: how far along (`progress`), the current step, what's `blocked`,
+an `attention` bucket (`gates_due`, `stale_inputs`, `partial_state`), the `interaction` mode,
+and a `complete` flag. Translate it — never read the raw field names, phase numbers, file
+names, or ids aloud:
+
+- **Progress** → a friendly fraction or "about two-thirds of the way."
+- **Current step** → describe what it *does* next, not its name ("I'll put rough numbers to
+  the opportunities"), not "Phase 6 / scoring-opportunities."
+- **Attention** → only if non-empty: a decision they still owe (`open_decisions`), numbers
+  being re-run (`stale_inputs`), something to redo together (`partial_state` — use each
+  item's `detail`), or a gate to clear (`gates_due`). If a deliverable gate is owed because
+  the work is done, frame it as "all that's left is the final sign-off," not "Gate B not-run."
+- **Mode** → mention only if it helps ("I'm moving autonomously — say the word to slow down").
+- **Complete** → if true, say the engagement is wrapped and offer the deliverable.
+
+<!-- status-narration:start -->
+> We're about two-thirds of the way through. Right now I'm lining up which opportunities to
+> take forward; next I'll put rough numbers to them. Nothing's waiting on you at the moment —
+> I'll flag it the second something needs your call.
+<!-- status-narration:end -->
+
 ## Resuming into a messy state
 
 A session can end mid-write: a half-saved file, a fan-out that wrote some item
