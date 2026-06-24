@@ -12,6 +12,7 @@ REQUIRED_HEADINGS = [
     "## Adaptive autonomy & holding the line",
     "## Elastic processes & convergence",
     "## Decision log",
+    "## Resuming into a messy state",
     "## Staleness",
     "## Edit & interruption splicing",
     "## Failure & rejection handling",
@@ -176,3 +177,24 @@ def test_conductor_register_drives_teaching():
     assert "Register voice" in text
     assert "teach as you go" in text
     assert "terse and domain-fluent" in text
+
+
+def test_conductor_resume_recovery_section():
+    sec = _section(SKILL.read_text(), "## Resuming into a messy state")
+    # Runs the integrity checker by absolute path.
+    assert "state/integrity.py" in sec
+    # Distinguishes auto-repair from must-surface.
+    assert "auto" in sec and "surface" in sec
+    # Auto path reuses the existing assembly primitive, not a re-implementation.
+    assert "index_from_headers" in sec
+    # Surface path is a batched must-ask that does not advance.
+    assert "must-ask" in sec
+    # Jargon-free narration block is present and fenced.
+    assert "<!-- resume-recovery-narration:start -->" in sec
+    assert "<!-- resume-recovery-narration:end -->" in sec
+
+
+def test_conductor_resume_recovery_runs_before_staleness():
+    text = SKILL.read_text()
+    # The drive loop references the recovery step before the staleness step.
+    assert "Resuming into a messy state" in _section(text, "## The drive loop")

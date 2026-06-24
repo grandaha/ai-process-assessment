@@ -118,6 +118,8 @@ Repeat until Phase 11 is done and Gate B is cleared:
    engagement was copied to another machine), re-stamp via
    `PYTHONPATH="<engine_root>" python3 -c "from state.conductor_state import reconcile_engine_root; reconcile_engine_root('<folder>', '<engine_root>')"`.
    The live value always wins.
+   After reconcile, **check for partial state** — see *Resuming into a messy state* —
+   and clear it before staleness and step-selection.
 2. **Reconcile overrides:** apply `state.overrides.parse_overrides(CLAUDE.md)` +
    `reconcile(...)` so authorized skips don't block. An override row only fires if its
    Override cell contains the phase's output filename (e.g. `context.md`) or skill dir
@@ -308,6 +310,44 @@ overwrite. Entry template:
 - rationale: <why>
 - evidence: <file path + section/anchor, or model/*.json key>
 ```
+
+## Resuming into a messy state
+
+A session can end mid-write: a half-saved file, a fan-out that wrote some item
+files before crashing, a hand-edit that left an input unreadable. Existence is
+not completeness — so on every resume, before staleness and before picking the
+next step, run the integrity check and clear what it finds.
+
+1. **Detect:** `python3 <engine_root>/state/integrity.py <folder>` → a JSON list
+   of issues, each with `kind`, `target`, `repair` (`auto` | `surface`), and a
+   plain-language `detail`.
+2. **Auto-repair silently** every `repair: "auto"` issue — these are
+   deterministically re-derivable from sources, so no confirmation is needed:
+   - `index_orphan_items` → rebuild that folder's `_index.md` from its item files
+     with `state.assembly.index_from_headers` (the same primitive the fan-out
+     merge uses, so the result is byte-identical to a fresh assembly). Use the
+     folder's canonical column tuple (e.g. opportunities: `('OPP-ID', 'id')`, …).
+   - `results_missing` → `python3 <engine_root>/engine/run.py <folder>/`, then
+     `record_input_hashes` so staleness reads clean.
+3. **Surface** every `repair: "surface"` issue as one **batched must-ask** in
+   plain language — name what looks incomplete and that you'll redo it together.
+   Do not advance past a surface issue (`empty_output`, `bad_json`,
+   `index_missing_item`, `malformed_item`).
+4. **Re-check:** run the checker again and confirm **only surface issues remain**
+   — this catches an auto-repair that failed or introduced a new issue (cap at a
+   second pass; if an `auto` issue persists, surface it rather than loop).
+
+`processes/` (Phase 4) is field-based: its orphan auto-repair is deferred (it
+needs `index_from_fields`), so a half-finished Phase 4 simply re-drives via the
+normal step-selection — unchanged behavior.
+
+Narrate jargon-free — no step, file, or id names:
+
+<!-- resume-recovery-narration:start -->
+> Picking up where we left off. A couple of things looked half-finished from
+> last time — I've tidied up what I could rebuild automatically. One part didn't
+> get saved completely; let's redo that quickly together before we go on.
+<!-- resume-recovery-narration:end -->
 
 ## Staleness
 
