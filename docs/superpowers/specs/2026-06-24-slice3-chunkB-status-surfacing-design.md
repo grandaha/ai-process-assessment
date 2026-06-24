@@ -51,19 +51,28 @@ Composition (no re-derivation):
 - `stale = state.staleness.changed_inputs(root, conductor.get("model_input_hashes", {}))`.
 - `issues = state.integrity.check_integrity(root)`.
 
+`read_state` internally reads `.conductor.md` once (for `engine_root`); `status_view`
+reads it again for the full interaction dict. Both are pure and the file is tiny — the
+second read is acceptable; a code comment will note it so a future maintainer doesn't
+mistake it for an oversight.
+
 ### 3.2 Projection shape
+
+Let `grc_status` / `deliverable_status` be the `status` of the matching entry in
+`snap["gates"]` (grc ∈ {`done`,`required`,`not-required`}; deliverable ∈ {`done`,`not-run`}),
+and `current_step` be the first phase whose status is `"available"` (see note below):
 
 ```python
 {
   "engagement": snap["engagement"],
   "progress": {"done": d, "total": t, "percent": int(round(100*d/t))},   # t>0 always
-  "current_step": {"id", "name"} of the first phase with status in
-                  {"available", "overridden"}, else None (all done),
+  "current_step": {"id", "name"} of the first phase with status == "available",
+                  else None (all done),
   "blocked": [ {"id", "name", "waiting_on": blocked_reason} for phases status=="blocked" ],
   "attention": {
-     "gate_due": "grc" if the grc gate status == "required" else None,
+     "gates_due": [...],                          # see below; [] if none
      "stale_inputs": stale,                       # list[str] stems, [] if none
-     "partial_state": [ {"kind", "target", "repair"} for i in issues ],  # [] if clean
+     "partial_state": [ {"kind", "target", "repair", "detail"} for i in issues ],  # [] if clean
   },
   "interaction": {
      "register": conductor.get("register"),                 # "consultant"|"operator"|None
@@ -71,18 +80,45 @@ Composition (no re-derivation):
      "deferred_processes": conductor.get("deferred_processes", []),
      "open_decisions": conductor.get("open_decisions", []),
   },
-  "complete": bool(current_step is None and grc not "required"),
+  "complete": (current_step is None and grc_status != "required"
+               and deliverable_status == "done"),
 }
 ```
 
+where
+```python
+gates_due = []
+if grc_status == "required":
+    gates_due.append("grc")
+if current_step is None and deliverable_status != "done":
+    gates_due.append("deliverable")   # all phase work done; final clearance still owed
+```
+
 Notes:
-- `current_step` reuses `snap["phases"]` status (already computed by `state.state`);
-  status precedence already encodes availability. The status strings come from
-  `state.state` verbatim — this projection never recomputes phase status.
+- **`current_step` uses only `"available"`.** `read_state` produces exactly `"done"` /
+  `"available"` / `"blocked"` — never `"overridden"` (that value comes from
+  `state.overrides.reconcile`, which needs CLAUDE.md). **Scope decision:** `status_view`
+  reflects *raw* phase availability and does **not** apply CLAUDE.md overrides; the drive
+  loop owns override-adjusted stepping (drive-loop step 2). Folding overrides in is a
+  possible later enhancement; it is out of scope here to avoid CLAUDE.md path-resolution in
+  a pure projection. Documented so the omission is a decision, not a bug.
+- The status strings come from `state.state` verbatim — this projection never recomputes
+  phase status or gate logic.
 - `percent` is integer-rounded; `total` is the phase count (always ≥ 1), so no div-by-zero.
-- `attention` is the actionable bucket: a non-empty `stale_inputs`, `partial_state`, or a
-  `gate_due` is what the Conductor must raise. Each sub-field is independently empty/None
-  when nothing applies.
+- **`partial_state` carries `detail`** (the integrity module's human-language hint) so the
+  Conductor narrates from it directly rather than re-deriving meaning from `kind`/`repair`
+  codes.
+- **`gates_due`** generalizes gate attention: `grc` when the GRC gate is `required`;
+  `deliverable` once all phase work is done but Gate B clearance (`evidence-log.md`) is not
+  yet recorded. The deliverable gate is never `"required"` (it is `"not-run"` by default),
+  so it is surfaced via the all-phases-done condition, not via a `required` status.
+- **`complete`** means the engagement is genuinely finished: all phases done, GRC not
+  outstanding, and Gate B clearance recorded.
+- **Absent model inputs are intentionally not a separate `attention` signal:** an input not
+  yet provided is conveyed by `current_step` being that input's phase (e.g. cost actuals),
+  and the engine renders absent inputs as `PENDING` by design. Surfacing a separate
+  "missing inputs" list would duplicate `current_step` and add phase-awareness the
+  projection deliberately avoids.
 - The projection tolerates a fresh/empty engagement (`read_conductor` → `{}` →
   interaction fields are `None`/`[]`; `current_step` is Phase 1).
 
@@ -141,11 +177,13 @@ state.
   - stale input (recorded hash ≠ current) → `attention.stale_inputs` non-empty; reuses the
     `staleness` boundary, not a re-implementation.
   - partial state (e.g. an empty phase output) → `attention.partial_state` carries the
-    integrity issue's `kind`/`target`/`repair`.
-  - grc gate required (non-green flag in `opportunities/_index.md`) → `attention.gate_due
-    == "grc"`.
-  - all phases done + gate not required → `current_step is None`, `complete is True`,
-    `progress.percent == 100`.
+    integrity issue's `kind`/`target`/`repair`/**`detail`**.
+  - grc gate required (non-green flag in `opportunities/_index.md`) → `"grc" in
+    attention.gates_due`.
+  - all phases done but `evidence-log.md` absent → `"deliverable" in attention.gates_due`
+    and `complete is False`.
+  - all phases done + grc satisfied + `evidence-log.md` present → `current_step is None`,
+    `gates_due == []`, `complete is True`, `progress.percent == 100`.
   - determinism: `status_view` called twice on the same folder is equal.
 - **`state/tests/test_status_cli.py`**: JSON parse + exit 0 on a valid dir; exit 2 on a
   non-dir.
