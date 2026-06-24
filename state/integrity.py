@@ -150,3 +150,18 @@ def check_integrity(root) -> list[Issue]:
 
     issues.sort(key=lambda i: (i.target, i.kind))
     return issues
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(prog="state.integrity")
+    parser.add_argument("engagement", type=Path, help="path to the engagement folder")
+    args = parser.parse_args(argv)
+    if not args.engagement.is_dir():
+        print(f"not a directory: {args.engagement}", file=sys.stderr)
+        return 2
+    print(json.dumps([asdict(i) for i in check_integrity(args.engagement)], indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
