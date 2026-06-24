@@ -75,25 +75,48 @@ Driven by `state/phases.py` (`PHASES`, `MODEL_INPUTS`) and the folder convention
 | kind | Trigger | repair | Repair path (Conductor) |
 |---|---|---|---|
 | `empty_output` | A `PHASES` output file exists but is empty / whitespace-only | `surface` | Re-drive that phase (its content is gone). |
-| `index_orphan_items` | Item files exist in a phase folder but are absent from / inconsistent with `_index.md` | `auto` | Rebuild index via `assembly.index_from_headers`. |
+| `index_orphan_items` | Body files exist in a phase folder but are absent from `_index.md` — **including the case where `_index.md` itself is absent** (bodies present, no index) — and every such body carries a valid extraction header | `auto` | Rebuild index via `assembly.index_from_headers` from the body files. |
 | `index_missing_item` | `_index.md` references an item id with no matching body file | `surface` | Re-drive that phase (the body content is gone). |
+| `malformed_item` | A body file (`PREFIX-*.md`) is present but lacks a valid extraction header (`assembly._header_fields` → `{}`), whether or not it is indexed | `surface` | Re-drive that item (its header/content is incomplete). |
 | `bad_json` | A present `model/<stem>.json` (stem ∈ `MODEL_INPUTS`) fails `json.loads` | `surface` | Ask the human for the correct value; re-record. |
-| `results_missing` | `model/*.json` inputs exist but `model/results.json` is absent | `auto` | Run `engine/run.py`, then `record_input_hashes`. |
+| `results_missing` | ≥1 `model/*.json` input exists but `model/results.json` is absent | `auto` | Run `engine/run.py`, then `record_input_hashes`. |
 
-**Deliberately not flagged** (already owned elsewhere — reconciliation principle):
+**Deliberately not flagged** (already owned elsewhere, or out of scope by decision):
 - changed model inputs after a clean run → `state/staleness.py`.
 - corrupt/absent `.conductor.md` → `read_conductor` returns `{}` + drive-loop re-stamp /
   `reconcile_engine_root`.
+- **orphan `_staging/` files** (a fan-out crash between the last subagent write and the
+  merge) → *known gap, out of scope for this chunk.* Staging is transient infrastructure
+  owned by the fan-out merge, not durable engagement state. Flagged here so the next
+  developer knows it is a conscious exclusion, not an oversight; a later chunk may add a
+  `stale_staging` (auto: run the merge from present staged files, then verify).
 
 Detection details:
 - *empty/whitespace*: `path.read_text().strip() == ""`.
-- *index drift*: parse the `_index.md` table's id column (first cell of each `|`-row that
-  is not header/separator) into a set; glob the folder for `PREFIX-*.md` (excluding
-  `_index.md`) into a set. Items-not-in-index → `index_orphan_items` (auto). Index-ids
-  with-no-file → `index_missing_item` (surface). Both can fire for one folder.
+- *index drift*: glob the folder for `PREFIX-*.md` body files (excluding `_index.md`) into
+  a set. If `_index.md` exists, parse its id column into a set — **reuse the exact
+  header/separator-skip heuristic of `state.state._count_non_green_grc`** (skip a `|`-row
+  whose first cell lower-cases to the column header or is empty/`-`-only) so the two
+  parsers never disagree. If `_index.md` is absent, the indexed set is empty.
+  - body-ids not in the indexed set → `index_orphan_items` (auto) **only if** every such
+    body has a valid header; any header-less body → `malformed_item` (surface) for that
+    file, and the orphan issue is withheld (we never auto-rebuild an empty-id row).
+  - indexed-ids with no body file → `index_missing_item` (surface).
+  - any body file (orphan or indexed) with `_header_fields(text) == {}` → `malformed_item`
+    (surface).
+  - More than one of these can fire for one folder.
 - *bad_json*: attempt `json.loads(path.read_text())`; `JSONDecodeError` → `bad_json`.
-- *results_missing*: any `MODEL_INPUTS` stem file present **and** `model/results.json`
-  absent.
+- *results_missing*: ≥1 `MODEL_INPUTS` stem file present **and** `model/results.json`
+  absent. **Partial inputs are safe to auto-repair:** the engine is designed to run after
+  every model-writing phase and renders absent inputs as `PENDING`
+  (`engine/model.py` `load_inputs` — "Missing files load as empty"), so re-running against
+  whatever inputs exist reproduces exactly the incremental state the drive loop would have
+  produced. No all-inputs-present guard is needed or wanted (that would suppress the
+  legitimate after-Phase-4-only case).
+
+`check_integrity` does not catch or wrap I/O exceptions — an unexpected `OSError`
+mid-scan propagates, matching `state.state`'s behavior (a broken filesystem is not a
+partial-state issue to classify).
 
 Ordering: results sorted by `(target, kind)` so output is stable across runs and
 filesystems (no mtime, matching the staleness rationale).
@@ -119,8 +142,11 @@ and step-selection (step 4):
 3. **Surface** every `repair: "surface"` issue as a single batched **must-ask** in plain
    language (no file/phase names leaked): name what looks incomplete and that you need to
    re-do that part with them. Do not advance past a `surface` issue.
-4. Re-run integrity after auto-repairs to confirm the auto set cleared; only `surface`
-   issues should remain.
+4. Re-run integrity after auto-repairs and assert **only `surface` issues remain** — this
+   catches both an auto issue that failed to clear and any new issue an auto-repair
+   introduced (e.g. a rebuilt index that still leaves `results_missing` because inputs are
+   partial — itself auto, so it repairs on the second pass). If any `auto` issue persists
+   after a second pass, surface it rather than looping.
 
 Narration block (jargon-free), fenced for the guard like the existing narration blocks:
 
@@ -147,12 +173,16 @@ Narration block (jargon-free), fenced for the guard like the existing narration 
 
 - **`state/tests/test_integrity.py`** (the trust core): build tiny engagement folders in
   `tmp_path`, assert the exact `Issue` set per scenario — clean folder → `[]`; empty
-  `scope.md` → one `empty_output`; orphan `OPP-003.md` not in index → `index_orphan_items`
-  (auto); index lists `OPP-009` with no file → `index_missing_item` (surface); malformed
-  `model/value.json` → `bad_json`; inputs present + no `results.json` → `results_missing`;
-  a folder with several issues → sorted, complete set. Plus: CLI prints JSON & exit 0;
-  non-dir → exit 2; deferral — a *changed* (not absent) input produces **no** integrity
-  issue (staleness owns it).
+  `scope.md` → one `empty_output`; orphan `OPP-003.md` (valid header) not in index →
+  `index_orphan_items` (auto); **`_index.md` absent but `OPP-001..003.md` present (valid
+  headers) → `index_orphan_items` (auto)**; index lists `OPP-009` with no file →
+  `index_missing_item` (surface); **a body file with no extraction header → `malformed_item`
+  (surface), and the orphan issue for that folder is withheld**; malformed
+  `model/value.json` → `bad_json`; **only `baselines.json` present + no `results.json` →
+  `results_missing` (auto), i.e. partial inputs still fire**; a folder with several issues
+  → sorted, complete set. Plus: CLI prints JSON & exit 0; non-dir → exit 2; deferral — a
+  *changed* (not absent) input produces **no** integrity issue (staleness owns it); a
+  clean fully-complete engagement with `results.json` → `[]`.
 - **`tests/test_conductor_skill.py`**: static guards over the new SKILL.md section using
   the existing `_section`/`methodology` fixture convention.
 - Full suite (`.venv/bin/python -m pytest`) stays green.
