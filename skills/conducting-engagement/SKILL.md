@@ -172,7 +172,7 @@ headless subagent. (Convergence already requires the full discovered set before 
 so every in-scope process is ready before this runs.)
 
 - **Dispatch:** dispatch **one subagent per process**, each running
-  `ai-process-assessment:identifying-opportunities` scoped to a single `PROC-NNN`, in one
+  `ai-process-assessment:identifying-opportunities` scoped to a single `PROC-NNN` (**single-process mode**), in one
   concurrent batch. Give each the engagement folder, `engine_root`, and its one `PROC-NNN`.
   Each writes only `<name>/_staging/phase5/proc-<process-id>.md` and returns a one-line
   summary (process id, opportunity count, GRC flag counts) — never opportunity content.
@@ -290,7 +290,7 @@ the next **drive-loop boundary**: apply, re-drive, then resume where you left of
   rule re-drives everything downstream.
 - **Structural** (opportunity type, roadmap sequencing) → **re-run the owning phase**. For an
   opportunity re-type, re-drive only that process's Phase 5 (**single-process mode**, see *Parallel
-  per-process fan-out*) and re-merge; the Staleness rule carries the change into scoring, roadmap,
+  per-process fan-out (Phase 5)*) and re-merge; the Staleness rule carries the change into scoring, roadmap,
   and business case.
 - **Human-only decision** (scope boundary, Build/Buy/Partner) → **re-open that must-ask**
   touchpoint; do not silently apply it.
