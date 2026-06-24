@@ -164,6 +164,12 @@ Repeat until Phase 11 is done and Gate B is cleared:
 - **Phase 5 (opportunity identification) is special:** with ≥2 ready processes you own a
   per-process fan-out rather than a single headless dispatch — see *Parallel per-process
   fan-out (Phase 5)*. With one process it runs once, whole-portfolio.
+- **Register voice (teaching).** The `register` stamped at intake drives *how* you explain
+  throughout the drive loop, not just at intake. **operator** (own team, no methodology training) →
+  teach as you go: plain-language "here's why this matters / what this means", explain before you
+  ask. **consultant** (domain-fluent, relaying interviews) → terse and domain-fluent: assume the
+  vocabulary, no hand-holding. Register sets the voice; autonomy sets the cadence; the must-ask
+  floor is the same for both.
 
 ## Parallel per-process fan-out (Phase 5)
 

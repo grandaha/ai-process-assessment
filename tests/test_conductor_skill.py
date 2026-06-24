@@ -164,3 +164,10 @@ def test_conductor_holding_the_line():
     assert "firm and teaching" in sec
     assert "never refuse-and-quote" in sec
     assert "shortest honest path" in sec
+
+
+def test_conductor_register_drives_teaching():
+    text = SKILL.read_text()
+    assert "Register voice" in text
+    assert "teach as you go" in text
+    assert "terse and domain-fluent" in text
