@@ -141,3 +141,12 @@ def test_conductor_adaptive_autonomy():
     assert "per_class" in sec
     assert "write_conductor" in sec
     assert "never sees or edits" in sec
+
+
+def test_conductor_should_confirm_batching():
+    text = SKILL.read_text()
+    sec = _section(text, "## Adaptive autonomy & holding the line")
+    assert "reviewable digest" in sec
+    assert "silently skipped" in sec
+    # The taxonomy placeholder is replaced by the implemented behavior.
+    assert "Autonomous batching is Slice 2" not in text

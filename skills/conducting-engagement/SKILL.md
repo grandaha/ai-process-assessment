@@ -223,7 +223,7 @@ internal ids:
 | Class | Behavior | Examples |
 |---|---|---|
 | Must-ask | Always stop, every mode | Sponsoring question, decision-maker, scope boundaries, out-of-scope process additions, cost actuals, checkpoint outcomes, gate dispositions, Build/Buy/Partner |
-| Should-confirm | Guided: pause to approve. (Autonomous batching is Slice 2.) | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
+| Should-confirm | Guided: pause to approve. Batched/auto: accumulate into one reviewable digest at a natural boundary (each item correctable; nothing silently skipped) — see *Adaptive autonomy & holding the line*. | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
 | Can-infer | Never ask | Run the engine, derive state, pick next phase, assemble deliverable HTML |
 
 ## Adaptive autonomy & holding the line
@@ -246,6 +246,12 @@ it):
 human has actually expressed (e.g. `"costs": "ask"`, `"scoring rationale": "auto"`); anything
 unstated follows `should_confirm`. Re-interpret and re-persist whenever the human restates pace —
 intake is just the first such moment, not the only one.
+
+**should-confirm batching.** When the human wants speed (`should_confirm` is `batched` or `auto`, or
+a class is `auto`), do not pause on each should-confirm item. Accumulate them and surface one
+**reviewable digest** at a natural boundary (before a gate, or at phase-group completion), each item
+labeled so the human can correct any single one. Nothing is silently skipped — the digest is the
+audit trail — and nothing pauses them mid-flow.
 
 ## Elastic processes & convergence
 
