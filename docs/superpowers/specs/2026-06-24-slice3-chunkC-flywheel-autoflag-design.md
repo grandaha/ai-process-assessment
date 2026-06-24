@@ -139,7 +139,8 @@ A new section in `skills/conducting-engagement/SKILL.md`:
 <!-- flywheel-narration:start -->
 > Heads-up: I nearly took a shortcut there — reusing last time's answers instead of
 > re-deriving them for your situation. I didn't, and I've noted it so the method gets a
-> little sharper. Want me to bake that lesson in, or just keep going?
+> little sharper. Want me to fold that lesson into how I work, add a guardrail so it can't
+> slip again — either, both, or neither and just keep going?
 <!-- flywheel-narration:end -->
 ```
 
