@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.21.0] - 2026-06-24
+
+Slice 4 — Step Reviews: a new operator-facing output tier. As you move through the
+assessment, each step now has a readable working document you can review and revise
+before the next step builds on it — distinct from the client checkpoints and the final
+deliverable.
+
+### Added
+- **Step review documents (Slice 4 Chunk A).** A new pure module `state/step_review.py`
+  consolidates a fragmented step (process discovery, opportunities, scoring, use-case briefs
+  — otherwise split across an index + per-item files) into one readable review document, each
+  item anchored by id. It parses inline `> 💬` comments, renders a **Change history** that is
+  a view of the decision log scoped to the step's items (original comment → what changed →
+  when), and preserves unresolved comments across regeneration (orphans surface under
+  "Unanchored comments", never dropped). Steps that already have one clean document use it
+  directly. The conductor surfaces the review read-only at each step boundary. No new content
+  — pure consolidation; no engine/math change.
+- **Inline comments + conflict pushback (Slice 4 Chunk B).** The operator marks the review up
+  inline (`> 💬 @OPP-3 …`); the conductor works through the comments, routing each through the
+  audited edit engine (Slice 2 edit-splicing) and re-deriving downstream via staleness — never
+  losing a comment (comment-preserving regeneration; drain-before-overwrite before a staleness
+  re-drive of a single-document surface). It **pushes back** rather than complying blindly when
+  a comment conflicts with the evidence, the methodology, the cascade, a prior decision, or
+  another comment — firm-and-teaching; the operator decides and the override is logged. A new
+  `comment:` decision-log field captures the operator's verbatim words for the change history.
+  Conductor behavior only — no new engine code.
+
 ## [2.20.0] - 2026-06-24
 
 Slice 3 — Polish + Flywheel (closes #88): the conductor recovers gracefully from a
