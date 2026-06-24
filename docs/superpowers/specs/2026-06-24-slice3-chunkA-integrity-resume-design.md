@@ -89,7 +89,7 @@ checker reads it. Header-agnostic checks (`empty_output`, `index_missing_item`, 
 | kind | Trigger | repair | Repair path (Conductor) |
 |---|---|---|---|
 | `empty_output` | A `PHASES` output file exists but is empty / whitespace-only | `surface` | Re-drive that phase (its content is gone). |
-| `index_orphan_items` | *(header-based folders only)* Body files exist but are absent from `_index.md` — **including the case where `_index.md` itself is absent** (bodies present, no index) — guarded so it is withheld unless every such body has a valid header | `auto` | Rebuild index via `assembly.index_from_headers` from the body files. |
+| `index_orphan_items` | *(header-based folders only)* Body files exist but are absent from `_index.md` — **including the case where `_index.md` itself is absent** (bodies present, no index) — withheld for the folder if any body produced a `malformed_item` | `auto` | Rebuild index via `assembly.index_from_headers` from the body files. |
 | `index_missing_item` | `_index.md` references an item id with no matching body file | `surface` | Re-drive that phase (the body content is gone). |
 | `malformed_item` | *(header-based folders only)* A body file (`PREFIX-*.md`) is present but lacks a valid extraction header (`assembly._header_fields` → `{}`), whether or not it is indexed | `surface` | Re-drive that item (its header/content is incomplete). |
 | `bad_json` | A present `model/<stem>.json` (stem ∈ `MODEL_INPUTS`) fails `json.loads` | `surface` | Ask the human for the correct value; re-record. |
