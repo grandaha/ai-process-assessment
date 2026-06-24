@@ -199,6 +199,13 @@ so every in-scope process is ready before this runs.)
   and sequential fan-out yield **byte-identical** `opportunities/`.
 - **Then** run the cross-process **chain-detection** scan over the merged `opportunities/`
   (see *Elastic processes & convergence*), then proceed to convergence / Phase 6.
+- **Degradation:** on a surface without concurrent dispatch, run the same per-process
+  invocations **sequentially** into the same staging layout — same merge, same ids, identical
+  result. Fan-out is an optimization; the sequential path is the invariant.
+- **Failure:** if one process's subagent fails, **re-dispatch only that process**; retain the
+  others' staged outputs; **do not merge until the full set is staged** (convergence already
+  demands every in-scope process). A merge error → stop, surface (must-ask), never advance on a
+  failed merge.
 
 N<2 → run Phase 5 once, whole-portfolio, exactly as before (the sequential spine).
 

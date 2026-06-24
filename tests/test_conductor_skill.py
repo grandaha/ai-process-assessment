@@ -50,3 +50,13 @@ def test_conductor_owns_phase5_fanout():
     assert "renumber_sequential" in sec
     # Cross-process chain-detection runs after the merge.
     assert "chain-detection" in sec
+
+
+def test_conductor_fanout_degradation_and_failure():
+    sec = _section(SKILL.read_text(), "## Parallel per-process fan-out")
+    # Cross-surface degradation: same per-process work, run sequentially, identical result.
+    assert "Degradation" in sec
+    assert "sequentially" in sec
+    # Per-process failure: re-dispatch only the failed process; merge waits for the full set.
+    assert "re-dispatch only that process" in sec
+    assert "do not merge until the full set is staged" in sec
