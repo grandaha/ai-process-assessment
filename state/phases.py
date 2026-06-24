@@ -34,7 +34,7 @@ PHASES: list[Phase] = [
     Phase("5", "Opportunities", "ai-process-assessment:identifying-opportunities", "opportunities/_index.md", "processes/_index.md", header_based=True),
     Phase("6", "Scoring", "ai-process-assessment:scoring-opportunities", "scores/_index.md", "opportunities/_index.md", header_based=True),
     Phase("7", "Roadmap", "ai-process-assessment:prioritizing-roadmap", "roadmap.md", "scores/_index.md"),
-    Phase("8", "Use-Case Briefs", "ai-process-assessment:packaging-usecases", "usecase-briefs/_index.md", "roadmap.md", header_based=True),
+    Phase("8", "Use-Case Briefs", "ai-process-assessment:packaging-usecases", "usecase-briefs/_index.md", "roadmap.md"),
     Phase("8.5", "Cost Actuals", "ai-process-assessment:collecting-cost-actuals", "cost-actuals.md", "usecase-briefs/_index.md"),
     Phase("9", "Business Case", "ai-process-assessment:building-business-case", "business-case.md", "cost-actuals.md"),
     Phase("10", "Executive Summary", "ai-process-assessment:building-executive-summary", "executive-summary.md", "business-case.md"),

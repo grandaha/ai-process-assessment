@@ -43,12 +43,16 @@ def test_phase_is_frozen_dataclass():
 def test_header_based_flag_marks_extraction_header_folders():
     from state.phases import PHASES, GATES
     by_id = {p.id: p for p in PHASES}
-    # Phases whose _index.md is built from <!-- index: id=... --> headers.
+    # Phases whose _index.md is built from <!-- index: id=... --> headers,
+    # with bare ids in the index table -> rebuildable via index_from_headers.
     assert by_id["5"].header_based is True
     assert by_id["6"].header_based is True
-    assert by_id["8"].header_based is True
     # Phase 4 (processes/) is field-based: index_from_fields, no id= header.
     assert by_id["4"].header_based is False
+    # Phase 8 (usecase-briefs/) is hand-assembled in main context (NOT
+    # index_from_headers): its index uses markdown-link ids and a rich 12-column
+    # table that index_from_headers cannot reproduce. Drift is deferred (False).
+    assert by_id["8"].header_based is False
     # Non-folder phases default False.
     assert by_id["1"].header_based is False
     grc = next(g for g in GATES if g.id == "grc")

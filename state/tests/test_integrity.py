@@ -122,6 +122,27 @@ def test_field_based_processes_still_flag_missing_item(engagement):
     assert ("index_missing_item", "processes/_index.md", "surface") in kinds
 
 
+def test_usecase_briefs_handassembled_index_is_clean(engagement):
+    # Phase 8's index is hand-assembled with markdown-link ids and a rich table
+    # that index_from_headers cannot reproduce; it is header_based=False, so a
+    # complete usecase-briefs folder must NOT report orphan/malformed drift
+    # (a false positive there would trigger a destructive auto-rebuild).
+    root = engagement(**{
+        "usecase-briefs/_index.md": (
+            "# Use-Case Briefs — Master Index\n\n"
+            "| UC-NNN | OPP ref | Title |\n| --- | --- | --- |\n"
+            "| [UC-001](UC-001.md) | OPP-001 | Status assembly |\n"
+        ),
+        "usecase-briefs/UC-001.md": (
+            "# UC-001 — Status assembly\n"
+            "<!-- index: id=UC-001 opp=OPP-001 -->\n\nBody.\n"
+        ),
+    })
+    issues = check_integrity(root)
+    assert not any(i.kind == "index_orphan_items" for i in issues)
+    assert not any(i.kind == "malformed_item" for i in issues)
+
+
 def test_issues_sorted_by_target_then_kind(engagement):
     root = engagement(**{
         "scope.md": "  ",                                         # empty_output (scope.md)

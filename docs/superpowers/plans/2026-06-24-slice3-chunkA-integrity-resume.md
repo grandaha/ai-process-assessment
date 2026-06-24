@@ -765,3 +765,23 @@ git commit -m "feat(conductor): resume into a messy state — integrity-driven r
 
 - [ ] Run the whole suite: `.venv/bin/python -m pytest -q` — expect all green (287 existing + new).
 - [ ] `python3 state/integrity.py sample-pso-delivery/` prints `[]` (the complete sample has no partial state) — a real-data smoke check.
+
+---
+
+## Post-implementation correction (final verification)
+
+The sample smoke check surfaced a false positive: `usecase-briefs/_index.md`
+reported `index_orphan_items`. Root cause — **Phase 8 (`usecase-briefs/`) is
+hand-assembled by `packaging-usecases` in main context**, not built via
+`index_from_headers`. Its index is a rich 12-column table whose id cells are
+markdown links (`[UC-001](UC-001.md)`), so the id-shaped parser found no indexed
+ids and treated every body as an orphan — and the would-be auto-repair via
+`index_from_headers` would have *overwritten* the rich table with a bare one.
+
+**Fix:** Phase 8 is `header_based=False` (Task 1 had set it `True`). It is now
+deferred exactly like `processes/` (Phase 4): header-agnostic checks only, no
+orphan/malformed/auto-repair. Updated: `state/phases.py`, `state/tests/test_phases.py`
+(assert `by_id["8"].header_based is False`), a regression test
+`test_usecase_briefs_handassembled_index_is_clean` in `state/tests/test_integrity.py`,
+and the spec's "Header-based vs field-based vs hand-assembled folders" + deferral note.
+Only phases 5/6 and the grc gate remain `header_based=True`.

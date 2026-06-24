@@ -72,19 +72,26 @@ Driven by `state/phases.py` (`PHASES`, `MODEL_INPUTS`) and the folder convention
 (per-item phases: `processes/` `PROC-`, `opportunities/` `OPP-`, `scores/` `OPP-`,
 `usecase-briefs/` `UC-`; gate folder `grc/` `OPP-`).
 
-**Header-based vs field-based folders.** Phases 5/6/8 and the `grc/` gate assemble their
-`_index.md` from each body's extraction header (`<!-- index: id=... -->`) via
-`assembly.index_from_headers`; their bodies are **header-based**. Phase 4 (`processes/`)
-is the lone exception: `discovering-processes` builds its index from content-derived
-fields via `assembly.index_from_fields` (the bodies carry `<!-- index: baseline=Ready -->`,
-*not* an `id=` header), so `PROC-NNN.md` files are **field-based**. The header-dependent
-checks below (`malformed_item`, and the header-based auto-repair of `index_orphan_items`)
-therefore apply **only to header-based folders**; running them on `processes/` would
-false-positive on every valid process file and, on repair, write empty-id rows. To encode
-this without hardcoding folder names in `integrity.py`, add a `header_based: bool` field to
-the `Phase` dataclass (`True` for 5/6/8 and the grc gate; `False` for Phase 4); the
-checker reads it. Header-agnostic checks (`empty_output`, `index_missing_item`, `bad_json`,
-`results_missing`) apply to all folders unchanged.
+**Header-based vs field-based vs hand-assembled folders.** Phases 5/6 and the `grc/` gate
+assemble their `_index.md` from each body's extraction header (`<!-- index: id=... -->`)
+via `assembly.index_from_headers`, and their index tables carry **bare** ids (`OPP-001`);
+their bodies are **header-based** and the index is rebuildable. Two folders are *not*:
+- Phase 4 (`processes/`): `discovering-processes` builds its index from content-derived
+  fields via `assembly.index_from_fields` (bodies carry `<!-- index: baseline=Ready -->`,
+  *not* an `id=` header) — **field-based**.
+- Phase 8 (`usecase-briefs/`): `packaging-usecases` **hand-assembles** its `_index.md` in
+  main context — a rich 12-column table whose id cells are **markdown links**
+  (`[UC-001](UC-001.md)`), which `index_from_headers` cannot reproduce. Treat it like
+  `processes/`: header-based checks do not apply.
+
+The header-dependent checks below (`malformed_item`, and the header-based auto-repair of
+`index_orphan_items`) therefore apply **only to header-based folders**; running them on
+`processes/` or `usecase-briefs/` would false-positive on valid files and, on repair,
+overwrite a legitimate index with an empty-id or stripped-down table. To encode this
+without hardcoding folder names in `integrity.py`, add a `header_based: bool` field to the
+`Phase` dataclass (`True` for 5/6 and the grc gate; `False` for Phase 4, Phase 8, and all
+non-folder phases); the checker reads it. Header-agnostic checks (`empty_output`,
+`index_missing_item`, `bad_json`, `results_missing`) apply to all folders unchanged.
 
 | kind | Trigger | repair | Repair path (Conductor) |
 |---|---|---|---|
@@ -104,14 +111,15 @@ checker reads it. Header-agnostic checks (`empty_output`, `index_missing_item`, 
   owned by the fan-out merge, not durable engagement state. Flagged here so the next
   developer knows it is a conscious exclusion, not an oversight; a later chunk may add a
   `stale_staging` (auto: run the merge from present staged files, then verify).
-- **`processes/` (Phase 4) index drift** → *header-based orphan auto-repair deferred.*
-  Field-based folders get the header-agnostic checks (`empty_output`, `index_missing_item`,
-  `bad_json`) but **not** `malformed_item` or header-based `index_orphan_items` auto-repair,
-  because their correct rebuild needs `index_from_fields` with a Phase-4-specific `extract`
-  function (parsing the `## PROC-NNN — Name` heading), which is its own unit of work. A
-  later chunk can add a field-based `index_orphan_items` repair path. Until then, a Phase 4
-  orphan/absent-index surfaces only via the phase reading "not done" in `state.state` and
-  is re-driven — the pre-existing behavior, not a regression.
+- **`processes/` (Phase 4) and `usecase-briefs/` (Phase 8) index drift** → *orphan
+  auto-repair deferred.* Both are `header_based=False`, so they get the header-agnostic
+  checks (`empty_output`, `index_missing_item`, `bad_json`) but **not** `malformed_item` or
+  header-based `index_orphan_items`. `processes/` would need `index_from_fields` with a
+  Phase-4-specific `extract` (parsing `## PROC-NNN — Name`); `usecase-briefs/` is
+  hand-assembled with a rich linked-id table that no assembly primitive reproduces. A later
+  chunk can add bespoke repair paths. Until then, a drift in either surfaces only via the
+  phase reading "not done" in `state.state` and is re-driven — pre-existing behavior, not a
+  regression.
 
 Detection details:
 - *empty/whitespace*: `path.read_text().strip() == ""`.
