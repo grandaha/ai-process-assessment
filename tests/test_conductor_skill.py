@@ -9,6 +9,7 @@ REQUIRED_HEADINGS = [
     "## Execution model",
     "## Parallel per-process fan-out",
     "## Touchpoint taxonomy",
+    "## Adaptive autonomy & holding the line",
     "## Elastic processes & convergence",
     "## Decision log",
     "## Staleness",
@@ -129,3 +130,49 @@ def test_conductor_edit_delta_narration_is_jargon_free():
     forbidden = ["OPP-", "model/", "_staging", "renumber"] + [f"Phase {n}" for n in range(1, 12)]
     for token in forbidden:
         assert token not in narration, f"delta narration leaks jargon: {token!r}"
+
+
+def test_conductor_adaptive_autonomy():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    # Plain-language interface, any time.
+    assert "plain language" in sec
+    # Interpreted into per-class behavior and persisted (conductor-maintained).
+    assert "per-class" in sec
+    assert "per_class" in sec
+    assert "write_conductor" in sec
+    assert "never sees or edits" in sec
+
+
+def test_conductor_should_confirm_batching():
+    text = SKILL.read_text()
+    sec = _section(text, "## Adaptive autonomy & holding the line")
+    assert "reviewable digest" in sec
+    assert "silently skipped" in sec
+    # The taxonomy placeholder is replaced by the implemented behavior.
+    assert "Autonomous batching is Slice 2" not in text
+
+
+def test_conductor_must_ask_invariant():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    assert "must-ask never collapses" in sec
+    assert "any pressure" in sec
+    assert "never** relax a must-ask" in sec or "never relax a must-ask" in sec
+    assert "Touchpoint taxonomy" in sec
+    # Validate that the canonical taxonomy floor carries the trust-critical categories.
+    text = SKILL.read_text()
+    for item in ("scope boundaries", "decision-maker", "cost actuals", "gate dispositions", "Build/Buy/Partner"):
+        assert item in text, f"must-ask taxonomy floor missing: {item!r}"
+
+
+def test_conductor_holding_the_line():
+    sec = _section(SKILL.read_text(), "## Adaptive autonomy & holding the line")
+    assert "firm and teaching" in sec
+    assert "never refuse-and-quote" in sec
+    assert "shortest honest path" in sec
+
+
+def test_conductor_register_drives_teaching():
+    text = SKILL.read_text()
+    assert "Register voice" in text
+    assert "teach as you go" in text
+    assert "terse and domain-fluent" in text

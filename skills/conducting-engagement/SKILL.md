@@ -95,6 +95,7 @@ assessment.)
 2. **Set autonomy preset** (default **guided**): guided = confirm each phase transition
    and every checkpoint/gate; autonomous = drive without per-step confirmation, stopping
    only at must-ask points. (Slice 1 runs should-confirm in guided mode.)
+   Pace and trust can be re-expressed at any point, not only here — see *Adaptive autonomy & holding the line*.
 3. **Run Phase 1** inline (`ai-process-assessment:scoping-engagement`) — this creates the
    engagement folder, `scope.md`, and the gitignore entry.
 4. **Stamp `.conductor.md`** with `register`, `autonomy.should_confirm`,
@@ -163,6 +164,12 @@ Repeat until Phase 11 is done and Gate B is cleared:
 - **Phase 5 (opportunity identification) is special:** with ≥2 ready processes you own a
   per-process fan-out rather than a single headless dispatch — see *Parallel per-process
   fan-out (Phase 5)*. With one process it runs once, whole-portfolio.
+- **Register voice (teaching).** The `register` stamped at intake drives *how* you explain
+  throughout the drive loop, not just at intake. **operator** (own team, no methodology training) →
+  teach as you go: plain-language "here's why this matters / what this means", explain before you
+  ask. **consultant** (domain-fluent, relaying interviews) → terse and domain-fluent: assume the
+  vocabulary, no hand-holding. Register sets the voice; autonomy sets the cadence; the must-ask
+  floor is the same for both.
 
 ## Parallel per-process fan-out (Phase 5)
 
@@ -222,8 +229,47 @@ internal ids:
 | Class | Behavior | Examples |
 |---|---|---|
 | Must-ask | Always stop, every mode | Sponsoring question, decision-maker, scope boundaries, out-of-scope process additions, cost actuals, checkpoint outcomes, gate dispositions, Build/Buy/Partner |
-| Should-confirm | Guided: pause to approve. (Autonomous batching is Slice 2.) | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
+| Should-confirm | Guided: pause to approve. Batched/auto: accumulate into one reviewable digest at a natural boundary (each item correctable; nothing silently skipped) — see *Adaptive autonomy & holding the line*. | Context map, opportunity log, scoring rationale, roadmap sequencing; once `results.json` exists, generating any requested artifact via `ai-process-assessment:generate-artifact` (produced from the verified contract, never by hand) |
 | Can-infer | Never ask | Run the engine, derive state, pick next phase, assemble deliverable HTML |
+
+## Adaptive autonomy & holding the line
+
+You adapt your interaction to the human within invariants that never move. The human never
+configures anything — they express pace and trust in **plain language, at any point** ("stop asking
+me about the small stuff", "slow down and walk me through these", "check anything cost-related with
+me"), and you adapt.
+
+**Adaptive autonomy.** Interpret each pace/trust statement into **per-class** behavior and persist
+it in `.conductor.md` under `autonomy` (written via `write_conductor`; the human never sees or edits
+it):
+
+    autonomy: {
+      should_confirm: "guided" | "batched" | "auto",
+      per_class: { "<class or item>": "ask" | "auto" }
+    }
+
+`should_confirm` is the default cadence for should-confirm items; `per_class` records only what the
+human has actually expressed (e.g. `"costs": "ask"`, `"scoring rationale": "auto"`); anything
+unstated follows `should_confirm`. Re-interpret and re-persist whenever the human restates pace —
+intake is just the first such moment, not the only one.
+
+**should-confirm batching.** When the human wants speed (`should_confirm` is `batched` or `auto`, or
+a class is `auto`), do not pause on each should-confirm item. Accumulate them and surface one
+**reviewable digest** at a natural boundary (before a gate, or at phase-group completion), each item
+labeled so the human can correct any single one. Nothing is silently skipped — the digest is the
+audit trail — and nothing pauses them mid-flow.
+
+**The line that never moves.** must-ask never collapses — in any mode, under any pressure, whatever
+autonomy the human has set. The canonical floor is the **must-ask row of the *Touchpoint taxonomy*** above — every item there, no exceptions. A per-class setting can tighten a
+should-confirm item to `ask` or relax a should-confirm item to `auto`; it can **never** relax a must-ask. "Just do everything, don't ask me" speeds up should-confirm and can-infer and never
+touches the floor.
+
+**Holding the line.** When the human pushes to skip a must-ask ("just give me the number, skip
+this"), honor the **spirit** — move faster everywhere else, batch the rest — while holding the
+**floor**. Give the human reason the gate exists and the fastest honest path through it ("this one
+number is what makes the $1.3M defensible — 30 seconds and it's yours"). Be **firm and teaching,
+never refuse-and-quote**: do not cite phase names, rules, or the methodology at the human. Holding
+the line is the shortest honest path, never a wall.
 
 ## Elastic processes & convergence
 
