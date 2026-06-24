@@ -359,9 +359,11 @@ The step-review Change-history view reads `comment:` to show *original comment �
 
 At each step boundary, offer the operator a readable review of what the step produced before
 the next step builds on it — the operator tier (distinct from the client checkpoints and the
-final deliverable). In this revision the review is **read-only**: you present it; corrections
-still flow through *Edit & interruption splicing* (the inline-comment round-trip lands in a
-later revision).
+final deliverable).
+
+**Surfacing** a review is read-only — presenting it never advances the drive loop or mutates
+anything. **Working through comments** is the two-way half: the operator marks the review up
+inline and you apply the agreed changes through the audited pipeline.
 
 - For a **fragmented** step (process discovery, opportunities, scoring, use-case briefs —
   split across an index + per-item files), render the consolidated review by absolute path:
@@ -372,6 +374,38 @@ later revision).
 
 Surfacing a review is **read-only**: it never advances the drive loop or mutates anything.
 The register sets how much you explain (operator vs consultant voice).
+
+### Working through comments
+
+The operator annotates the review **inline** — a blockquote led by `> 💬`, anchored to the
+item with `@<ID>` or by sitting under that item's heading:
+
+```
+> 💬 @OPP-3 this is augmentation, not automation — a human still signs off
+```
+
+Lifecycle (never lose a comment, never silently overwrite):
+
+1. **Generate** — render the review fresh (Chunk A) when the step completes.
+2. **Annotate** — the operator adds `> 💬` comments and saves.
+3. **Intake** — when they say they've commented (or on request), read the document and
+   extract its comments (`state.step_review.extract_comments`).
+4. **Work through (with pushback — below)** — for each comment: route it through *Edit & interruption splicing*
+   (classify → fix the owning artifact → re-run the audited engine);
+   log the decision with the operator's words **verbatim** in the decision-log `comment:`
+   field. Staleness re-derives downstream.
+5. **Regenerate** — re-render the review: resolved comments move into the **Change history**
+   (the decision-log view); unresolved comments are preserved at their anchor.
+
+Invariants:
+- **Never silently regenerate** a review that still carries unresolved comments;
+  regeneration is comment-preserving (an orphaned comment lands under *Unanchored comments*,
+  never dropped).
+- **Drain before overwrite.** A single-document surface (e.g. `scope.md`) is also rewritten
+  out-of-band when a **staleness re-drive** re-runs that phase. Before any re-drive
+  overwrites a surface carrying unresolved comments, drain them first — process them, or
+  re-inject them at their anchors in the re-driven document (orphaned anchors surface, never
+  silently dropped). Check for unresolved comments at the top of any single-doc re-drive.
 
 Narrate jargon-free — no file names, ids, or step numbers:
 

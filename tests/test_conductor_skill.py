@@ -303,3 +303,17 @@ def test_decision_log_has_comment_field():
     assert "verbatim" in sec.lower()
     # It is distinct from rationale (which may be the conductor's counter-argument).
     assert "rationale:" in sec
+
+
+def test_step_review_comment_lifecycle():
+    sec = _section(SKILL.read_text(), "## Step reviews")
+    # Inline comment convention is named.
+    assert "💬" in sec
+    # Comments are read back and routed through the audited edit engine.
+    assert "extract" in sec.lower() or "read" in sec.lower()
+    assert "Edit & interruption splicing" in sec
+    # The no-silent-clobber + drain-before-overwrite invariants are stated.
+    assert "unresolved" in sec.lower()
+    assert "drain" in sec.lower() or "before" in sec.lower()
+    # Resolved comments move into the change history (not deleted into the void).
+    assert "change history" in sec.lower()
