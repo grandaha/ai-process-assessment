@@ -57,6 +57,22 @@ The operator never sees a fragmented folder as the review surface; they see one 
 document either way. (Phase 11, `deliverable.html`, has no operator review — it *is* the
 client hand-off tier, reviewed via the deliverable-gate, not the operator tier.)
 
+### 3.3 Change-history section
+
+Each review document ends with a **"Change history"** section: original comment → what
+changed → when, for the comments already worked through on this step. This is a **rendered
+view of the decision log** (`<engagement>/decision-log.md`) filtered to the step's item ids
+(e.g. all `OPP-*` for the opportunities review) — **not** a second, separately-authored
+record. The decision log is the canonical append-only audit trail Slice 2 already writes on
+every correction; sourcing the history from it means it cannot drift from the audit record,
+and it keeps the review document fully derived (body from source + history from the decision
+log). It regenerates with the document.
+
+For the render to show the "original comment," comment-driven decision-log entries must
+capture the operator's **verbatim comment** as the correction's rationale (the entry is
+already timestamped and tagged by item id). That is the one small addition to the existing
+"log both parties" step (§4.2 / Slice 2 Chunk B).
+
 ### 3.2 New unit — `state/step_review.py`
 
 Pure functions of the filesystem, stdlib + `state.*` only (matches `state/status.py`,
@@ -132,9 +148,14 @@ Invariants:
   silently. Regeneration happens at step 1 (initial) and step 5 (after a processing pass).
 - Regeneration is **comment-preserving**: any comment not yet resolved is carried forward to
   its anchor in the fresh render (safety net for a mid-review re-render).
-- For **single-document** review surfaces there is no regeneration (the doc is source); the
-  conductor applies the edit and **strips the resolved comment lines** in the same edit, so
-  the source never accumulates stale comments.
+- A **resolved** comment is not deleted into the void — it moves from the active inline
+  markup into the rendered **Change history** section (§3.3), sourced from the decision-log
+  entry the resolution wrote. So "clear the comment" means "the comment now lives in the
+  audit-backed history below," not "the comment is gone."
+- For **single-document** review surfaces there is no body regeneration (the doc is source);
+  the conductor applies the edit and **strips the resolved inline comment** in the same edit.
+  Its history still renders from the decision log (the single-doc surface gets the same
+  Change-history view appended).
 
 ## 6. Conflict pushback
 
@@ -188,26 +209,33 @@ markdown convention measurably slows the operator on dense documents.
 Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow used for Slices 2–3:
 
 - **Chunk A — Step review documents.** `state/step_review.py` (`render_review`,
-  `review_path`, CLI); the parameterized consolidation of the 4 fragmented phases; conductor
-  "step review at the boundary" surfacing. Deliverable: the operator can open one readable
-  review document for any step.
+  `review_path`, the Change-history render from the decision log, CLI); the parameterized
+  consolidation of the 4 fragmented phases; conductor "step review at the boundary"
+  surfacing. Deliverable: the operator can open one readable review document for any step,
+  including its (initially empty) change-history view.
 - **Chunk B — Inline comments + conflict pushback.** `extract_comments`; the comment-aware
-  lifecycle (§5); conductor wiring to work through comments, route via edit-splicing, and
+  lifecycle (§5); the verbatim-comment capture into the decision log that populates the
+  Change history; conductor wiring to work through comments, route via edit-splicing, and
   push back on conflicts (§6). Deliverable: the operator marks up a review and the conductor
-  revises with them, coherently.
+  revises with them, coherently, leaving an audit-backed history.
 
 ## 10. Files (across both chunks)
 
 - **Create** `state/step_review.py` — `render_review`, `review_path`, `extract_comments`,
-  `Comment`, CLI.
+  `Comment`, the Change-history render (decision-log entries scoped to the step's item ids),
+  CLI.
 - **Create** `state/tests/test_step_review.py` — renderer consolidation, anchors, determinism,
   CLI; comment extraction (explicit + positional anchor, multiple, none); comment-preserving
-  regeneration.
+  regeneration; Change-history render from a fixture decision log (scoped/filtered, ordered,
+  shows verbatim comment + disposition + timestamp).
 - **Modify** `skills/conducting-engagement/SKILL.md` — add "Step reviews" (boundary
-  surfacing + lifecycle) and the conflict-pushback handling; reference from the drive loop.
+  surfacing + lifecycle + Change history) and the conflict-pushback handling; record the
+  operator's verbatim comment in the decision-log entry when routing a comment; reference
+  from the drive loop.
 - **Modify** `tests/test_conductor_skill.py` — guards for the new sections (present,
-  references `state/step_review.py`, lifecycle protects comments, conflict-pushback classes,
-  jargon-free narration sweep).
+  references `state/step_review.py`, lifecycle protects comments + resolved→history,
+  verbatim-comment captured in the decision log, conflict-pushback classes, jargon-free
+  narration sweep).
 
 ## 11. Testing strategy
 
@@ -216,8 +244,11 @@ Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow u
   single-doc phase; deterministic (same inputs → same bytes). `extract_comments` returns the
   right `(anchor, body)` for explicit `@id`, positional fallback, multiple comments, and
   none; ignores non-comment blockquotes. Comment-preserving regeneration: a render that
-  carries an unresolved comment re-emits it at its anchor. CLI: writes the target, prints the
-  path, exit 0; non-dir → exit 2.
+  carries an unresolved comment re-emits it at its anchor. **Change history**: given a
+  fixture `decision-log.md`, the renderer's history section includes only entries scoped to
+  this step's item ids, in order, each showing the verbatim comment, disposition, and
+  timestamp; an unrelated entry (another step's id) is excluded. CLI: writes the target,
+  prints the path, exit 0; non-dir → exit 2.
 - **`tests/test_conductor_skill.py`** (static guards): the step-review and conflict-pushback
   sections present; references the renderer; states the no-silent-clobber + comment-preserving
   invariants; enumerates the conflict classes; narration jargon-free (forbidden-token sweep).
@@ -234,5 +265,9 @@ Two chunks, same brainstorm → spec → plan → subagent-TDD → review flow u
 - **No stale-cache risk.** Review render targets are regenerated from source; the
   comment-aware lifecycle is the only thing that defers regeneration, and it preserves
   comments when it does.
+- **One audit trail, no parallel log.** The Change-history section is a rendered *view* of
+  the decision log scoped to the step — not a second record. The decision log stays the
+  single append-only source of truth; the review doc never authors history of its own, so
+  the two cannot drift.
 - **Pure/stdlib/testable**, matching the `state/*` conventions — the rejected JS surface is
   explicitly out (§8).
