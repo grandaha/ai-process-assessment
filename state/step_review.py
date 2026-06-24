@@ -23,6 +23,14 @@ _ID_SEARCH = re.compile(r"[A-Z]+-\d+")     # find an id inside a heading
 _COMMENT_RE = re.compile(r"^>\s*💬\s*(.*\S)\s*$")
 _AT_RE = re.compile(r"@([A-Z]+-\d+)")
 
+# Fragmented phases: phase_id -> (folder, review-file slug, display name).
+_FRAGMENTED = {
+    "4": ("processes", "04-processes", "Process Discovery"),
+    "5": ("opportunities", "05-opportunities", "Opportunities"),
+    "6": ("scores", "06-scores", "Scoring"),
+    "8": ("usecase-briefs", "08-usecase-briefs", "Use-Case Briefs"),
+}
+
 
 @dataclass(frozen=True)
 class Comment:
@@ -46,3 +54,39 @@ def extract_comments(text: str) -> list[Comment]:
             if s:
                 heading_id = s.group(0)
     return out
+
+
+def review_path(phase_id: str) -> str:
+    if phase_id in _FRAGMENTED:
+        return f"reviews/{_FRAGMENTED[phase_id][1]}.md"
+    for p in PHASES:
+        if p.id == phase_id:
+            return p.output
+    raise ValueError(f"unknown phase_id: {phase_id}")
+
+
+def _item_bodies(folder: Path) -> list[Path]:
+    return sorted(
+        (p for p in folder.glob("*.md")
+         if p.name != "_index.md" and _ID_RE.fullmatch(p.stem)),
+        key=lambda p: p.stem,
+    )
+
+
+def render_review(root, phase_id: str) -> str:
+    if phase_id not in _FRAGMENTED:
+        raise ValueError(f"phase {phase_id} is not fragmented; use its source doc")
+    root = Path(root)
+    folder_name, _slug, display = _FRAGMENTED[phase_id]
+    folder = root / folder_name
+
+    parts = [
+        f"# Review — {display} ({folder_name}/)", "",
+        "> Working review document — read it and tell me what to change.", "",
+    ]
+    index = folder / "_index.md"
+    if index.exists():
+        parts += ["## Summary", "", index.read_text(encoding="utf-8").rstrip(), ""]
+    for p in _item_bodies(folder):
+        parts += ["---", "", p.read_text(encoding="utf-8").rstrip(), ""]
+    return "\n".join(parts).rstrip() + "\n"
