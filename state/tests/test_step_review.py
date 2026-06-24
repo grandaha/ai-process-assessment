@@ -122,3 +122,43 @@ def test_render_review_includes_change_history(engagement):
     out = render_review(root, "5")
     assert "## Change history" in out
     assert "this is augmentation, not automation" in out
+
+
+def test_render_preserves_anchored_comment(engagement):
+    root = engagement(**{
+        "opportunities/_index.md": "| OPP-ID |\n",
+        "opportunities/OPP-001.md": "## OPP-001 — X\n\nb\n",
+    })
+    # write an existing review target carrying a comment
+    target = root / "reviews" / "05-opportunities.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(render_review(root, "5").replace(
+        "b\n", "b\n\n> 💬 @OPP-001 please revise\n"))
+    out = render_review(root, "5")
+    assert "> 💬 @OPP-001 please revise" in out
+    # the comment sits within the OPP-001 section, before Change history
+    assert out.index("please revise") < out.index("## Change history")
+
+
+def test_render_preserves_orphan_comment_in_unanchored(engagement):
+    root = engagement(**{
+        "opportunities/_index.md": "| OPP-ID |\n",
+        "opportunities/OPP-001.md": "## OPP-001 — X\n\nb\n",
+    })
+    target = root / "reviews" / "05-opportunities.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # comment anchored to an item that no longer exists
+    target.write_text("# Review\n\n> 💬 @OPP-999 stale anchor\n")
+    out = render_review(root, "5")
+    assert "## Unanchored comments" in out
+    assert "stale anchor" in out
+
+
+def test_render_no_target_no_comments(engagement):
+    root = engagement(**{
+        "opportunities/_index.md": "| OPP-ID |\n",
+        "opportunities/OPP-001.md": "## OPP-001 — X\n\nb\n",
+    })
+    out = render_review(root, "5")
+    assert "Unanchored comments" not in out
+    assert "> 💬" not in out

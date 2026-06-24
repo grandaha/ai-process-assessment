@@ -122,6 +122,16 @@ def render_review(root, phase_id: str) -> str:
     folder_name, _slug, display = _FRAGMENTED[phase_id]
     folder = root / folder_name
 
+    # comments to preserve from an existing target
+    target = root / review_path(phase_id)
+    preserved = extract_comments(target.read_text(encoding="utf-8")) if target.exists() else []
+    bodies = _item_bodies(folder)
+    ids = {p.stem for p in bodies}
+    by_anchor: dict[str, list[Comment]] = {}
+    unanchored: list[Comment] = []
+    for c in preserved:
+        (by_anchor.setdefault(c.anchor, []) if c.anchor in ids else unanchored).append(c)
+
     parts = [
         f"# Review — {display} ({folder_name}/)", "",
         "> Working review document — read it and tell me what to change.", "",
@@ -129,8 +139,13 @@ def render_review(root, phase_id: str) -> str:
     index = folder / "_index.md"
     if index.exists():
         parts += ["## Summary", "", index.read_text(encoding="utf-8").rstrip(), ""]
-    for p in _item_bodies(folder):
+    for p in bodies:
         parts += ["---", "", p.read_text(encoding="utf-8").rstrip(), ""]
-    ids = {p.stem for p in _item_bodies(folder)}
+        for c in by_anchor.get(p.stem, []):
+            parts += [f"> 💬 {c.body}", ""]
+    if unanchored:
+        parts += ["## Unanchored comments", ""]
+        for c in unanchored:
+            parts += [f"> 💬 {c.body}", ""]
     parts += [render_change_history(root, ids), ""]
     return "\n".join(parts).rstrip() + "\n"
