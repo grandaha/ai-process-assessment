@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   correction to the right audited mechanism, re-runs the pipeline, and reports exactly what changed
   (backed by the new deterministic `state/results_diff.py`). Replaces the old spreadsheet "what-if",
   stricter because it re-runs the audited engine. No engine/math change.
+- **Adaptive interaction (Slice 2 Chunk C, #87).** The conductor adapts to the human: pace and trust
+  expressed in plain language at any point become per-class autonomy; should-confirm items batch into
+  one reviewable digest when speed is wanted; the register (operator vs consultant) drives the
+  teaching voice; and the must-ask floor never collapses — under pressure the conductor holds the
+  line firm-and-teaching (human reason + fastest honest path), never refuse-and-quote. The engine of
+  AC-1. No new code.
 
 ### Changed
 - Phase 5 opportunity assembly now uses the portable stdlib `state.assembly` layer instead of inline `awk`, so it runs on Python-only surfaces and is deterministic regardless of subagent completion order (#100).
