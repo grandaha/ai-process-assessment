@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.20.0] - 2026-06-24
+
+Slice 3 — Polish + Flywheel (closes #88): the conductor recovers gracefully from a
+messy or half-finished engagement, can tell you where things stand in plain language,
+and quietly makes the methodology sharper over time.
+
+### Added
+- **Messy/partial-state handling + resume hardening (Slice 3 Chunk A, #88).** A new
+  pure-Python integrity checker (`state/integrity.py`) closes the *existence ≠ completeness*
+  gap: a truncated phase output, an index that drifted from its item files, malformed
+  `model/*.json`, or absent `results.json` are now detected and classified as
+  auto-repairable (deterministically re-derivable — rebuild an index, re-run the engine) or
+  must-surface (needs human content). On resume the conductor self-heals the derivable set
+  silently and surfaces the rest as one batched must-ask. Header-based folders (Phases 5/6
+  and Gate A) are rebuilt via the assembly layer; field-based `processes/` and the
+  hand-assembled `usecase-briefs/` index are deferred, never destructively rebuilt.
+  Reconciled with staleness and `.conductor.md` health to avoid redundant detection.
+- **`conductor-status` surfacing (Slice 3 Chunk B, #88).** A pure-Python status projection
+  (`state/status.py`) composes the existing readers — content state, interaction state,
+  staleness, and partial state — into one human-oriented view (progress, current step,
+  what's blocked, what needs attention, working mode, complete). The conductor narrates it
+  jargon-free when you ask "where are we?"; it is read-only and never advances the drive
+  loop. Not the removed SSE cockpit dashboard. Suppresses a false "stale" alarm when no
+  hash baseline has been recorded.
+- **Improvement-flywheel auto-flagging (Slice 3 Chunk C, #88).** When the conductor catches
+  itself reaching for a methodology shortcut (the *holding the line* moment), it now refuses
+  it and auto-writes a structured RED entry to the engagement's `improvement-log.md` via a
+  pure, append-safe helper (`state/improvement_log.py`) — turning the refusal into durable
+  signal. GREEN (the rationalization-table row) and REFACTOR (gate tightening) remain
+  human-approved; narration is conditional on a successful write.
+
 ## [2.19.0] - 2026-06-24
 
 Slice 2 — Adaptive + Parallel + Editable (closes #87): the conductor handles a
