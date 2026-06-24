@@ -332,3 +332,10 @@ def test_step_review_comment_lifecycle():
     assert "drain" in sec.lower() or "before" in sec.lower()
     # Resolved comments move into the change history (not deleted into the void).
     assert "change history" in sec.lower()
+
+
+def test_staleness_section_drains_review_comments():
+    sec = _section(SKILL.read_text(), "## Staleness")
+    low = sec.lower()
+    assert "drain" in low
+    assert "unresolved" in low and "comment" in low

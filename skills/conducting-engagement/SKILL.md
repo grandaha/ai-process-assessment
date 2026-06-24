@@ -372,7 +372,6 @@ inline and you apply the agreed changes through the audited pipeline.
 - For a step that already has one clean document, that document is the review — just point to
   it.
 
-Surfacing a review is **read-only**: it never advances the drive loop or mutates anything.
 The register sets how much you explain (operator vs consultant voice).
 
 ### Working through comments
@@ -508,6 +507,8 @@ re-drive every portfolio phase downstream of the change. Any human ratification 
 against the now-superseded numbers is recorded `invalidated-by-staleness` in the decision
 log and re-surfaced per its touchpoint class — never silently kept. After a clean
 re-drive, call `record_input_hashes` so outputs read clean again.
+
+Before re-driving a single-document phase, check its surface for unresolved `> 💬` review comments and drain them first (see *Step reviews → drain-before-overwrite*) — never overwrite a surface that still carries unresolved comments.
 
 ## Edit & interruption splicing
 
