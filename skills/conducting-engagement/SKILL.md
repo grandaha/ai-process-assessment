@@ -350,6 +350,31 @@ overwrite. Entry template:
 - evidence: <file path + section/anchor, or model/*.json key>
 ```
 
+## Step reviews
+
+At each step boundary, offer the operator a readable review of what the step produced before
+the next step builds on it — the operator tier (distinct from the client checkpoints and the
+final deliverable). In this revision the review is **read-only**: you present it; corrections
+still flow through *Edit & interruption splicing* (the inline-comment round-trip lands in a
+later revision).
+
+- For a **fragmented** step (process discovery, opportunities, scoring, use-case briefs —
+  split across an index + per-item files), render the consolidated review by absolute path:
+  `python3 <engine_root>/state/step_review.py <folder> <phase_id>` — it writes one readable
+  document and prints its path. Offer to open it.
+- For a step that already has one clean document, that document is the review — just point to
+  it.
+
+Surfacing a review is **read-only**: it never advances the drive loop or mutates anything.
+The register sets how much you explain (operator vs consultant voice).
+
+Narrate jargon-free — no file names, ids, or step numbers:
+
+<!-- step-review-narration:start -->
+> Here's what this step produced, pulled together so it's easy to read in one place. Take a
+> look whenever you like — and just tell me if anything should change before I build on it.
+<!-- step-review-narration:end -->
+
 ## Status on demand
 
 When the user asks where things stand — "where are we?", "what's left?", "what do you need

@@ -13,6 +13,7 @@ REQUIRED_HEADINGS = [
     "## Improvement flywheel — auto-flagging escapes",
     "## Elastic processes & convergence",
     "## Decision log",
+    "## Step reviews",
     "## Status on demand",
     "## Resuming into a messy state",
     "## Staleness",
@@ -253,3 +254,29 @@ def test_conductor_flywheel_narration_is_jargon_free():
                  + [f"Phase {n}" for n in range(1, 12)])
     for token in forbidden:
         assert token not in narration, f"flywheel narration leaks jargon: {token!r}"
+
+
+def test_conductor_step_reviews_section():
+    sec = _section(SKILL.read_text(), "## Step reviews")
+    # Renders the review by absolute path.
+    assert "state/step_review.py" in sec
+    # Read-only in this chunk (the comment round-trip comes later).
+    assert "read-only" in sec.lower()
+    # Fragmented vs single-doc distinction is stated.
+    assert "fragmented" in sec.lower()
+    # Jargon-free narration block, fenced.
+    assert "<!-- step-review-narration:start -->" in sec
+    assert "<!-- step-review-narration:end -->" in sec
+
+
+def test_conductor_step_review_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- step-review-narration:start -->")
+    end = text.find("<!-- step-review-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "step-review narration must be wrapped in its fences"
+    narration = text[start:end]
+    forbidden = (["OPP-", "PROC-", "UC-", "step_review", "_index.md", "reviews/",
+                  "render_review"] + [f"Phase {n}" for n in range(1, 12)])
+    for token in forbidden:
+        assert token not in narration, f"step-review narration leaks jargon: {token!r}"
