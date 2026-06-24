@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.19.0] - 2026-06-24
+
+Slice 2 — Adaptive + Parallel + Editable (closes #87): the conductor handles a
+multi-process engagement concurrently, lets the user correct anything in plain
+language, and adapts its autonomy, teaching register, and posture to the human
+within an unbreakable must-ask floor.
+
 ### Added
 - **Parallel per-process opportunity identification (Slice 2 Chunk A, #87).** On a
   multi-process engagement the conductor now finds opportunities across all processes
