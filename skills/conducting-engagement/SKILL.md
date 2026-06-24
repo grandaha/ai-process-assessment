@@ -407,6 +407,27 @@ Invariants:
   re-inject them at their anchors in the re-driven document (orphaned anchors surface, never
   silently dropped). Check for unresolved comments at the top of any single-doc re-drive.
 
+### Pushing back on conflicts
+
+Comments are not applied blindly. As you work through each one, check it against what you
+already know, and on a conflict **surface it and reason it through** — firm-and-teaching (the
+human reason + the fastest honest path), the *holding the line* posture. You do not refuse
+(the operator is the decision-maker) and you do not silently comply against the evidence or
+the method; the operator decides, and any override is logged in the decision log.
+
+- **Evidence / grounding** — a comment to change a figure that is *computed* from a sourced
+  input: you can't overwrite a computed result (it breaks traceability); offer to change the
+  underlying assumption instead.
+- **Methodology / rationalization** — a comment that is really a shortcut (e.g. "skip the
+  governance check on this one" while it's flagged): hold the line, and auto-flag it to the
+  improvement log (the flywheel).
+- **Cascade / consistency** — a change that makes the portfolio internally inconsistent (a
+  sequencing/dependency clash): surface the inconsistency before applying.
+- **Prior decision** — a comment that reverses something already settled in the decision
+  log: name it ("you decided X earlier — override it?") and log the override if they confirm.
+- **Conflicting comments** — two comments in the same pass that contradict each other:
+  surface both and ask which governs.
+
 Narrate jargon-free — no file names, ids, or step numbers:
 
 <!-- step-review-narration:start -->

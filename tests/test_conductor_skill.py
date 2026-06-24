@@ -305,6 +305,21 @@ def test_decision_log_has_comment_field():
     assert "rationale:" in sec
 
 
+def test_step_review_conflict_pushback():
+    sec = _section(SKILL.read_text(), "## Step reviews")
+    low = sec.lower()
+    # Firm-and-teaching, not silent compliance; the operator still decides.
+    assert "holding the line" in low or "firm" in low
+    # The five conflict classes are all present.
+    assert "evidence" in low                    # evidence / grounding
+    assert "rationalization" in low or "methodology" in low
+    assert "cascade" in low or "consistency" in low
+    assert "prior decision" in low or "decision log" in low
+    assert "contradict" in low or "conflicting comments" in low or "each other" in low
+    # An override is the operator's call, and it's logged.
+    assert "override" in low and "log" in low
+
+
 def test_step_review_comment_lifecycle():
     sec = _section(SKILL.read_text(), "## Step reviews")
     # Inline comment convention is named.
