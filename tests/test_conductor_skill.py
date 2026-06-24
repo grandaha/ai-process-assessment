@@ -40,8 +40,22 @@ def test_skill_names_both_parties_in_decision_log():
 def _section(text: str, header: str) -> str:
     start = text.find(header)
     assert start != -1, f"missing section: {header!r}"
-    nxt = text.find("\n## ", start + len(header))
-    return text[start: nxt if nxt != -1 else len(text)]
+
+    # Find the next section header, skipping any embedded ## within code blocks
+    pos = start + len(header)
+    while True:
+        nxt = text.find("\n## ", pos)
+        if nxt == -1:
+            return text[start:]
+
+        # Check if this ## is inside a code block by counting ``` before it
+        code_fence_count = text[start:nxt].count("```")
+        # If even number of ```, we're outside code blocks; if odd, we're inside
+        if code_fence_count % 2 == 0:
+            return text[start:nxt]
+
+        # We're inside a code block, keep searching
+        pos = nxt + 1
 
 
 def test_conductor_owns_phase5_fanout():
@@ -280,3 +294,48 @@ def test_conductor_step_review_narration_is_jargon_free():
                   "render_review"] + [f"Phase {n}" for n in range(1, 12)])
     for token in forbidden:
         assert token not in narration, f"step-review narration leaks jargon: {token!r}"
+
+
+def test_decision_log_has_comment_field():
+    sec = _section(SKILL.read_text(), "## Decision log")
+    # The entry template carries a distinct verbatim-comment field for review-driven edits.
+    assert "comment:" in sec
+    assert "verbatim" in sec.lower()
+    # It is distinct from rationale (which may be the conductor's counter-argument).
+    assert "rationale:" in sec
+
+
+def test_step_review_conflict_pushback():
+    sec = _section(SKILL.read_text(), "## Step reviews")
+    low = sec.lower()
+    # Firm-and-teaching, not silent compliance; the operator still decides.
+    assert "holding the line" in low or "firm" in low
+    # The five conflict classes are all present.
+    assert "evidence" in low                    # evidence / grounding
+    assert "rationalization" in low or "methodology" in low
+    assert "cascade" in low or "consistency" in low
+    assert "prior decision" in low or "decision log" in low
+    assert "contradict" in low or "conflicting comments" in low or "each other" in low
+    # An override is the operator's call, and it's logged.
+    assert "override" in low and "log" in low
+
+
+def test_step_review_comment_lifecycle():
+    sec = _section(SKILL.read_text(), "## Step reviews")
+    # Inline comment convention is named.
+    assert "💬" in sec
+    # Comments are read back and routed through the audited edit engine.
+    assert "extract" in sec.lower() or "read" in sec.lower()
+    assert "Edit & interruption splicing" in sec
+    # The no-silent-clobber + drain-before-overwrite invariants are stated.
+    assert "unresolved" in sec.lower()
+    assert "drain" in sec.lower() or "before" in sec.lower()
+    # Resolved comments move into the change history (not deleted into the void).
+    assert "change history" in sec.lower()
+
+
+def test_staleness_section_drains_review_comments():
+    sec = _section(SKILL.read_text(), "## Staleness")
+    low = sec.lower()
+    assert "drain" in low
+    assert "unresolved" in low and "comment" in low

@@ -347,16 +347,23 @@ overwrite. Entry template:
 - disposition: accepted | edited | overridden→<X> | invalidated-by-{staleness|checkpoint|gate}
 - decision: <what was decided>
 - rationale: <why>
+- comment: <verbatim operator review comment, when this entry was driven by a step-review comment; omit otherwise>
 - evidence: <file path + section/anchor, or model/*.json key>
 ```
+
+When an entry is driven by a step-review comment, record the operator's words **verbatim** in
+`comment:` — distinct from `rationale:` (which may be your counter-argument on an override).
+The step-review Change-history view reads `comment:` to show *original comment → what changed*.
 
 ## Step reviews
 
 At each step boundary, offer the operator a readable review of what the step produced before
 the next step builds on it — the operator tier (distinct from the client checkpoints and the
-final deliverable). In this revision the review is **read-only**: you present it; corrections
-still flow through *Edit & interruption splicing* (the inline-comment round-trip lands in a
-later revision).
+final deliverable).
+
+**Surfacing** a review is read-only — presenting it never advances the drive loop or mutates
+anything. **Working through comments** is the two-way half: the operator marks the review up
+inline and you apply the agreed changes through the audited pipeline.
 
 - For a **fragmented** step (process discovery, opportunities, scoring, use-case briefs —
   split across an index + per-item files), render the consolidated review by absolute path:
@@ -365,8 +372,60 @@ later revision).
 - For a step that already has one clean document, that document is the review — just point to
   it.
 
-Surfacing a review is **read-only**: it never advances the drive loop or mutates anything.
 The register sets how much you explain (operator vs consultant voice).
+
+### Working through comments
+
+The operator annotates the review **inline** — a blockquote led by `> 💬`, anchored to the
+item with `@<ID>` or by sitting under that item's heading:
+
+```
+> 💬 @OPP-3 this is augmentation, not automation — a human still signs off
+```
+
+Lifecycle (never lose a comment, never silently overwrite):
+
+1. **Generate** — render the review fresh (Chunk A) when the step completes.
+2. **Annotate** — the operator adds `> 💬` comments and saves.
+3. **Intake** — when they say they've commented (or on request), read the document and
+   extract its comments (`state.step_review.extract_comments`).
+4. **Work through (with pushback — below)** — for each comment: route it through *Edit & interruption splicing*
+   (classify → fix the owning artifact → re-run the audited engine);
+   log the decision with the operator's words **verbatim** in the decision-log `comment:`
+   field. Staleness re-derives downstream.
+5. **Regenerate** — re-render the review: resolved comments move into the **Change history**
+   (the decision-log view); unresolved comments are preserved at their anchor.
+
+Invariants:
+- **Never silently regenerate** a review that still carries unresolved comments;
+  regeneration is comment-preserving (an orphaned comment lands under *Unanchored comments*,
+  never dropped).
+- **Drain before overwrite.** A single-document surface (e.g. `scope.md`) is also rewritten
+  out-of-band when a **staleness re-drive** re-runs that phase. Before any re-drive
+  overwrites a surface carrying unresolved comments, drain them first — process them, or
+  re-inject them at their anchors in the re-driven document (orphaned anchors surface, never
+  silently dropped). Check for unresolved comments at the top of any single-doc re-drive.
+
+### Pushing back on conflicts
+
+Comments are not applied blindly. As you work through each one, check it against what you
+already know, and on a conflict **surface it and reason it through** — firm-and-teaching (the
+human reason + the fastest honest path), the *holding the line* posture. You do not refuse
+(the operator is the decision-maker) and you do not silently comply against the evidence or
+the method; the operator decides, and any override is logged in the decision log.
+
+- **Evidence / grounding** — a comment to change a figure that is *computed* from a sourced
+  input: you can't overwrite a computed result (it breaks traceability); offer to change the
+  underlying assumption instead.
+- **Methodology / rationalization** — a comment that is really a shortcut (e.g. "skip the
+  governance check on this one" while it's flagged): hold the line, and auto-flag it to the
+  improvement log (the flywheel).
+- **Cascade / consistency** — a change that makes the portfolio internally inconsistent (a
+  sequencing/dependency clash): surface the inconsistency before applying.
+- **Prior decision** — a comment that reverses something already settled in the decision
+  log: name it ("you decided X earlier — override it?") and log the override if they confirm.
+- **Conflicting comments** — two comments in the same pass that contradict each other:
+  surface both and ask which governs.
 
 Narrate jargon-free — no file names, ids, or step numbers:
 
@@ -448,6 +507,8 @@ re-drive every portfolio phase downstream of the change. Any human ratification 
 against the now-superseded numbers is recorded `invalidated-by-staleness` in the decision
 log and re-surfaced per its touchpoint class — never silently kept. After a clean
 re-drive, call `record_input_hashes` so outputs read clean again.
+
+Before re-driving a single-document phase, check its surface for unresolved `> 💬` review comments and drain them first (see *Step reviews → drain-before-overwrite*) — never overwrite a surface that still carries unresolved comments.
 
 ## Edit & interruption splicing
 
