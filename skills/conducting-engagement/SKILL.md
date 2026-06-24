@@ -209,6 +209,14 @@ so every in-scope process is ready before this runs.)
 
 N<2 → run Phase 5 once, whole-portfolio, exactly as before (the sequential spine).
 
+When you begin the fan-out, narrate it in plain language — no step names, file names, or
+internal ids:
+
+<!-- fanout-narration:start -->
+> I've mapped all your processes — now I'm finding opportunities across them together, so I
+> can catch the wins that only show up when the whole picture is in view.
+<!-- fanout-narration:end -->
+
 ## Touchpoint taxonomy
 
 | Class | Behavior | Examples |

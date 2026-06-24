@@ -60,3 +60,17 @@ def test_conductor_fanout_degradation_and_failure():
     # Per-process failure: re-dispatch only the failed process; merge waits for the full set.
     assert "re-dispatch only that process" in sec
     assert "do not merge until the full set is staged" in sec
+
+
+def test_fanout_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- fanout-narration:start -->")
+    end = text.find("<!-- fanout-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "fan-out narration must be wrapped in <!-- fanout-narration:start --> ... :end -->"
+    narration = text[start:end]
+    forbidden = ["subagent", "OPP-", "_staging", "renumber"] + [f"Phase {n}" for n in range(1, 12)]
+    for token in forbidden:
+        assert token not in narration, f"narration leaks methodology jargon: {token!r}"
+    # It states the 'whole board at once' promise in plain language.
+    assert "together" in narration.lower()
