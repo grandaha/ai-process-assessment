@@ -12,6 +12,7 @@ REQUIRED_HEADINGS = [
     "## Adaptive autonomy & holding the line",
     "## Elastic processes & convergence",
     "## Decision log",
+    "## Status on demand",
     "## Resuming into a messy state",
     "## Staleness",
     "## Edit & interruption splicing",
@@ -198,3 +199,28 @@ def test_conductor_resume_recovery_runs_before_staleness():
     text = SKILL.read_text()
     # The drive loop references the recovery step before the staleness step.
     assert "Resuming into a messy state" in _section(text, "## The drive loop")
+
+
+def test_conductor_status_on_demand_section():
+    sec = _section(SKILL.read_text(), "## Status on demand")
+    # Reads the status projection by absolute path.
+    assert "state/status.py" in sec
+    # Read-only: surfacing status never advances the drive loop.
+    assert "read-only" in sec.lower() or "does not advance" in sec.lower()
+    # Jargon-free narration block is present and fenced.
+    assert "<!-- status-narration:start -->" in sec
+    assert "<!-- status-narration:end -->" in sec
+
+
+def test_conductor_status_narration_is_jargon_free():
+    text = SKILL.read_text()
+    start = text.find("<!-- status-narration:start -->")
+    end = text.find("<!-- status-narration:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "status narration must be wrapped in <!-- status-narration:start --> ... :end -->"
+    narration = text[start:end]
+    forbidden = (["OPP-", "PROC-", "UC-", "model/", "gates_due", "stale_inputs",
+                  "partial_state", "current_step", "Gate A", "Gate B", "GRC"]
+                 + [f"Phase {n}" for n in range(1, 12)])
+    for token in forbidden:
+        assert token not in narration, f"status narration leaks methodology jargon: {token!r}"
