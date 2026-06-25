@@ -7,6 +7,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 CONDUCTOR = REPO / "skills" / "conducting-engagement" / "SKILL.md"
+KEYSTONE = REPO / "skills" / "using-methodology" / "SKILL.md"
 
 # Tokens that mean "the user is being shown the methodology", which the greeting must avoid.
 GREETING_BLOCKLIST = (
@@ -26,6 +27,27 @@ def test_conductor_has_first_contact_offer():
         assert label in body, f"first-contact offer missing the path label: {label!r}"
     assert "ai-process-assessment:running-sample-engagement" in body, \
         "first-contact flow must route the sample to running-sample-engagement"
+
+
+def test_keystone_routes_first_contact_to_conductor():
+    """The keystone is loaded at session start; it must route the first turn to the
+    Conductor so first contact (greeting + sample offer) actually fires. Without this
+    wiring the greeting lives only inside conducting-engagement and never triggers on a
+    cold/vague opener — the onboarding regression that hid the 'run a sample' path.
+    """
+    body = KEYSTONE.read_text(encoding="utf-8")
+    assert "ai-process-assessment:conducting-engagement" in body, \
+        "keystone must name the Conductor so first-contact (greeting + sample offer) fires"
+    assert "front door" in body.lower(), \
+        "keystone must designate the Conductor as the front door for cold/vague openers"
+    # The Conductor must be the FIRST destination, not a passing mention that could be
+    # demoted below the phase skills. Guard ordering: the Conductor is referenced before
+    # the Phase 1 scoping skill in the "Chain to next skill" footer.
+    chain = body[body.index("## Chain to next skill"):]
+    conductor_at = chain.find("ai-process-assessment:conducting-engagement")
+    scoping_at = chain.find("ai-process-assessment:scoping-engagement")
+    assert conductor_at != -1 and scoping_at != -1 and conductor_at < scoping_at, \
+        "keystone chain must route to the Conductor before Phase 1 scoping (front door first)"
 
 
 def test_greeting_is_jargon_free():
