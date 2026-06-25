@@ -92,3 +92,17 @@ def test_sample_deliverable_is_osl_branded():
     assert 'class="brand-logo"' in html, "sample masthead missing inlined OSL logo"
     # Old model-invented palette token must be gone.
     assert "--slate-light:" not in html, "stale non-brand palette still present in sample"
+
+
+def test_sample_has_no_dangling_css_vars():
+    """Every var(--X) referenced in the sample must be defined in the vendored CSS
+    (brand.css or components.css). Comments are stripped first so the components.css
+    'var(--token)' doc comment is not counted as a reference."""
+    import re
+    html = SAMPLE.read_text(encoding="utf-8")
+    no_comments = re.sub(r"/\*.*?\*/", "", html, flags=re.DOTALL)
+    referenced = set(re.findall(r"var\(\s*(--[a-z0-9-]+)\s*\)", no_comments))
+    defined_css = BRAND.read_text(encoding="utf-8") + COMPONENTS.read_text(encoding="utf-8")
+    defined = set(re.findall(r"(--[a-z0-9-]+)\s*:", defined_css))
+    dangling = sorted(referenced - defined)
+    assert not dangling, f"sample references undefined CSS vars: {dangling}"
