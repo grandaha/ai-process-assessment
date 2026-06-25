@@ -8,6 +8,7 @@ BRAND = OSL / "brand.css"
 LOGO = OSL / "logo-lockup.svg"
 COMPONENTS = OSL / "components.css"
 DELIVERABLE_SKILL = REPO / "skills" / "building-deliverable" / "SKILL.md"
+CHECKPOINT_SKILL = REPO / "skills" / "building-checkpoint" / "SKILL.md"
 
 
 def test_brand_assets_exist():
@@ -61,9 +62,6 @@ def test_components_use_tokens_not_raw_hex():
     assert "var(--blue-500)" in css, "components.css should consume OSL tokens"
 
 
-CHECKPOINT_SKILL = REPO / "skills" / "building-checkpoint" / "SKILL.md"
-
-
 def test_deliverable_skill_inlines_vendored_shell():
     text = DELIVERABLE_SKILL.read_text(encoding="utf-8")
     assert "assets/osl/brand.css" in text and "assets/osl/components.css" in text, \
@@ -71,8 +69,8 @@ def test_deliverable_skill_inlines_vendored_shell():
     assert "assets/osl/logo-lockup.svg" in text, "masthead must inline the OSL logo"
     assert "verbatim" in text, "skill must say inline the shell verbatim"
     # The old model-authored-CSS instruction must be gone.
-    assert "Section-renderer agents must not invent new CSS classes" not in text or \
-        "do not author" in text.lower(), "remove/replace the model-authors-CSS wording"
+    assert "Section-renderer agents must not invent new CSS classes" not in text, \
+        "the old model-authors-CSS wording must be removed, not left alongside the new"
 
 
 def test_checkpoint_skill_inlines_vendored_shell():
