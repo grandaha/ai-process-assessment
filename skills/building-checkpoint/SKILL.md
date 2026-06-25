@@ -66,7 +66,6 @@ Shell structure:
   <nav class="sticky-nav">
     [per-checkpoint anchors — see mapping below]
   </nav>
-  [masthead block — engagement name from scope.md, per-checkpoint label, date]
 
   [section blocks in anchor order — from the resolved checkpoint's renderer]
 
