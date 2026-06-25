@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FY27 Delivery Transformation — Wave 1 Funding Recommendation · Lattice Consulting Group</title>
+<style>
+/* One Step Labs brand layer — vendored from one-step-labs-design (commit 7e7d85d).
+   Single source of truth for OSL tokens. Inlined verbatim into every branded HTML
+   artifact. See SOURCE.md for re-vendor steps. */
+
+/* --- Webfonts: DM Sans (display+body), DM Mono (data). Falls back to system-ui offline. --- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+/* --- Color tokens --- */
+:root {
+  --blue-700: #0D5A96;
+  --blue-500: #1B75BC;
+  --blue-300: #5FA8DC;
+  --blue-100: #E8F3FB;
+  --orange-700: #C0410D;
+  --orange-500: #E06030;
+  --orange-300: #EF8E6B;
+  --orange-100: #FCEEE8;
+  --neutral-900: #111827;
+  --neutral-700: #374151;
+  --neutral-500: #6B7280;
+  --neutral-300: #D1D5DB;
+  --neutral-200: #E5E7EB;
+  --neutral-100: #F4F5F7;
+  --white: #FFFFFF;
+
+  --color-primary: var(--blue-500);
+  --color-primary-hover: var(--blue-700);
+  --color-accent: var(--orange-500);
+  --color-accent-hover: var(--orange-700);
+  --text-strong: var(--neutral-900);
+  --text-body: var(--neutral-900);
+  --text-secondary: var(--neutral-700);
+  --text-muted: var(--neutral-500);
+  --text-on-primary: var(--white);
+  --link: var(--blue-500);
+  --link-hover: var(--blue-700);
+  --surface-page: var(--neutral-100);
+  --surface-card: var(--white);
+  --surface-tint-blue: var(--blue-100);
+  --surface-tint-orange: var(--orange-100);
+  --border-default: var(--neutral-300);
+  --border-subtle: var(--neutral-200);
+  --border-strong: var(--neutral-700);
+  --focus-ring: 0 0 0 3px rgba(27, 117, 188, 0.10);
+}
+
+/* --- Typography tokens --- */
+:root {
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display-size: 42px; --font-display-weight: 300; --font-display-tracking: -0.025em; --font-display-leading: 1.1;
+  --font-h1-size: 28px; --font-h1-weight: 600; --font-h1-tracking: -0.015em; --font-h1-leading: 1.2;
+  --font-h2-size: 20px; --font-h2-weight: 600; --font-h2-tracking: -0.01em; --font-h2-leading: 1.3;
+  --font-h3-size: 16px; --font-h3-weight: 600; --font-h3-tracking: 0; --font-h3-leading: 1.3;
+  --font-body-size: 15px; --font-body-weight: 400; --font-body-leading: 1.65;
+  --font-small-size: 13px; --font-small-weight: 400; --font-small-leading: 1.5;
+  --font-label-size: 10px; --font-label-weight: 600; --font-label-tracking: 0.14em;
+  --font-mono-size: 13px; --font-mono-weight: 400;
+}
+
+/* --- Spacing tokens --- */
+:root {
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px; --space-24: 96px;
+  --content-max: 980px; --content-pad: 24px; --grid-gutter: 20px; --card-min: 260px;
+}
+
+/* --- Radius tokens --- */
+:root {
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 16px; --radius-pill: 999px;
+}
+
+/* --- Shadow tokens --- */
+:root {
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.09), 0 2px 4px rgba(0,0,0,.05);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.11), 0 4px 8px rgba(0,0,0,.05);
+}
+
+/* --- Base layer + canonical type roles --- */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-body-size);
+  font-weight: var(--font-body-weight);
+  line-height: var(--font-body-leading);
+  color: var(--text-body);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.osl-display { font-family: var(--font-sans); font-size: var(--font-display-size); font-weight: var(--font-display-weight); letter-spacing: var(--font-display-tracking); line-height: var(--font-display-leading); color: var(--text-strong); }
+.osl-h1 { font-size: var(--font-h1-size); font-weight: var(--font-h1-weight); letter-spacing: var(--font-h1-tracking); line-height: var(--font-h1-leading); color: var(--text-strong); }
+.osl-h2 { font-size: var(--font-h2-size); font-weight: var(--font-h2-weight); letter-spacing: var(--font-h2-tracking); line-height: var(--font-h2-leading); color: var(--text-strong); }
+.osl-h3 { font-size: var(--font-h3-size); font-weight: var(--font-h3-weight); line-height: var(--font-h3-leading); color: var(--text-strong); }
+.osl-body { font-size: var(--font-body-size); line-height: var(--font-body-leading); }
+.osl-small { font-size: var(--font-small-size); line-height: var(--font-small-leading); color: var(--text-muted); }
+.osl-mono { font-family: var(--font-mono); font-size: var(--font-mono-size); font-weight: var(--font-mono-weight); }
+.osl-label { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--font-label-size); font-weight: var(--font-label-weight); letter-spacing: var(--font-label-tracking); text-transform: uppercase; color: var(--text-muted); }
+.osl-label::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--orange-500); flex: none; }
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); }
+
+/* One Step Labs — HTML artifact components.
+   Restyles this repo's deliverable/checkpoint design-system classes onto OSL tokens
+   (brand.css). Inlined verbatim AFTER brand.css. Colors via var(--token) only.
+   Two-hue palette: blue leads, orange spark, neutral structure. */
+
+/* --- Page frame --- */
+body { background: var(--surface-page); }
+.page-wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--content-pad); }
+
+/* --- Masthead (static shell; carries the inlined logo) --- */
+.masthead { padding: var(--space-12) 0 var(--space-8); border-bottom: 1px solid var(--border-subtle); }
+.brand-logo { height: 40px; width: auto; display: block; margin-bottom: var(--space-6); }
+.masthead .eyebrow { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--font-label-size); font-weight: var(--font-label-weight); letter-spacing: var(--font-label-tracking); text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-3); }
+.masthead .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: var(--radius-pill); background: var(--orange-500); }
+.masthead h1 { font-size: var(--font-h1-size); font-weight: var(--font-h1-weight); letter-spacing: var(--font-h1-tracking); line-height: var(--font-h1-leading); color: var(--text-strong); margin: 0 0 var(--space-3); }
+.masthead .subtitle { font-size: var(--font-body-size); color: var(--text-secondary); margin: 0; }
+.masthead .meta-line { font-size: var(--font-small-size); color: var(--text-muted); margin-top: var(--space-3); }
+
+/* --- Sticky nav --- */
+.sticky-nav { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: var(--space-1); background: var(--surface-card); border-bottom: 1px solid var(--border-subtle); padding: var(--space-2) var(--content-pad); }
+.sticky-nav a { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); }
+.sticky-nav a:hover { background: var(--neutral-100); color: var(--text-strong); }
+
+/* --- Sections --- */
+.section-block { padding: var(--space-12) 0; border-bottom: 1px solid var(--border-subtle); scroll-margin-top: 52px; }
+.section-block h2 { font-size: var(--font-h2-size); font-weight: var(--font-h2-weight); letter-spacing: var(--font-h2-tracking); color: var(--text-strong); margin: 0 0 var(--space-6); }
+.doc-footer { border-top: 1px solid var(--border-subtle); padding: var(--space-8) 0 var(--space-24); font-size: var(--font-small-size); color: var(--text-muted); }
+
+/* --- Stat cards --- */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--grid-gutter); }
+.stat-card { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+.stat-value { font-size: var(--font-h1-size); font-weight: var(--font-h1-weight); color: var(--text-strong); }
+.stat-label { display: block; font-size: var(--font-label-size); font-weight: var(--font-label-weight); letter-spacing: var(--font-label-tracking); text-transform: uppercase; color: var(--text-muted); margin-top: var(--space-2); }
+.stat-sub { font-size: var(--font-small-size); color: var(--text-secondary); margin-top: var(--space-1); }
+.stat-context { font-size: 11px; color: var(--text-muted); margin-top: var(--space-1); }
+
+/* --- Verdict (GO=blue, NO-GO=orange) --- */
+.verdict-block { background: var(--surface-tint-blue); border-left: 4px solid var(--blue-500); border-radius: var(--radius-lg); padding: var(--space-8); }
+.verdict-block.nogo { background: var(--surface-tint-orange); border-left-color: var(--orange-500); }
+.verdict-label { font-size: var(--font-h1-size); font-weight: var(--font-h1-weight); color: var(--blue-500); }
+.verdict-block.nogo .verdict-label { color: var(--orange-700); }
+.verdict-text { font-size: var(--font-body-size); line-height: var(--font-body-leading); color: var(--text-body); margin-top: var(--space-3); }
+
+/* --- Score bars --- */
+.score-bar-wrap { display: flex; align-items: center; gap: var(--space-3); }
+.score-bar-track { flex: 1; height: 8px; background: var(--neutral-200); border-radius: var(--radius-pill); overflow: hidden; }
+.score-bar-fill { height: 100%; background: var(--blue-500); border-radius: var(--radius-pill); }
+.score-value { font-family: var(--font-mono); font-size: var(--font-mono-size); color: var(--text-secondary); }
+
+/* --- Waves (sequential: blue-500 / blue-300 / neutral) --- */
+.wave-badge { display: inline-block; border-radius: var(--radius-pill); font-size: var(--font-label-size); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px var(--space-3); color: var(--white); }
+.wave-badge.w1 { background: var(--blue-500); }
+.wave-badge.w2 { background: var(--blue-300); }
+.wave-badge.w3 { background: var(--neutral-500); }
+.wave-timeline { display: flex; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; }
+.wave-band { flex: 1; padding: var(--space-6); border-top: 3px solid var(--neutral-300); }
+.wave-band.w1 { background: var(--surface-tint-blue); border-top-color: var(--blue-500); }
+.wave-band.w2 { background: var(--neutral-100); border-top-color: var(--blue-300); }
+.wave-band.w3 { background: var(--neutral-100); border-top-color: var(--neutral-300); }
+.wave-band-label { font-size: var(--font-label-size); font-weight: 600; letter-spacing: var(--font-label-tracking); text-transform: uppercase; color: var(--text-muted); }
+.wave-band-horizon { font-size: var(--font-h2-size); font-weight: 600; margin-top: var(--space-2); color: var(--blue-500); }
+.wave-band.w2 .wave-band-horizon { color: var(--blue-300); }
+.wave-band.w3 .wave-band-horizon { color: var(--neutral-500); }
+.wave-pills { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+.wave-pill { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3); font-size: var(--font-small-size); color: var(--text-secondary); }
+.wave-band-note { font-size: 11px; color: var(--text-muted); margin-top: var(--space-3); }
+
+/* --- Use case cards --- */
+.uc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: var(--grid-gutter); }
+.uc-card { display: flex; flex-direction: column; background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.uc-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); border-bottom: 1px solid var(--border-subtle); }
+.uc-card-title { font-size: 14px; font-weight: 600; color: var(--text-strong); }
+.uc-card-body { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); }
+.uc-card-type { display: inline-block; border-radius: var(--radius-sm); padding: 2px var(--space-2); font-size: var(--font-label-size); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.uc-problem { font-size: var(--font-small-size); line-height: 1.5; color: var(--text-secondary); }
+.uc-outcome { font-size: 12px; font-weight: 600; color: var(--blue-700); background: var(--surface-tint-blue); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); }
+.uc-meta { display: flex; flex-wrap: wrap; gap: var(--space-3); font-size: 11px; color: var(--text-muted); }
+.uc-quickwin { display: inline-block; background: var(--surface-tint-orange); color: var(--orange-700); font-size: var(--font-label-size); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px var(--space-2); border-radius: var(--radius-sm); }
+
+/* --- Type badges (blue family = AI; orange = insight/agentic; neutral = RPA) --- */
+.type-rpa { background: var(--neutral-200); color: var(--neutral-700); }
+.type-aug { background: var(--blue-100); color: var(--blue-700); }
+.type-ai { background: var(--blue-300); color: var(--white); }
+.type-chain { background: var(--blue-100); color: var(--blue-500); border: 1px solid var(--blue-300); }
+.type-data { background: var(--orange-100); color: var(--orange-700); }
+.type-agentic { background: var(--orange-300); color: var(--white); }
+
+/* --- Phase completion log (evidence) --- */
+.phase-log { display: flex; flex-direction: column; gap: var(--space-3); }
+.phase-chip-row { display: flex; align-items: flex-start; gap: var(--space-2); }
+.phase-dot { width: 10px; height: 10px; border-radius: var(--radius-pill); background: var(--blue-500); margin-top: 4px; flex: none; }
+.phase-dot.pending { background: var(--neutral-300); }
+.phase-chip-label { font-size: var(--font-small-size); font-weight: 600; color: var(--text-strong); }
+.phase-chip-meta { font-size: 11px; color: var(--text-muted); }
+
+/* --- Owner chip --- */
+.owner-chip { display: inline-block; background: var(--neutral-100); color: var(--text-secondary); font-size: 11px; padding: 2px var(--space-2); border-radius: var(--radius-pill); }
+
+/* --- Callouts (info/success=blue, warning=orange, note=neutral) --- */
+.callout { border-left: 3px solid var(--blue-300); background: var(--surface-tint-blue); padding: var(--space-4); border-radius: var(--radius-md); }
+.callout-highlight { border-left: 3px solid var(--blue-500); background: var(--surface-tint-blue); padding: var(--space-4); border-radius: var(--radius-md); }
+.callout-success { border-left: 3px solid var(--blue-500); background: var(--surface-tint-blue); padding: var(--space-4); border-radius: var(--radius-md); }
+.callout-warning { border-left: 3px solid var(--orange-500); background: var(--surface-tint-orange); padding: var(--space-4); border-radius: var(--radius-md); }
+.callout-note { border-left: 3px solid var(--neutral-300); background: var(--neutral-100); padding: var(--space-4); border-radius: var(--radius-md); }
+.gap-note { color: var(--text-muted); font-style: italic; font-size: var(--font-small-size); }
+
+</style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <a href="#verdict" onclick="navScrollTo('verdict'); return false;">Verdict</a>
+  <a href="#problem" onclick="navScrollTo('problem'); return false;">Problem</a>
+  <a href="#portfolio" onclick="navScrollTo('portfolio'); return false;">Portfolio</a>
+  <a href="#usecases" onclick="navScrollTo('usecases'); return false;">Use Cases</a>
+  <a href="#roadmap" onclick="navScrollTo('roadmap'); return false;">Roadmap</a>
+  <a href="#investment" onclick="navScrollTo('investment'); return false;">Investment</a>
+  <a href="#risks" onclick="navScrollTo('risks'); return false;">Risks</a>
+  <a href="#actions" onclick="navScrollTo('actions'); return false;">Actions</a>
+  <a href="#evidence" onclick="navScrollTo('evidence'); return false;">Evidence</a>
+</nav>
+
+<header class="masthead">
+<svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 372 96" width="372" height="96" role="img" aria-label="One Step Labs — coaching consulting">
+  <g transform="translate(8,6) scale(0.82)">
+    <g fill="#D96E3A">
+      <circle cx="50" cy="15" r="9"></circle>
+      <circle cx="50" cy="33" r="9"></circle>
+      <circle cx="50" cy="69" r="9"></circle>
+      <circle cx="50" cy="87" r="9"></circle>
+      <circle cx="34.41" cy="42" r="9"></circle>
+      <circle cx="65.59" cy="42" r="9"></circle>
+      <circle cx="65.59" cy="60" r="9"></circle>
+      <circle cx="18.82" cy="33" r="9"></circle>
+      <circle cx="81.18" cy="33" r="9"></circle>
+      <circle cx="81.18" cy="69" r="9"></circle>
+    </g>
+    <g fill="#034D74">
+      <circle cx="34.41" cy="60" r="9"></circle>
+      <circle cx="18.82" cy="69" r="9"></circle>
+    </g>
+  </g>
+  <text x="116" y="46" font-family="'DM Sans', sans-serif" font-size="30" font-weight="500" letter-spacing="-0.5" fill="#111827">one step labs</text>
+  <text x="117" y="70" font-family="'DM Sans', sans-serif" font-size="11" font-weight="600" letter-spacing="3.5" fill="#6B7280">COACHING · CONSULTING</text>
+</svg>
+  <div class="eyebrow">Lattice Consulting Group · PSO Delivery Team</div>
+  <h1>FY27 Delivery Transformation — Wave 1 Funding Recommendation</h1>
+  <p class="subtitle">An AI &amp; automation assessment of the delivery operation: a ranked, baseline-backed shortlist for the FY27 investment committee.</p>
+  <div class="meta-line">Prepared for <strong>Dana Okafor (Chief Delivery Officer)</strong> · Read-ahead for the October 2026 FY27 investment committee, chaired by Marcus Bell (CFO) · Basis: AACE Class 5 (&plusmn;50%) ROM</div>
+</header>
+<div class="sample-banner">
+  <span class="pill">Fictional sample engagement &mdash; illustrative data only</span>
+</div>
+
+<!-- ===================== #verdict ===================== -->
+<section class="section-block" id="verdict">
+  <h2>Verdict</h2>
+  <div class="lede">The decision this enables</div>
+
+  <div class="verdict-block">
+    <div class="verdict-label">GO &mdash; Fund Wave 1 (Foundation)</div>
+    <p class="verdict-text">Fund three baseline-backed initiatives, led by a quick win: <b>OPP-003</b> (Point-of-Entry Time Validation, the month-3 quick win), <b>OPP-001</b> (Status Report Assembly Assistant), and <b>OPP-005</b> (Governed AI SOW Drafting). Wave 1 also funds an in-tenant DLP / Microsoft Purview enabler workstream that unblocks Wave 2.</p>
+  </div>
+
+  <p class="pull-quote">&ldquo;A ranked, baseline-backed shortlist that survives a skeptical CFO &mdash; not the autonomous RPA that defined Project Swift. The consultant stays the entry actor, the PM keeps narrative judgment, and legal/finance validation stays human.&rdquo;</p>
+
+  <ul class="why-now">
+    <li><span class="tick">&#10003;</span><span><b>Every value claim traces to a real baseline from Lattice&rsquo;s own operation.</b> OPP-003 attacks the 18% entry-correction rate on ~1,680 timesheets/mo (Polaris audit, High confidence); OPP-001 attacks the 90-min-per-report effort across ~720 reports/mo; OPP-005 attacks the 30% legal/finance rework rate on ~20 SOWs/mo. No baseline, no number.</span></li>
+    <li><span class="tick">&#10003;</span><span><b>Conservative confidence framing against the post-Swift bar.</b> AACE Class 5 (&plusmn;50%) ROM with a deliberate 30% contingency across all three &mdash; above the standard 15&ndash;20%, held high on purpose.</span></li>
+    <li><span class="tick">&#10003;</span><span><b>Attended, not unattended; Buy/configure over build.</b> Two of three are Buy; the one Partner item exists only because the cross-system stitch has no off-the-shelf product. No Swift-style custom build.</span></li>
+  </ul>
+
+  <div class="callout">
+    <b>The choice in front of Dana:</b> which delivery-side initiative(s) enter the FY27 budget submission (due September 2026), constrained by a ~$1.5M discretionary envelope &mdash; or fund nothing and wait a year. The Wave-1 investment low band sits well inside that envelope; the Class-5 high band straddles and exceeds it, stated plainly (see Investment).
+  </div>
+</section>
+
+<!-- ===================== #problem ===================== -->
+<section class="section-block" id="problem">
+  <h2>The Problem</h2>
+  <div class="lede">Where delivery margin leaks &mdash; quoted context, from context.md</div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value">~$14M</div>
+      <div class="stat-label">Utilization gap</div>
+      <div class="stat-sub">Running at 68% vs. a 75% target &mdash; a 7-point gap.</div>
+      <div class="stat-context">Each utilization point ~$2M of annual revenue across 420 consultants (intake-stated context).</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">58 days</div>
+      <div class="stat-label">DSO vs. 45-day target</div>
+      <div class="stat-sub">Slow, rebill-heavy invoicing ties up cash.</div>
+      <div class="stat-context">CFO-owned metric; driven by invoicing speed and the rebill rate.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">~17%</div>
+      <div class="stat-label">Voluntary attrition</div>
+      <div class="stat-sub">Exit interviews repeatedly cite administrative burden.</div>
+      <div class="stat-context">Status reports, time entry, internal reporting &mdash; the busywork Wave 1 targets.</div>
+    </div>
+  </div>
+
+  <p class="lede" style="margin-top:6px">Process baselines the recommendation attacks (model/baselines.json)</p>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value">18%</div>
+      <div class="stat-label">Time entries corrected · PROC-004</div>
+      <div class="stat-sub">~1,680 timesheets/mo (~34,000 entries); 8% late past cutoff.</div>
+      <div class="stat-context">Polaris audit, High confidence &mdash; OPP-003 attacks this at the source.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">90 min</div>
+      <div class="stat-label">Effort per status report · PROC-003</div>
+      <div class="stat-sub">~720 reports/mo; 5.5 FTE across the portfolio.</div>
+      <div class="stat-context">Sofia&rsquo;s 15-report stopwatch sample, Medium-High confidence &mdash; OPP-001 target.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">30%</div>
+      <div class="stat-label">SOW legal/finance rework · PROC-002</div>
+      <div class="stat-sub">~20 SOWs/mo; 12% ship with a margin error.</div>
+      <div class="stat-context">Tom, estimated, Medium confidence &mdash; OPP-005 target.</div>
+    </div>
+  </div>
+
+  <p class="gap-note">The board&rsquo;s headline delivery metric is utilization (68% &rarr; 73% goal); DSO and retention are the secondary leaks. Wave 1 maps to all three levers: less PM/consultant admin &rarr; more billable hours (utilization), less busywork (retention), and cleaner upstream time entry &rarr; faster, cleaner invoicing (cash/DSO).</p>
+</section>
+
+<!-- ===================== #portfolio ===================== -->
+<section class="section-block" id="portfolio">
+  <h2>Opportunity Portfolio</h2>
+  <div class="lede">8 scored opportunities, ranked by composite · value ranges from model/results.json</div>
+
+  <table class="data">
+    <thead>
+      <tr>
+        <th>OPP</th>
+        <th>Initiative</th>
+        <th>Type</th>
+        <th>Composite</th>
+        <th>Annual value ($/yr)</th>
+        <th>B/B/P</th>
+        <th>GRC</th>
+        <th>Wave</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="wave1-row">
+        <td><b>OPP-003</b></td>
+        <td>Point-of-Entry Time Validation <span class="uc-quickwin">Quick Win</span></td>
+        <td><span class="uc-card-type type-aug">AI Augmentation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:83.4%"></div></div><span class="score-value">4.17</span></div>
+        </td>
+        <td class="num">$116,998.56 &ndash; $194,997.60</td>
+        <td>Buy</td>
+        <td><span class="grc-flag grc-green">Green</span></td>
+        <td><span class="wave-badge w1">Wave 1</span></td>
+      </tr>
+      <tr class="wave1-row">
+        <td><b>OPP-001</b></td>
+        <td>Status Report Assembly Assistant</td>
+        <td><span class="uc-card-type type-chain">Chain Automation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:76.6%"></div></div><span class="score-value">3.83</span></div>
+        </td>
+        <td class="num">$357,501.60 &ndash; $464,752.08</td>
+        <td>Partner</td>
+        <td><span class="grc-flag grc-green">Green</span></td>
+        <td><span class="wave-badge w1">Wave 1</span></td>
+      </tr>
+      <tr class="wave1-row">
+        <td><b>OPP-005</b></td>
+        <td>Governed AI SOW Drafting</td>
+        <td><span class="uc-card-type type-aug">AI Augmentation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:70%"></div></div><span class="score-value">3.5</span></div>
+        </td>
+        <td class="num">$85,800.00 &ndash; $128,700.00</td>
+        <td>Buy</td>
+        <td><span class="grc-flag grc-yellow">Cleared w/ conditions</span></td>
+        <td><span class="wave-badge w1">Wave 1</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-002</b></td>
+        <td>Assisted Invoice Reconciliation</td>
+        <td><span class="uc-card-type type-chain">Chain Automation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:66.6%"></div></div><span class="score-value">3.33</span></div>
+        </td>
+        <td class="num">$124,800.48 &ndash; $187,200.72</td>
+        <td>Partner</td>
+        <td><span class="grc-flag grc-yellow">Cleared w/ conditions</span></td>
+        <td><span class="wave-badge w2">Wave 2</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-007</b></td>
+        <td>Intra-Month Margin Early-Warning</td>
+        <td><span class="uc-card-type type-data">Data &amp; Analytics</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:63.4%"></div></div><span class="score-value">3.17</span></div>
+        </td>
+        <td class="num">$58,500.09 &ndash; $117,000.18</td>
+        <td>Partner</td>
+        <td><span class="grc-flag grc-green">Green</span></td>
+        <td><span class="wave-badge w2">Wave 2</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-006</b></td>
+        <td>Staffing Shortlist Augmentation</td>
+        <td><span class="uc-card-type type-aug">AI Augmentation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:60%"></div></div><span class="score-value">3.0</span></div>
+        </td>
+        <td class="num">$91,000.00 &ndash; $159,250.00</td>
+        <td>Buy</td>
+        <td><span class="grc-flag grc-green">Green</span></td>
+        <td><span class="wave-badge w2">Wave 2</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-008</b></td>
+        <td>Clean-Entry &rarr; Clean-Invoice Chain</td>
+        <td><span class="uc-card-type type-chain">Chain Automation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:53.4%"></div></div><span class="score-value">2.67</span></div>
+        </td>
+        <td class="num">$20,800.08 &ndash; $37,440.14</td>
+        <td>Hybrid</td>
+        <td><span class="grc-flag grc-yellow">Cleared w/ conditions</span></td>
+        <td><span class="wave-badge w3">Wave 3</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-004</b></td>
+        <td>Automated Mechanical Pre-QA <span style="font-size:11px;color:var(--slate-light)">(DLP-gated)</span></td>
+        <td><span class="uc-card-type type-aug">AI Augmentation</span></td>
+        <td>
+          <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:46.6%"></div></div><span class="score-value">2.33</span></div>
+        </td>
+        <td class="num">$97,500.00 &ndash; $146,250.00</td>
+        <td>Buy</td>
+        <td><span class="grc-flag grc-yellow">Cleared w/ conditions</span></td>
+        <td><span class="wave-badge w2">Wave 2</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout-note callout">
+    <b>Score ranks; constraints sequence.</b> OPP-002 (3.33) and OPP-004 (2.33) score in the Wave-1 band but are sequenced to Wave 2 by dependency and enabler-gap logic, not by value &mdash; OPP-002 waits on OPP-003&rsquo;s upstream fix; OPP-004 waits on the Wave-1 DLP enabler before any client-confidential deliverable content is admissible.
+  </div>
+</section>
+
+<!-- ===================== #usecases ===================== -->
+<section class="section-block" id="usecases">
+  <h2>Wave 1 Use Cases</h2>
+  <div class="lede">Three funded Foundation initiatives + one enabler workstream</div>
+
+  <div class="uc-grid">
+
+    <div class="uc-card">
+      <div class="uc-card-header">
+        <span class="uc-card-type type-aug">AI Augmentation</span>
+        <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:83.4%"></div></div><span class="score-value">4.17</span></div>
+      </div>
+      <div class="uc-card-body">
+        <div class="uc-card-title">OPP-003 &middot; Point-of-Entry Time Validation <span class="uc-quickwin">Quick Win</span></div>
+        <p class="uc-problem">Flag anomalies and suggest codes at the point of entry to prevent miscoded time at the source &mdash; attacking the 18% entry-correction rate on ~1,680 timesheets/mo (Polaris audit, High confidence). Single-system, in-tenant, no DLP needed; the consultant remains the entry actor.</p>
+        <div class="uc-outcome">Month-3 outcome: anomaly-flag + code-suggestion live in Polaris for a pilot practice, with the first reduction in the 18% correction rate as a visible win.</div>
+        <div class="uc-meta">
+          <span>Value <b>$116,998.56 &ndash; $194,997.60/yr</b></span>
+          <span>Sourcing <b>Buy</b></span>
+          <span>GRC <b>Green</b></span>
+          <span>Owner <span class="owner-chip">Greg Olsen</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uc-card">
+      <div class="uc-card-header">
+        <span class="uc-card-type type-chain">Chain Automation</span>
+        <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:76.6%"></div></div><span class="score-value">3.83</span></div>
+      </div>
+      <div class="uc-card-body">
+        <div class="uc-card-title">OPP-001 &middot; Status Report Assembly Assistant</div>
+        <p class="uc-problem">System-assemble the Polaris&rarr;NetSuite&rarr;Slack status-report draft; the PM keeps narrative/RAG judgment. Eliminates the gather/reformat checkpoint (60&ndash;70% of per-report effort) against the 90-min-per-report baseline across ~720 reports/mo (5.5 FTE).</p>
+        <div class="uc-outcome">Largest value contributor in Wave 1 &mdash; the firm&rsquo;s single largest admin load.</div>
+        <div class="uc-meta">
+          <span>Value <b>$357,501.60 &ndash; $464,752.08/yr</b></span>
+          <span>Sourcing <b>Partner</b></span>
+          <span>GRC <b>Green</b></span>
+          <span>Owner <span class="owner-chip">Sofia Reyes</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uc-card">
+      <div class="uc-card-header">
+        <span class="uc-card-type type-aug">AI Augmentation</span>
+        <div class="score-bar-wrap"><div class="score-bar-track"><div class="score-bar-fill" style="width:70%"></div></div><span class="score-value">3.5</span></div>
+      </div>
+      <div class="uc-card-body">
+        <div class="uc-card-title">OPP-005 &middot; Governed AI SOW Drafting</div>
+        <p class="uc-problem">Governed in-tenant drafting with a live rate card that replaces the shadow-ChatGPT path. Attacks the 30% legal/finance rework rate and 12% shipped-margin-error rate on ~20 SOWs/mo; legal/finance validation stays human.</p>
+        <div class="uc-outcome">Converts a live ungoverned shadow exposure into a sanctioned, policy-enforced path.</div>
+        <div class="uc-meta">
+          <span>Value <b>$85,800.00 &ndash; $128,700.00/yr</b></span>
+          <span>Sourcing <b>Buy</b></span>
+          <span>GRC <b>Cleared w/ conditions</b></span>
+          <span>Owner <span class="owner-chip">Tom Bradley</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="uc-card">
+      <div class="uc-card-header">
+        <span class="uc-card-type type-rpa">Enabler</span>
+        <div class="score-bar-wrap"><span class="score-value" style="color:var(--slate-light)">&mdash;</span></div>
+      </div>
+      <div class="uc-card-body">
+        <div class="uc-card-title">Enabler &middot; In-Tenant DLP / Microsoft Purview</div>
+        <p class="uc-problem">Not a process opportunity &mdash; produces no standalone process value, carries no composite or value range. Clears the binding DLP constraint so client-confidential deliverable content can be processed in-tenant.</p>
+        <div class="uc-outcome">Unblocks OPP-004 (Automated Mechanical Pre-QA) in Wave 2 &mdash; its return is realized there.</div>
+        <div class="uc-meta">
+          <span>Value <b>&mdash; (unblocks OPP-004)</b></span>
+          <span>Sourcing <b>Buy/Partner</b></span>
+          <span>Owner <span class="owner-chip">Aisha Khan</span> + IT</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <p class="gap-note">Owner assignments and milestone month-numbering are roadmap judgments drawn from the context.md stakeholder set, not sourced commitments; source files give lead-time direction but no dated project plan.</p>
+</section>
+
+<!-- ===================== #roadmap ===================== -->
+<section class="section-block" id="roadmap">
+  <h2>Roadmap &mdash; Foundation / Scale / Optimize</h2>
+  <div class="lede">Sequenced around one causal spine: clean the data, then automate on top of it, then compose the chain</div>
+
+  <div class="wave-timeline">
+    <div class="wave-band w1">
+      <div class="wave-band-label">Wave 1 &middot; Foundation</div>
+      <div class="wave-band-horizon">Months 0&ndash;6</div>
+      <div class="wave-pills">
+        <span class="wave-pill">OPP-003 Time Validation (quick win)</span>
+        <span class="wave-pill">OPP-001 Status Report Assembly</span>
+        <span class="wave-pill">OPP-005 Governed SOW Drafting</span>
+        <span class="wave-pill">Enabler: In-Tenant DLP / Purview</span>
+      </div>
+      <div class="wave-band-note">Fix data at the source + convert the largest, lowest-risk admin loads into governed assists. Funds the DLP enabler that unblocks Wave 2.</div>
+    </div>
+    <div class="wave-band w2">
+      <div class="wave-band-label">Wave 2 &middot; Scale</div>
+      <div class="wave-band-horizon">Months 6&ndash;18</div>
+      <div class="wave-pills">
+        <span class="wave-pill">OPP-002 Invoice Reconciliation</span>
+        <span class="wave-pill">OPP-004 Mechanical Pre-QA (DLP-gated)</span>
+        <span class="wave-pill">OPP-006 Staffing Shortlist</span>
+        <span class="wave-pill">OPP-007 Margin Early-Warning</span>
+      </div>
+      <div class="wave-band-note">Higher-friction or enabler-gated items once their prerequisites exist. OPP-002 should not start until OPP-003 is in stable production &ge;60 days.</div>
+    </div>
+    <div class="wave-band w3">
+      <div class="wave-band-label">Wave 3 &middot; Optimize</div>
+      <div class="wave-band-horizon">Months 18&ndash;36</div>
+      <div class="wave-pills">
+        <span class="wave-pill">OPP-008 Clean-Entry &rarr; Clean-Invoice Chain</span>
+      </div>
+      <div class="wave-band-note">Composes the cross-process chain (PROC-004&rarr;PROC-006); coherent only once both OPP-003 and OPP-002 are live and a role-boundary redesign is funded.</div>
+    </div>
+  </div>
+
+  <div class="callout-note callout">
+    <b>Deliberately deferred, by dependency &mdash; not by value.</b> Invoice reconciliation (OPP-002) waits because its true root is the upstream miscoded time OPP-003 fixes; QA-with-DLP (OPP-004) waits on the Wave-1 DLP enabler; staffing (OPP-006) and margin forecasting (OPP-007) follow; and the cross-process chain (OPP-008) is coherent only once both predecessors are live. Sequencing first lets each later item land on stable ground.
+  </div>
+</section>
+
+<!-- ===================== #investment ===================== -->
+<section class="section-block" id="investment">
+  <h2>Investment &mdash; Wave 1 ROM</h2>
+  <div class="lede">AACE Class 5 (&plusmn;50%) ROM &middot; every figure from model/results.json (wave1_aggregate)</div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value">$652,730.00</div>
+      <div class="stat-label">Investment &mdash; low band</div>
+      <div class="stat-sub">Sits well inside Dana&rsquo;s ~$1.5M FY27 envelope.</div>
+      <div class="stat-context">ROM, AACE Class 5 (&plusmn;50%).</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$1,958,190.00</div>
+      <div class="stat-label">Investment &mdash; high band</div>
+      <div class="stat-sub">Straddles and exceeds the envelope &mdash; stated plainly.</div>
+      <div class="stat-context">Spread driven mainly by OPP-001&rsquo;s 3-system Partner integration (its own high band $1,131,000.00).</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">$560,300.16</div>
+      <div class="stat-label">Annual value &mdash; low</div>
+      <div class="stat-sub">Combined Wave-1 annual value (OPP-001 + OPP-003 + OPP-005).</div>
+      <div class="stat-context">High band: $788,449.68/yr.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0.83&ndash;3.49 yr</div>
+      <div class="stat-label">Rough payback horizon</div>
+      <div class="stat-sub">Low 0.83 years &middot; high 3.49 years.</div>
+      <div class="stat-context">Engine-computed; not a budget commitment.</div>
+    </div>
+  </div>
+
+  <p class="lede" style="margin-top:6px">Per-initiative cost stacks (model/results.json · costs)</p>
+  <table class="data">
+    <thead>
+      <tr><th>OPP</th><th>Initiative</th><th>Total (point est.)</th><th>Initiative ROM range</th><th>Sourcing</th></tr>
+    </thead>
+    <tbody>
+      <tr class="wave1-row"><td><b>OPP-003</b></td><td>Point-of-Entry Time Validation</td><td class="num">$290,160.00</td><td class="num">$145,080.00 &ndash; $435,240.00</td><td>Buy</td></tr>
+      <tr class="wave1-row"><td><b>OPP-001</b></td><td>Status Report Assembly Assistant</td><td class="num">$754,000.00</td><td class="num">$377,000.00 &ndash; $1,131,000.00</td><td>Partner</td></tr>
+      <tr class="wave1-row"><td><b>OPP-005</b></td><td>Governed AI SOW Drafting</td><td class="num">$261,300.00</td><td class="num">$130,650.00 &ndash; $391,950.00</td><td>Buy</td></tr>
+    </tbody>
+  </table>
+
+  <p class="gap-note">Contingency held at 30% across all three (vs. the standard 15&ndash;20%), deliberately, against the post-Swift evidentiary bar. Tech/integration figures are year-1 vendor/IT estimates; internal labor is benchmark-based at $185/hr (Buy) / $200/hr (Partner) &mdash; internal actuals not yet confirmed. The enabler workstream is not costed in this ROM.</p>
+
+  <a class="artifact-link" href="financial-model.xlsx" download>
+    <span class="ico">&#128202;</span> Download the financial model (financial-model.xlsx) &mdash; inspect and flex the math
+  </a>
+
+  <div class="callout-warning callout">
+    <b>This is a magnitude check, not a commitment.</b> A definitive business case requires confirmed internal labor rates, vendor quotes (chiefly on OPP-001), NPV modeling, and finance review before submission. Vendor quotes are the path to narrowing the Class-5 band.
+  </div>
+</section>
+
+<!-- ===================== #risks ===================== -->
+<section class="section-block" id="risks">
+  <h2>Top Risks &amp; Governance Conditions</h2>
+  <div class="lede">GRC conditions carried forward (grc/_index.md · Gate A) and political pressure points</div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Risk / condition</th><th>What it requires</th><th>Owner</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Client-confidential content (firm-wide rule)</b></td>
+        <td>No client-confidential content leaves firm walls without in-tenant DLP controls. Gates OPP-004; the Wave-1 DLP/Purview enabler exists to clear it.</td>
+        <td><span class="owner-chip">Aisha Khan</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-005 &mdash; Cleared with Conditions</b></td>
+        <td>Replace the shadow-ChatGPT path; run a governed in-tenant path; enforce the usage policy; retain human legal/finance validation.</td>
+        <td><span class="owner-chip">Tom Bradley</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-002 / OPP-008 &mdash; Cleared with Conditions</b></td>
+        <td>Attended human-in-loop (attended, not unattended) on the invoicing/billing path; full audit logging; finance sign-off. OPP-008 inherits OPP-002&rsquo;s conditions.</td>
+        <td><span class="owner-chip">Greg Olsen</span></td>
+      </tr>
+      <tr>
+        <td><b>OPP-004 &mdash; Cleared with Conditions</b></td>
+        <td>In-tenant DLP; no content leaves walls; security-review pass; human substantive QA. Enabler-gated to Wave 2.</td>
+        <td><span class="owner-chip">Aisha Khan</span></td>
+      </tr>
+      <tr>
+        <td><b>CFO credibility (post-Swift)</b></td>
+        <td>Hard numbers tied to real baselines + a credible buy/configure sourcing story. Project Swift (2024 RPA) overran ~2x and was shelved &mdash; raises the evidentiary bar.</td>
+        <td><span class="owner-chip">Marcus Bell</span></td>
+      </tr>
+      <tr>
+        <td><b>Staffing autonomy (RMO)</b></td>
+        <td>Frame staffing work (OPP-006) as augmentation, honestly &mdash; selection stays human. &ldquo;The algorithm decides who staffs what&rdquo; will be resisted.</td>
+        <td><span class="owner-chip">Priya Nair</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout-warning callout">
+    <b>GRC throughline:</b> the binding firm-wide rule is that no client-confidential content leaves firm walls without in-tenant data-protection controls; invoicing automation stays attended-not-unattended with a finance audit trail; and SOW drafting runs only on a governed in-tenant path. All four non-Green opportunities are Cleared-with-Conditions &mdash; none blocked (Gate A, 2026-06-18).
+  </div>
+</section>
+
+<!-- ===================== #actions ===================== -->
+<section class="section-block" id="actions">
+  <h2>Next Actions</h2>
+  <div class="lede">To tighten the estimate and clear the path to the FY27 submission</div>
+
+  <table class="data">
+    <thead>
+      <tr><th>Action</th><th>Why it matters</th><th>Owner</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Obtain a systems-integrator quote for OPP-001</b></td>
+        <td>The 3-system Polaris&rarr;NetSuite&rarr;Slack stitch is the single largest cost line and the widest Class-5 band; a real quote narrows the aggregate high band most.</td>
+        <td><span class="owner-chip">Sofia Reyes</span> + Procurement</td>
+      </tr>
+      <tr>
+        <td><b>Confirm internal fully-burdened labor rates</b></td>
+        <td>Replaces the benchmark $185/hr (Buy) and $200/hr (Partner) placeholders before any budget submission.</td>
+        <td><span class="owner-chip">Marcus Bell</span> (Finance)</td>
+      </tr>
+      <tr>
+        <td><b>Get vendor quotes for OPP-003 &amp; OPP-005, one-time vs. recurring separated</b></td>
+        <td>M365 Copilot/Azure (OPP-003) and Azure OpenAI + governance tooling (OPP-005) tech lines are blended; separation tightens the ROM.</td>
+        <td><span class="owner-chip">Greg Olsen</span> / <span class="owner-chip">Tom Bradley</span></td>
+      </tr>
+      <tr>
+        <td><b>Stand up the in-tenant DLP / Purview enabler</b></td>
+        <td>Budget CAB + mandatory security-review weeks so OPP-004 can clear its security-review-pass condition at the top of Wave 2.</td>
+        <td><span class="owner-chip">Aisha Khan</span> + IT</td>
+      </tr>
+      <tr>
+        <td><b>Launch the OPP-003 pilot for a month-3 correction-rate read</b></td>
+        <td>Delivers the visible, baseline-backed quick win that buys air cover for the rest of the program.</td>
+        <td><span class="owner-chip">Greg Olsen</span></td>
+      </tr>
+      <tr>
+        <td><b>Carry the recommendation to the October 2026 committee</b></td>
+        <td>FY27 budget submission is due end of Q3 FY26 (September 2026).</td>
+        <td><span class="owner-chip">Dana Okafor</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== #evidence ===================== -->
+<section class="section-block" id="evidence">
+  <h2>Evidence &amp; Methodology</h2>
+  <div class="lede">Phase completion, stakeholder interviews, and gate clearances</div>
+
+  <div class="callout-highlight callout">
+    <b>Gate B &mdash; Deliverable Gate: CLEARED (2026-06-18).</b> Terminal integrity gate re-run after remediation. All required phase outputs present; five integrity dimensions passed; the determinism Critical (a prose-computed Wave-1 point sum with no results.json source) was remediated &mdash; the business case now cites only engine-sourced figures. Spot-check of 5 headline figures (investment low/high, value high, OPP-001 total + ROM high) all equal their results.json fields.
+  </div>
+
+  <div class="callout-warning callout">
+    <b>Gate A &mdash; Governance/Risk/Compliance: Cleared with Conditions (2026-06-18).</b> All four non-Green GRC opportunities (OPP-002, OPP-004, OPP-005, OPP-008) cleared with named conditions; none blocked. OPP-004 conditioned on in-tenant DLP (no NDA content leaves firm walls); OPP-002/OPP-008 attended-not-unattended + audit trail (Swift lesson); OPP-005 replaces shadow ChatGPT with a governed path.
+  </div>
+
+  <p class="lede" style="margin-top:6px">Phase completion log</p>
+  <div class="phase-log">
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 1&ndash;2 &middot; Scope &amp; Context</div><div class="phase-chip-meta">scope.md, context.md &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 3 &middot; Technology Inventory</div><div class="phase-chip-meta">tech-inventory.md &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 4 &middot; Process Baselines</div><div class="phase-chip-meta">processes/ (PROC-001..007 + _index) &mdash; all 7 Ready</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 5 &middot; Opportunities</div><div class="phase-chip-meta">opportunities/ (OPP-001..008 + _index) &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 6 &middot; Scoring</div><div class="phase-chip-meta">scores/ (OPP-001..008 + _index) &mdash; Cleared, 0 Critical</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 6.5 &middot; GRC (Gate A)</div><div class="phase-chip-meta">grc/ (OPP-002/004/005/008 + _index) &mdash; Cleared with Conditions</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 7 &middot; Roadmap / Waves</div><div class="phase-chip-meta">roadmap.md &mdash; Cleared, 0 Critical</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 8 &middot; Use-Case Briefs</div><div class="phase-chip-meta">usecase-briefs/ (UC-001..008 + _index) &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 9 &middot; Business Case</div><div class="phase-chip-meta">business-case.md, cost-actuals.md, financial-model.xlsx &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 9.5 &middot; Gate B (Deliverable Gate)</div><div class="phase-chip-meta">evidence-log.md &mdash; CLEARED after remediation</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 10 &middot; Executive Summary</div><div class="phase-chip-meta">executive-summary.md &mdash; complete</div></div></div>
+    <div class="phase-chip-row"><div class="phase-dot"></div><div><div class="phase-chip-label">Phase 11 &middot; HTML Deliverable</div><div class="phase-chip-meta">deliverable.html &mdash; this document</div></div></div>
+  </div>
+
+  <p class="lede" style="margin-top:18px">Stakeholder interview log</p>
+  <table class="data">
+    <thead>
+      <tr><th>Name</th><th>Role</th><th>Round</th><th>Date</th><th>Topics covered</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Dana Okafor</td><td>Chief Delivery Officer (Sponsor)</td><td>R1 &mdash; Sponsor</td><td>2026-05-06</td><td>Strategic framing across all seven processes, rough baselines, constraints</td></tr>
+      <tr><td>Priya Nair</td><td>Director, Resource Management Office</td><td>R2 &mdash; Operator</td><td>2026-05-11</td><td>Staffing process walkthrough, availability data, rework</td></tr>
+      <tr><td>Tom Bradley</td><td>Engagement Manager (Strategy &amp; Ops)</td><td>R2 &mdash; Operator</td><td>2026-05-11</td><td>SOW drafting, scoping, rate cards, rework</td></tr>
+      <tr><td>Sofia Reyes</td><td>Senior Project Manager</td><td>R2 &mdash; Operator</td><td>2026-05-12</td><td>Status report assembly, data sources, effort, forecasting (EAC); time-entry approval view</td></tr>
+      <tr><td>Aisha Khan</td><td>Quality Office Lead</td><td>R2 &mdash; Operator</td><td>2026-05-12</td><td>QA gate, reviewer capacity, defects, standards</td></tr>
+      <tr><td>Greg Olsen</td><td>Billing Manager, Project Finance</td><td>R2 &mdash; Operator</td><td>2026-05-13</td><td>Invoicing, reconciliation, time-entry quality (finance side), Swift history</td></tr>
+      <tr><td>Marcus Bell</td><td>CFO</td><td>R3 &mdash; Adjacent</td><td>2026-05-18</td><td>Downstream of forecasting &amp; invoicing; DSO; ROI bar; Swift</td></tr>
+      <tr><td>Lena Park</td><td>Technology Practice Lead</td><td>R3 &mdash; Adjacent</td><td>2026-05-19</td><td>Consumes staffing &amp; status; client-facing pain</td></tr>
+      <tr><td>James Carter</td><td>Senior Consultant</td><td>R3 &mdash; Adjacent</td><td>2026-05-20</td><td>Time entry (upstream of billing), deliverable production (upstream of QA), shadow tools</td></tr>
+      <tr><td>Dana Okafor</td><td>Chief Delivery Officer (Sponsor)</td><td>R4 &mdash; Clarification</td><td>2026-05-26</td><td>Reconcile cross-round conflicts; lock baselines</td></tr>
+      <tr><td>Priya Nair</td><td>Director, Resource Management Office</td><td>R4 &mdash; Clarification</td><td>2026-05-26</td><td>Reconcile cross-round conflicts; lock baselines</td></tr>
+      <tr><td>Sofia Reyes</td><td>Senior Project Manager</td><td>R4 &mdash; Clarification</td><td>2026-05-26</td><td>Reconcile cross-round conflicts; lock baselines</td></tr>
+      <tr><td>Greg Olsen</td><td>Billing Manager, Project Finance</td><td>R4 &mdash; Clarification</td><td>2026-05-26</td><td>Reconcile cross-round conflicts; lock baselines</td></tr>
+      <tr><td>Lena Park</td><td>Technology Practice Lead</td><td>R4 &mdash; Clarification</td><td>2026-05-26</td><td>Reconcile cross-round conflicts; lock baselines</td></tr>
+    </tbody>
+  </table>
+
+  <p class="gap-note">Determinism note: every dollar figure in this deliverable is cited from model/results.json (or the underlying model JSON). No arithmetic is performed in this prose; ROM ranges are AACE Class 5 (&plusmn;50%).</p>
+</section>
+
+<footer class="doc-footer">
+  <p class="confidential">Confidential &mdash; Lattice Consulting Group internal &middot; Do not distribute outside the FY27 investment committee</p>
+  <p>Prepared for <strong>Dana Okafor, Chief Delivery Officer (CDO)</strong> &middot; Read-ahead for the October 2026 FY27 investment committee, chaired by Marcus Bell (CFO).</p>
+  <p>Basis: AACE Class 5 (&plusmn;50%) ROM. Every dollar figure is cited from <strong>model/results.json</strong>. This is a magnitude check, not a finance-approved business case &mdash; a definitive case requires confirmed internal labor rates, vendor quotes, NPV modeling, and finance review.</p>
+  <p><strong>This is a fictional sample engagement.</strong> All names, figures, and findings are illustrative sample data and do not describe any real organization. Generated by the ai-process-assessment methodology, Phase 11.</p>
+</footer>
+
+<script>
+function navScrollTo(anchorId) {
+  var el = document.getElementById(anchorId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
+</body>
+</html>

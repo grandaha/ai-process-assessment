@@ -80,3 +80,15 @@ def test_checkpoint_skill_inlines_vendored_shell():
     assert "assets/osl/logo-lockup.svg" in text, "checkpoint masthead must inline the OSL logo"
     assert "Generate the `<style>` from that documented design system" not in text, \
         "remove the model-generates-CSS instruction"
+
+
+SAMPLE = REPO / "sample-pso-delivery" / "deliverable.html"
+
+
+def test_sample_deliverable_is_osl_branded():
+    html = SAMPLE.read_text(encoding="utf-8")
+    assert "--blue-500: #1B75BC" in html, "sample not re-shelled with OSL brand tokens"
+    assert "DM Sans" in html, "sample missing OSL fonts"
+    assert 'class="brand-logo"' in html, "sample masthead missing inlined OSL logo"
+    # Old model-invented palette token must be gone.
+    assert "--slate-light:" not in html, "stale non-brand palette still present in sample"
