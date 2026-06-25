@@ -9,6 +9,23 @@ description: Keystone — load at session start. Teaches model how to find and i
 You are operating inside the AI & Automation Use Case Identification methodology. Every engagement runs through eleven sequential phases (plus an interim cost-actuals step, 8.5) and two cross-cutting gates. You may not skip phases. You may not generate output for a phase until the prior phase's file exists in the engagement folder. CLAUDE.md overrides this skill — but only when CLAUDE.md says so explicitly.
 </EXTREMELY-IMPORTANT>
 
+## Front Door — start every session through the Conductor
+
+`ai-process-assessment:conducting-engagement` is the **front door**. On a fresh
+session — whether the user opens with a natural-language goal ("help me find AI
+opportunities", "assess my billing team"), a vague opener ("hi", "what is this", or
+nothing specific), or a request to resume ("where did we leave off") — **invoke
+`ai-process-assessment:conducting-engagement` before doing anything else.** It owns
+first contact: it greets, resolves any existing engagement, and offers the three
+paths — **start a new assessment · continue an existing one · run a sample** — then
+drives the phases below end-to-end, pausing only at human-decision touchpoints.
+
+Do **not** route a cold or vague opener straight into Phase 1 or any other phase
+skill. Drop into a specific phase skill directly (per the When-to-Invoke Reference)
+only when the user explicitly names that phase's action inside an engagement the
+Conductor is already driving. The Phase Map below is the rulebook the Conductor
+honors; it is not the entry point.
+
 ## Phase Map
 
 | Phase | Skill ID | Purpose | Gate condition | Output file |
@@ -82,7 +99,7 @@ The entry is written before the table row — so the escape and the fix are perm
 
 ## Routing Logic
 
-- On any new engagement prompt → invoke `ai-process-assessment:scoping-engagement`.
+- On session start / any cold or vague opener → invoke `ai-process-assessment:conducting-engagement` (the front door; see above). It owns first contact and, when the user starts a new assessment, runs `ai-process-assessment:scoping-engagement` (Phase 1) itself as part of intake. Do not invoke `scoping-engagement` directly on a cold open — go through the Conductor.
 - After each phase's output file is saved → invoke the next skill in the chain.
 - For phases that carry a `## Subagent Dispatch` section (discovering-processes, identifying-opportunities, scoring-opportunities, prioritizing-roadmap) → offload the per-item or independent-review work to the named subagents per that section; keep gate decisions and cross-item judgments in the main context.
 - After Phase 2 saves `context.md`, before Phase 3 → **recommended:** invoke `ai-process-assessment:building-checkpoint` (checkpoint `scope`) to validate the engagement framing — sponsoring question, decision-maker, scope, success criteria, and strategic context — with the sponsor + decision-maker. Recommended-and-recorded, not a hard gate. On "Changes Requested", route scope-field corrections to Phase 1 and context-field corrections to Phase 2, then regenerate before Phase 3.
@@ -99,6 +116,7 @@ The entry is written before the table row — so the escape and the fix are perm
 
 | Trigger phrase / situation | Skill to invoke |
 |---|---|
+| Session start; "hi", "what is this", "help me find AI opportunities", "assess my team", "where did we leave off"; any cold or vague opener | `ai-process-assessment:conducting-engagement` (front door — greets, resumes, offers the sample, then drives every phase below) |
 | "scope this engagement", "what are we trying to decide" | `ai-process-assessment:scoping-engagement` |
 | "what's the org context", "who else matters" | `ai-process-assessment:mapping-context` |
 | "what systems / data do they have" | `ai-process-assessment:inventorying-tech-data` |
@@ -143,4 +161,8 @@ A phase's skill MUST verify the predecessor file(s) exist before producing any o
 
 ## Chain to next skill
 
-→ `ai-process-assessment:scoping-engagement` (on any new engagement prompt)
+→ `ai-process-assessment:conducting-engagement` (the front door — invoke first on any
+session start or cold/vague opener; it greets, resumes, offers the sample, and routes
+into the phases)
+→ `ai-process-assessment:scoping-engagement` (Phase 1 — only when the Conductor is
+already driving and the user explicitly moves to scope a new engagement)

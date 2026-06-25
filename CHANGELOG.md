@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.21.1] - 2026-06-24
+
+Onboarding fix: the Conductor's first-contact greeting — including the **"run a
+sample"** offer — now reliably fires on a fresh session.
+
+### Fixed
+- **Keystone never routed to the Conductor.** `skills/using-methodology/SKILL.md`
+  (loaded at session start) had zero references to
+  `ai-process-assessment:conducting-engagement`, so on a cold or vague opener the
+  model had no instruction to invoke the front door. The greeting and the sample-run
+  offer lived only inside the Conductor skill and never triggered. Added a **Front
+  Door** section, a When-to-Invoke row, a Routing-Logic entry, and a Chain-to-next
+  link that all route first contact through the Conductor before any phase skill.
+- Regenerated `system-prompt.md` (the Claude.ai Projects copy-paste surface) to
+  mirror the updated keystone.
+- Added a regression guard (`tests/test_onboarding.py`) asserting the keystone
+  routes first contact to the Conductor before Phase 1 scoping.
+
 ## [2.21.0] - 2026-06-24
 
 Slice 4 — Step Reviews: a new operator-facing output tier. As you move through the
