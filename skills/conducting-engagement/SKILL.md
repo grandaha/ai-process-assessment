@@ -28,7 +28,11 @@ clear request ("assess my billing team"), skip the greeting and start. On a clea
 "continue/resume", resolve and pick up — no greeting.
 
 Resolve existing engagements first (folders with a `.conductor.md` whose work is
-incomplete — the same resolution the drive loop's step 0 performs), then offer:
+incomplete, **or a `.sample-run.md`** marker from a generated/bundled sample whose work is
+incomplete — a freshly generated sample has only `.sample-run.md` until Phase 1 stamps
+`.conductor.md`, so a resolution that keys on `.conductor.md` alone would miss it and
+report "nothing to resume" — the same resolution the drive loop's step 0 performs), then
+offer:
 
 | Engagements found | Offer |
 |---|---|
@@ -109,7 +113,10 @@ assessment.)
 Repeat until Phase 11 is done and Gate B is cleared:
 
 0. **Resolve the active engagement:** the folder containing a `.conductor.md` whose work
-   is incomplete. None → run Intake. More than one incomplete → ask which.
+   is incomplete, **or a `.sample-run.md`** marker whose work is incomplete (a generated or
+   bundled sample is resumable from its marker alone — `.conductor.md` is not stamped until
+   Phase 1, so keying on it alone would silently miss a generated-but-unscoped sample).
+   None → run Intake. More than one incomplete → ask which.
 0a. **Resolve `engine_root`:** take the live plugin root from the session-start note
    (injected fresh every session start). This is the value all commands below use.
 1. **Read state:** `python3 <engine_root>/state/state.py <folder>` → JSON snapshot.
@@ -580,5 +587,22 @@ the reconcile step; this is not that.)
 
 ## Sample mode
 
-If the engagement folder contains `.sample-run.md`, drive with the bundled sample data
-and do not prompt for live stakeholders (mirror the existing sample-run convention).
+If the engagement folder contains `.sample-run.md`, you drive the sample **exactly like a
+real engagement** — same drive loop, same gates, same touchpoint taxonomy, same autonomous
+subagent dispatch for headless phases. The **only** thing that changes is the source of
+phase inputs: wherever a phase would interview a live human (Phases 1–4), read the mapped
+intake file from the marker's `intake_root` instead of prompting for live stakeholders.
+
+- **You are still the driver.** Do **not** hand the user a manual session restart or a
+  skill id to invoke between phases. The session boundaries in the standalone sample skills
+  are legacy; under the Conductor, context isolation is achieved by dispatching headless
+  phases to subagents (per the *Execution model*), not by asking the user to restart. After
+  intake is generated or located, continue straight into Phase 1 yourself.
+- **Pause only at genuine touchpoints** — the must-ask floor and should-confirm items in the
+  *Touchpoint taxonomy*, honoring the active autonomy preset — never at an artificial
+  per-phase "start a new session" boundary.
+- The GRC gate (Gate A) and the deliverable gate (Gate B) fire and must be cleared exactly
+  as in a real engagement; the sample is built so Gate A fires on at least one opportunity.
+- No live cost actuals exist in a sample — follow the sample's cost-actuals convention
+  (firm-level anchors as the sourced basis; label estimates without an internal-actuals
+  basis as ROM; invent no vendor quotes), exactly as `running-sample-engagement` describes.

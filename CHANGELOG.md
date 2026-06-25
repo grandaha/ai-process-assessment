@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Sample run is now Conductor-driven end to end** (#122). Resolves two defects hit when
+  running the sample through `conducting-engagement`:
+  - **Generated sample not resumable.** The Conductor's resume resolution (first-contact
+    and drive-loop step 0) keyed only on `.conductor.md`, so a freshly generated sample —
+    which has only `.sample-run.md` until Phase 1 stamps `.conductor.md` — reported "No
+    existing engagements to resume" despite existing on disk. Resolution now recognizes a
+    `.sample-run.md`-only folder as resumable, restoring the intended sample-mode design.
+  - **Legacy manual session-restart handoffs.** `running-sample-engagement`,
+    `generating-sample-intake`, `building-checkpoint`, and the PSO sample README told the
+    user to "start a new/fresh session and invoke a skill" between phases, contradicting
+    the Conductor's autonomous-driver contract. Continuation now routes through the
+    Conductor (subagent isolation, pause only at genuine touchpoints); the user is never
+    asked to restart a session or name a phase skill. Sample mode drives the sample exactly
+    like a real engagement.
+
+### Added
+- `generating-sample-intake` verifies every intake file exists on disk before confirming
+  success (defensive assert-before-claim).
+- Anti-regression guards in `tests/test_guards.py` for all three behaviors
+  (no manual-restart handoffs; generator verifies on disk; Conductor resume detects
+  `.sample-run.md`).
+
 ## [2.22.0] - 2026-06-24
 
 OSL-branded HTML artifacts: the client-facing HTML (the Phase 11 deliverable and the

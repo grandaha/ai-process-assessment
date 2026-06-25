@@ -126,4 +126,4 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 
 **Output rule:** Do NOT reproduce or echo the HTML content in this response. State the file path only.
 
-**Session boundary:** Producing the checkpoint and recording its outcome completes this session. Instruct the user to start a fresh session for the route-back phase (on Changes Requested) or for Phase 5 (on Confirmed).
+**Return to the Conductor:** Producing the checkpoint and recording its outcome completes this skill's work. The checkpoint **outcome** is a must-ask touchpoint — the Conductor stops for the stakeholder's decision. Once it is recorded, control returns to `ai-process-assessment:conducting-engagement`, which routes onward itself: on Changes Requested it re-drives the route-back phase above; on Confirmed it continues to the next phase. It isolates that phase by dispatching a subagent — it does **not** ask the user to restart a session.

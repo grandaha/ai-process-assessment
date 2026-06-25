@@ -25,12 +25,12 @@ The seven processes: staffing & resource assignment, SOW creation, weekly status
 
 ## How to run it
 
-Invoke the **`ai-process-assessment:running-sample-engagement`** skill (say something like *"run the sample engagement"* or *"test the methodology"*). It is a guided entry point — **not** a shortcut. It:
+Just say something like *"run the sample engagement"* or *"test the methodology"*. The Conductor (`ai-process-assessment:conducting-engagement`) sets up the sample and then drives it end-to-end — you never need to know a phase name or a skill id. It:
 
-1. Points you at `intake/` as the source material for Phases 1–4.
-2. Has you invoke `ai-process-assessment:scoping-engagement` and proceed through the normal phase chain.
-3. Wherever a phase would interview a live human, you read the corresponding intake file instead.
-4. **Preserves every normal gate and session boundary** — you approve each phase transition and restart sessions exactly as in a real engagement.
+1. Uses `intake/` as the source material for Phases 1–4.
+2. Drives the full phase chain itself, isolating each phase by dispatching a subagent.
+3. Wherever a phase would interview a live human, reads the corresponding intake file instead.
+4. **Preserves every normal gate** — you approve each phase transition and clear both gates exactly as in a real engagement, but the Conductor handles continuation; you are never asked to restart a session.
 5. Produces a complete engagement under `sample-pso-delivery/`, terminating in `deliverable.html`.
 
 There is no answer key and no pre-filled phase output. Phases 1–4 interpret the raw intake into structured outputs; Phases 5–11 do the analysis. The baselines in `interview-notes.md` are constructed to support the value claims the later phases derive — so a faithful run should not produce orphan value hypotheses.
