@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.0] - 2026-06-24
+
+OSL-branded HTML artifacts: the client-facing HTML (the Phase 11 deliverable and the
+3 stakeholder checkpoints) now renders in the One Step Labs brand, deterministically.
+
+### Added
+- **Vendored OSL design system** under `assets/osl/`: `brand.css` (OSL color/type/
+  spacing/radius/shadow tokens + DM Sans/DM Mono webfonts), a shared `components.css`
+  (every deliverable/checkpoint design-system class restyled onto OSL tokens, two-hue
+  palette — blue leads, orange sparingly, neutral structure), `logo-lockup.svg`, and
+  `SOURCE.md` recording the vendor provenance + re-vendor steps. Self-contained (AC-2):
+  the CSS is inlined; the only network reference is the webfont `@import`, with a
+  system-ui fallback offline. No runtime dependency on the OSL plugin.
+- **Golden reference output** under a tracked `golden/` directory
+  (`golden/pso-delivery/deliverable.html`) — the bundled PSO deliverable re-shelled in
+  the OSL brand, kept under version control so a live run can't clobber it. Seeds #120.
+- Guard tests (`tests/test_branding.py`): vendored assets exist and are on-brand;
+  every CSS class in the deliverable contract is defined in `components.css`;
+  `components.css` uses color tokens only (no raw hex); the skills inline the vendored
+  shell verbatim; the golden reference is OSL-branded with no dangling CSS variables.
+
+### Changed
+- `building-deliverable` and `building-checkpoint` now **inline the vendored OSL shell
+  verbatim** (`brand.css` + `components.css`) and embed the logo in the masthead,
+  instead of the model authoring the `<style>` block on every build. The CSS class
+  contract is unchanged (section-renderers and existing output guards are unaffected);
+  only the source of the styling moved from per-build authoring to the vendored file.
+- Regenerated `system-prompt.md` is unaffected (branding is not in the keystone).
+
+### Notes
+- This makes the brand/CSS layer deterministic. Making the document *structure*
+  deterministic (so agents stop composing the deliverable body from scratch) is
+  tracked separately in #120; the new `golden/` reference is its seed example.
+
 ## [2.21.1] - 2026-06-24
 
 Onboarding fix: the Conductor's first-contact greeting — including the **"run a

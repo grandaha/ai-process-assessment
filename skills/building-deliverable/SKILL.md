@@ -44,14 +44,14 @@ The deliverable contains exactly 9 sections in this scroll order:
 
 ## Required CSS components
 
-All CSS component systems below must be embedded in the static shell. Section-renderer agents must not invent new CSS classes. If a new class is genuinely needed, it must be added to the static shell and documented here first.
+**The shell's `<head><style>` is the vendored OSL design system — do not author or modify CSS.** Inline `assets/osl/brand.css` then `assets/osl/components.css` **verbatim** into a single `<style>` block (brand layer first, components second). The class tables below document *which classes exist* so section-renderer agents know what to use; the CSS *source* is the vendored file. Section-renderer agents must not invent CSS classes or emit `<style>`. If a new class is genuinely needed, add it to `assets/osl/components.css` (consuming OSL tokens) and document it here first — never inline ad-hoc CSS.
 
 ### Structural / layout components
 
 | CSS class | Purpose | Used in |
 |---|---|---|
 | `.sticky-nav` | Sticky top navigation bar — links to all 9 section anchors | Page-level — top of body |
-| `.sticky-nav a` | Nav link style — 11px bold uppercase, slate color | Sticky nav |
+| `.sticky-nav a` | Nav link style — 11px bold uppercase, muted neutral color | Sticky nav |
 | `.section-block` | Padded scrollable content section with bottom border; `scroll-margin-top: 52px` for sticky nav offset | All 9 sections |
 | `.section-block h2` | Section heading — 20px bold | All sections |
 | `.doc-footer` | Document footer with border-top separator — confidentiality, preparer, date | Bottom of page |
@@ -62,7 +62,7 @@ All CSS component systems below must be embedded in the static shell. Section-re
 |---|---|---|
 | `.stat-row` | CSS grid wrapper for stat cards (auto-fit columns, min 180px) | Problem section, Investment section |
 | `.stat-card` / `.stat-value` / `.stat-label` / `.stat-sub` | KPI card with large bold number, uppercase label, sub-note | Problem section, Investment section |
-| `.stat-context` | Supplementary context line below stat-sub — 11px slate gray | Problem section, Investment section |
+| `.stat-context` | Supplementary context line below stat-sub — 11px muted | Problem section, Investment section |
 
 ### Verdict components
 
@@ -80,7 +80,7 @@ All CSS component systems below must be embedded in the static shell. Section-re
 
 | CSS class | Purpose | Used in |
 |---|---|---|
-| `.wave-badge` + `.w1` / `.w2` / `.w3` | Color-coded wave pill badges (green/blue/gray) | Portfolio table, Use Cases grid |
+| `.wave-badge` + `.w1` / `.w2` / `.w3` | Color-coded wave pill badges (w1=blue-500, w2=blue-300, w3=neutral-500) | Portfolio table, Use Cases grid |
 | `.wave-timeline` | 3-band container for wave roadmap — flexbox, rounded, overflow hidden | Roadmap section |
 | `.wave-band` | Individual wave band — flex 1, padded | Roadmap section |
 | `.wave-band.w1` / `.wave-band.w2` / `.wave-band.w3` | Wave band background and border colors | Roadmap section |
@@ -101,20 +101,20 @@ All CSS component systems below must be embedded in the static shell. Section-re
 | `.uc-card-body` | Card body — padded flex column | Use Cases section |
 | `.uc-card-type` | Type badge — 11px pill with modifier class | Portfolio table, Use Cases cards |
 | `.uc-problem` | Problem statement text — 13px, line-height 1.5 | Use Cases cards |
-| `.uc-outcome` | Outcome statement — 12px bold green on green-tint background | Use Cases cards |
-| `.uc-meta` | Meta row — flex wrap, 11px slate | Use Cases cards |
+| `.uc-outcome` | Outcome statement — 12px bold blue-700 on blue-tint background | Use Cases cards |
+| `.uc-meta` | Meta row — flex wrap, 11px muted | Use Cases cards |
 | `.uc-quickwin` | Quick-win badge — yellow tint, 10px bold | Use Cases cards |
 
 ### Type badge modifier classes
 
 | CSS class | Type | Colors |
 |---|---|---|
-| `.type-rpa` | RPA | slate background, slate text |
-| `.type-aug` | Augmentation | purple-tint background, purple text |
-| `.type-ai` | AI | blue-tint background, blue text |
-| `.type-chain` | Chain | teal-tint background, teal text |
-| `.type-data` | Data | amber-tint background, amber text |
-| `.type-agentic` | Agentic | orange-tint background, orange text |
+| `.type-rpa` | RPA | neutral background, neutral text |
+| `.type-aug` | Augmentation | blue-100 background, blue-700 text |
+| `.type-ai` | AI | blue-300 background, white text |
+| `.type-chain` | Chain | blue-100 background, blue-500 text, blue-300 border |
+| `.type-data` | Data | orange-100 background, orange-700 text |
+| `.type-agentic` | Agentic | orange-300 background, white text |
 
 ### Phase completion log components (evidence section)
 
@@ -122,25 +122,25 @@ All CSS component systems below must be embedded in the static shell. Section-re
 |---|---|---|
 | `.phase-log` | Vertical stack of phase chip rows | Evidence section |
 | `.phase-chip-row` | One row — dot + label/meta stacked | Evidence section |
-| `.phase-dot` | Filled green dot (complete) | Evidence section |
+| `.phase-dot` | Filled blue-500 dot (complete) | Evidence section |
 | `.phase-dot.pending` | Empty gray dot (pending) | Evidence section |
 | `.phase-chip-label` | Phase name — 13px bold | Evidence section |
-| `.phase-chip-meta` | Output filename + status — 11px slate | Evidence section |
+| `.phase-chip-meta` | Output filename + status — 11px muted | Evidence section |
 
 ### Owner chip
 
 | CSS class | Purpose | Used in |
 |---|---|---|
-| `.owner-chip` | Inline owner name pill — 11px, slate background, rounded | Risks table, Actions table |
+| `.owner-chip` | Inline owner name pill — 11px, neutral background, rounded | Risks table, Actions table |
 
 ### Callout variants
 
 | CSS class | Purpose | Used in |
 |---|---|---|
 | `.callout` | Standard informational callout (blue left border) | Multiple sections |
-| `.callout-highlight` | Success callout (green left border) | Evidence section — Gate B |
-| `.callout-warning` | Warning callout (amber left border) | Evidence section — GRC gates |
-| `.callout-note` | Muted callout (slate left border) | Portfolio section, Roadmap section |
+| `.callout-highlight` | Success callout (blue-500 left border) | Evidence section — Gate B |
+| `.callout-warning` | Warning callout (orange-500 left border) | Evidence section — GRC gates |
+| `.callout-note` | Muted callout (neutral-300 left border) | Portfolio section, Roadmap section |
 | `.callout-success` | Success callout — distinct from `.callout-highlight` | Use where appropriate |
 | `.gap-note` | Gray italic text for data gaps and ROM notes | Problem section, Investment section |
 
@@ -159,6 +159,20 @@ Sticky nav usage pattern:
 
 ```html
 <a href="#verdict" onclick="navScrollTo('verdict'); return false;">Verdict</a>
+```
+
+## Masthead (static shell)
+
+The masthead sits directly after the sticky nav, per the assembly page order. Inline the OSL logo lockup at its top, verbatim from `assets/osl/logo-lockup.svg`, then the eyebrow/title/subtitle/meta:
+
+```html
+<header class="masthead">
+  <!-- inline the full contents of assets/osl/logo-lockup.svg here, with class="brand-logo" on the <svg> -->
+  <div class="eyebrow">AI &amp; Automation Opportunity Assessment</div>
+  <h1>[engagement title from scope.md]</h1>
+  <p class="subtitle">[one-line framing]</p>
+  <p class="meta-line">[client · preparer · date]</p>
+</header>
 ```
 
 ## Sticky nav HTML
@@ -192,6 +206,7 @@ The static shell includes a sticky nav immediately after `<body>`:
   - Pass to each renderer: engagement folder path and its section ID. Each renderer reads the source files it needs for its section. Do not pass document content to renderers.
 - [ ] Each renderer writes its section to `<engagement-folder>/_staging/phase11/<section-id>.html`. Returns one-line confirmation: "section <id> written." Orchestrator collects confirmations, then assembles `deliverable.html` from staging files. The orchestrator does NOT receive HTML block content from renderers.
 - [ ] Verify each return: no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
+- [ ] Verify the assembled shell `<style>` is exactly `assets/osl/brand.css` + `assets/osl/components.css` inlined verbatim (no hand-authored CSS), and the masthead inlines `assets/osl/logo-lockup.svg`.
 - [ ] Assemble in main context in the specified page order (see assembly pattern below)
 - [ ] Write `<engagement>/deliverable.html`
 - [ ] Open the file and confirm: scroll works, sticky nav links target correct sections, all 9 anchors present, no missing-class artifacts
@@ -238,7 +253,7 @@ Pull all headline figures from `model/results.json` — renderers cite computed 
 | "Generate any missing content here — the source file has a gap." | Phase 11 generates no content. A gap in the source is a Phase 1–9 problem. Fix the source, re-run the affected renderer. |
 | "Place the three executive blocks adjacent to each other." | The page order is intentional. #verdict opens the page; #risks and #actions close it after the portfolio and roadmap. Assembly interleaving is the design. |
 | "Section renderers can return full HTML pages — easier to collect." | Full pages cannot be interleaved. Agents return inner `<div class="section-block">` only. Wrapper markup from agents is rejected. |
-| "Invent a CSS class if you need a new visual." | The shell defines the design system. Inventing classes breaks the package. Use existing classes; if a new one is genuinely needed, that is a shell change — add it here and document it before using it. |
+| "Invent a CSS class / hand-write the `<style>` for this build." | The `<style>` is the vendored OSL shell (`assets/osl/brand.css` + `components.css`), inlined verbatim — never author or tweak CSS per build, and never invent classes. A genuinely-needed class is a shell change: add it to `assets/osl/components.css` (OSL tokens) and document it here first. |
 
 ## Chain to next skill
 

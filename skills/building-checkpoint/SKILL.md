@@ -51,17 +51,21 @@ The checkpoint's predecessor outputs exist (for `baseline`: `processes/_index.md
 
 ## Checkpoint shell
 
-The checkpoint is a single-scroll HTML page assembled in the main context (the orchestrator generates content for none of it — section blocks come from renderers). The shell embeds a `<style>` block implementing the **same design-system classes documented in `ai-process-assessment:building-deliverable`** (reuse the identical class names and visual tokens so checkpoints look consistent with the final deliverable). Generate the `<style>` from that documented design system at assembly time; do not invent new class names.
+The checkpoint is a single-scroll HTML page assembled in the main context (the orchestrator generates content for none of it — section blocks come from renderers). **The shell's `<head><style>` is the vendored OSL design system, identical to the final deliverable: inline `assets/osl/brand.css` then `assets/osl/components.css` verbatim** (brand first, components second). Do not author or generate CSS, and do not invent class names — checkpoints use a subset of the same classes documented in `ai-process-assessment:building-deliverable`, so they look consistent with the final deliverable by construction.
 
 Shell structure:
 
 ```
-<head> [<style> design-system CSS] [smooth-scroll JS helper] </head>
+<head> [<style> assets/osl/brand.css + assets/osl/components.css, inlined verbatim] [smooth-scroll JS helper] </head>
 <body>
   <nav class="sticky-nav">
     [per-checkpoint anchors — see mapping below]
   </nav>
-  [masthead block — engagement name from scope.md, per-checkpoint label, date]
+  <header class="masthead">
+    <!-- inline the full contents of assets/osl/logo-lockup.svg here, class="brand-logo" on <svg> -->
+    <div class="eyebrow">Interim — for stakeholder validation</div>
+    <h1>[checkpoint title]</h1>
+  </header>
 
   [section blocks in anchor order — from the resolved checkpoint's renderer]
 
