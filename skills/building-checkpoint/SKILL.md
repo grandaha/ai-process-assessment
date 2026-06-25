@@ -58,14 +58,14 @@ Shell structure:
 ```
 <head> [<style> assets/osl/brand.css + assets/osl/components.css, inlined verbatim] [smooth-scroll JS helper] </head>
 <body>
+  <nav class="sticky-nav">
+    [per-checkpoint anchors — see mapping below]
+  </nav>
   <header class="masthead">
     <!-- inline the full contents of assets/osl/logo-lockup.svg here, class="brand-logo" on <svg> -->
     <div class="eyebrow">Interim — for stakeholder validation</div>
     <h1>[checkpoint title]</h1>
   </header>
-  <nav class="sticky-nav">
-    [per-checkpoint anchors — see mapping below]
-  </nav>
 
   [section blocks in anchor order — from the resolved checkpoint's renderer]
 

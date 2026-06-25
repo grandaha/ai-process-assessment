@@ -18,4 +18,5 @@ methodology's HTML artifacts are self-contained and need no plugin at runtime.
 1. Update the source plugin (`/plugin marketplace update grandaha`).
 2. Copy the token files above into `brand.css` (fonts @import first), and `logo-lockup.svg`.
 3. Bump the OSL commit + date here.
-4. Run `.venv/bin/python -m pytest tests/test_branding.py -q`.
+4. If OSL renames or removes a token, reconcile `components.css` (it consumes those tokens via `var(--…)`) and re-run `.venv/bin/python -m pytest tests/test_branding.py -q`.
+5. Run `.venv/bin/python -m pytest tests/test_branding.py -q`.
