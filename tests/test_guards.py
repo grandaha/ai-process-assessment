@@ -488,3 +488,54 @@ def test_phase4_index_uses_portable_layer(methodology):
     assert "from state.assembly import" in body
     assert "index_from_fields" in body
     assert "for f in <name>/processes/PROC-*.md" not in body
+
+
+# --- #sample-conductor-driven guards (defends: legacy manual session-restart handoffs in
+# the sample flow that contradict the Conductor's autonomous-driver contract; a generator
+# that reported success without verifying its writes; and a resume resolution blind to a
+# generated-but-unscoped sample). Observed defects in a live sample run: a phantom
+# sample-<slug>/ folder the generator claimed to write, a "Start a new session and
+# invoke ..." handoff, and "No existing engagements to resume." ---
+
+# The Conductor — not the user — owns continuation. These surfaces must never instruct the
+# user to manually restart a session as the way to advance an engagement.
+MANUAL_RESTART_RE = re.compile(r"(start a (?:new|fresh) session|restart sessions?)", re.IGNORECASE)
+NO_MANUAL_RESTART_FILES = [
+    "skills/running-sample-engagement/SKILL.md",
+    "skills/generating-sample-intake/SKILL.md",
+    "skills/building-checkpoint/SKILL.md",
+    "samples/pso-delivery-team/README.md",
+]
+
+
+def test_no_manual_session_restart_handoffs():
+    offenders = []
+    for rel in NO_MANUAL_RESTART_FILES:
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        for m in MANUAL_RESTART_RE.finditer(text):
+            line = text[: m.start()].count("\n") + 1
+            offenders.append(f"{rel}:{line} :: {m.group(0)!r}")
+    assert not offenders, (
+        "manual session-restart handoff(s) found — continuation is the Conductor's job, "
+        "not the user's:\n" + "\n".join(offenders)
+    )
+
+
+def test_generating_sample_intake_verifies_before_claiming(methodology):
+    """Defect A: the generator reported creating intake files it never wrote. It must
+    verify every intake file exists on disk before confirming success."""
+    body = methodology.skills["ai-process-assessment:generating-sample-intake"].body
+    assert "verify every intake file exists on disk" in body, (
+        "generating-sample-intake must verify files exist on disk before confirming success"
+    )
+
+
+def test_conductor_resume_detects_sample_marker(methodology):
+    """Defect B: a generated sample has only .sample-run.md (no .conductor.md until Phase 1
+    stamps it), so resume resolution must treat .sample-run.md as a resumable signal too —
+    in both the first-contact resolution and the drive-loop step 0."""
+    body = methodology.skills["ai-process-assessment:conducting-engagement"].body
+    assert body.count("or a `.sample-run.md`") >= 2, (
+        "conducting-engagement must recognize a generated sample (.sample-run.md without "
+        ".conductor.md) as resumable in BOTH first-contact resolution and drive-loop step 0"
+    )

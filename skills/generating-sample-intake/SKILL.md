@@ -385,15 +385,33 @@ Before writing any file, verify your scenario plan satisfies all of these. If an
 - [ ] The prior failure / false start in org-context.md connects to the skeptic's posture
 - [ ] No phase outputs pre-seeded (raw intake only)
 
-## Step 7 — Confirm and hand off
+## Step 7 — Verify, then confirm and return control
 
-After writing all files, confirm what was created:
+**Verify before you claim anything.** Never report files you did not write. After the
+writes, **verify every intake file exists on disk** — list each expected path and confirm
+it is present and non-empty before producing the confirmation block:
+
+```bash
+for f in \
+  samples/<slug>/README.md \
+  samples/<slug>/intake/engagement-request.md \
+  samples/<slug>/intake/org-context.md \
+  samples/<slug>/intake/systems-and-data.md \
+  samples/<slug>/intake/interview-notes.md \
+  sample-<slug>/.sample-run.md ; do
+  [ -s "$f" ] && echo "OK   $f" || echo "MISSING $f"
+done
+```
+
+If any path reports `MISSING` (or the folder was never created), **stop and say so plainly**
+— do not narrate a scenario that is not on disk. Re-create the missing file, or surface the
+failure to the user. Only once every path reads `OK` do you confirm what was created:
 
 ```
 Generated scenario: [Company name]
 Slug: <slug>
 Engagement folder: sample-<slug>/
-Intake files written:
+Intake files written (verified on disk):
   samples/<slug>/README.md
   samples/<slug>/intake/engagement-request.md
   samples/<slug>/intake/org-context.md
@@ -406,13 +424,18 @@ Conflicts seeded: Conflict A ([process]), Conflict B ([process])
 GRC trigger: [process + data asset]
 ```
 
-**If invoked standalone** (not from within `running-sample-engagement`):
+**Then return control to whoever invoked you — never hand the user a manual restart.**
+Continuation is the Conductor's job, not the user's:
 
-> Your scenario is ready. Start a new session and invoke `ai-process-assessment:running-sample-engagement`. It will detect your generated scenario at `sample-<slug>/` and proceed to Phase 1.
-
-**If invoked from within `running-sample-engagement`**:
-
-> Scenario generated. Return to `running-sample-engagement` and continue from the Setup section, substituting `sample-<slug>` for the engagement name and `samples/<slug>/intake` for the intake root throughout.
+- **Invoked from the Conductor / `running-sample-engagement` (the normal path):** return
+  silently with the engagement name (`sample-<slug>`) and intake root
+  (`samples/<slug>/intake`). The Conductor picks up in sample mode and drives Phase 1
+  itself, reading `samples/<slug>/intake/engagement-request.md` in place of a live sponsor
+  interview. Do **not** tell the user to restart a session or invoke a skill.
+- **Invoked truly standalone** (no Conductor in the loop): say the scenario is ready and
+  offer to run it now — then continue into `ai-process-assessment:conducting-engagement`
+  in this same session, which detects the `.sample-run.md` marker and drives. The user
+  never needs to know a phase name or a skill id.
 
 ## Chain to next skill
 
