@@ -539,3 +539,43 @@ def test_conductor_resume_detects_sample_marker(methodology):
         "conducting-engagement must recognize a generated sample (.sample-run.md without "
         ".conductor.md) as resumable in BOTH first-contact resolution and drive-loop step 0"
     )
+
+
+# --- #first-contact-consistency guard (defends: non-deterministic first contact, #125) ---
+# Same opener must produce the same shape every run: (1) always reflect intent back and
+# confirm, then (2) present the next step as selectable options. A request "skips" nothing
+# on phrasing alone — the only thing a named target changes is the confirmation sentence.
+# The legacy "clear request -> skip the greeting and start" bypass is the source of the
+# run-to-run variance and must be gone.
+
+def _first_contact_section(body: str) -> str:
+    i = body.find("## First contact")
+    assert i != -1, "conducting-engagement has no '## First contact' section"
+    j = body.find("\n## ", i + len("## First contact"))
+    return body[i:] if j == -1 else body[i:j]
+
+
+def test_first_contact_reflect_confirm_then_selectable(methodology):
+    body = methodology.skills["ai-process-assessment:conducting-engagement"].body
+    section = _first_contact_section(body)
+    # Beat 1: always reflect the user's intent back and confirm before advancing.
+    assert "Reflect their intent back and confirm" in section, (
+        "first contact must always reflect intent back and confirm (beat 1)"
+    )
+    # Beat 2: the next step is presented as selectable options (deterministic buttons),
+    # not freeform prose the user answers by typing.
+    assert "selectable options" in section, (
+        "first contact must present the next step as selectable options (beat 2)"
+    )
+    # A request only differs by whether it 'names a target' — never by skipping the beats.
+    assert "names a target" in section, (
+        "first contact must gate target-handling on whether the request names a target"
+    )
+
+
+def test_first_contact_legacy_skip_bypass_removed(methodology):
+    body = methodology.skills["ai-process-assessment:conducting-engagement"].body
+    assert "skip the greeting and start" not in body, (
+        "the legacy 'skip the greeting and start' bypass causes non-deterministic first "
+        "contact (#125) and must be removed"
+    )

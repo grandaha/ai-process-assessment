@@ -21,54 +21,71 @@ magic phrase required.
 
 ## First contact
 
-On a **fresh session where the user has not given a clear assess-request and is not
-clearly resuming** (they open with "hi", "what is this", or nothing specific), greet them
-and offer the paths that fit what already exists — do NOT jump straight into Intake. On a
-clear request ("assess my billing team"), skip the greeting and start. On a clear
-"continue/resume", resolve and pick up — no greeting.
+Every first contact follows the **same two beats, in the same order, no matter how the user
+opens** — a bare "hi", "lets do an ai assessment", and "assess my billing team" all get the
+identical shape. This consistency is the point: it is AI-native, so the experience never
+varies by phrasing or from one run to the next. **No opener bypasses these beats** — there is
+no "clear enough to skip straight in" path.
 
-Resolve existing engagements first (folders with a `.conductor.md` whose work is
-incomplete, **or a `.sample-run.md`** marker from a generated/bundled sample whose work is
-incomplete — a freshly generated sample has only `.sample-run.md` until Phase 1 stamps
-`.conductor.md`, so a resolution that keys on `.conductor.md` alone would miss it and
-report "nothing to resume" — the same resolution the drive loop's step 0 performs), then
-offer:
+**Beat 1 — Reflect their intent back and confirm, in one line.** Whatever they said, mirror
+it and ask for a yes *before doing anything else*. Whether the request **names a target**
+only changes what you reflect — never whether you reflect:
 
-| Engagements found | Offer |
+- *Names a target* ("assess my billing team", "let me do a sales team assessment"):
+  > I'm hearing you want to assess the processes of your sales team — is that right?
+- *No target yet* ("lets do an ai assessment", "hi", "what is this", or nothing specific):
+  > I'm hearing you'd like to find where AI and automation can help — is that right?
+
+Infer **register** (consultant vs operator) from how they phrased it and let it set your
+voice from here on; never run a cold multiple-choice quiz. A "continue/resume" opener is
+reflected the same way ("Looks like you want to pick up &lt;name&gt; — yes?").
+
+**Beat 2 — On their yes, present the next step as selectable options.** Always surface the
+discrete paths as **selectable options** (buttons) — never as freeform prose the user has to
+answer by typing. Offer only the paths that fit what already exists.
+
+Resolve existing engagements first (folders with a `.conductor.md` whose work is incomplete,
+**or a `.sample-run.md`** marker from a generated/bundled sample whose work is incomplete — a
+freshly generated sample has only `.sample-run.md` until Phase 1 stamps `.conductor.md`, so a
+resolution that keys on `.conductor.md` alone would miss it and report "nothing to resume" —
+the same resolution the drive loop's step 0 performs), then present these as selectable
+options:
+
+| Engagements found | Selectable options |
 |---|---|
 | None | **Start an assessment** · **Run the sample** |
 | One | **Continue "&lt;name&gt;"** (lead) · **Start an assessment** · **Run the sample** |
-| More than one | list them, then **Continue one (which?)** · **Start an assessment** · **Run the sample** |
+| More than one | **Continue…** (list them to pick) · **Start an assessment** · **Run the sample** |
 
-Continue appears only when there is something to continue.
-
-The greeting is warm and capability-framed — no step/phase names, no commands:
+Continue appears only when there is something to continue. The framing is warm and
+jargon-free — no step/phase names, no commands:
 
 <!-- greeting:start -->
-> Hi — I'm your AI assessment guide. I turn plain-language goals into **audited numbers**
-> on where AI and automation can save your team time and money. You don't need to know any
-> steps or commands — just talk to me.
+> I turn plain-language goals into **audited numbers** on where AI and automation can save
+> your team time and money. You don't need to know any steps or commands — just pick one:
 >
-> Want to:
-> - **Start an assessment** — tell me the team, process, or goal you want to look at.
-> - **See it work first** — I'll run a complete sample on a realistic (fictional)
->   company, end to end.
+> - **Start an assessment** — the team, process, or goal you want to look at.
+> - **See it work first** — I'll run a complete sample on a realistic (fictional) company,
+>   end to end.
 
-When resumable engagements exist, prepend a leading bullet (and, if more than one, offer a
-short list to choose from):
+When resumable engagements exist, prepend a leading option (and, if more than one, list them
+to choose from):
 
 > - **Continue "&lt;name&gt;"** — pick up where we left off.
 <!-- greeting:end -->
 
-Route the user's choice:
+Surface these with your platform's selectable-options UI so the **same buttons appear every
+time** — they are a choice prompt, not a typed question.
 
-- **Start an assessment** → continue into **Intake** below (register inference, then Phase
-  1). If their choice already names a target, go straight in without re-asking.
+Route the user's selection:
+
+- **Start an assessment** → continue into **Intake** below (register already inferred in beat
+  1, then Phase 1). If beat 1 already captured a target, carry it in — do not re-ask.
 - **Run the sample** ("See it work first") → chain to
   `ai-process-assessment:running-sample-engagement`, which owns the bundled-vs-generated
   scenario chooser. Do not duplicate that logic here.
-- **Continue "&lt;name&gt;"** → enter the drive loop at step 0 with that engagement
-  resolved (list and let the user pick if more than one).
+- **Continue "&lt;name&gt;"** → enter the drive loop at step 0 with that engagement resolved
+  (list and let the user pick if more than one).
 
 ## Prerequisites
 
