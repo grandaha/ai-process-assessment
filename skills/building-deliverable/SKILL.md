@@ -44,7 +44,7 @@ The deliverable contains exactly 9 sections in this scroll order:
 
 ## Required CSS components
 
-All CSS component systems below must be embedded in the static shell. Section-renderer agents must not invent new CSS classes. If a new class is genuinely needed, it must be added to the static shell and documented here first.
+**The shell's `<head><style>` is the vendored OSL design system — do not author or modify CSS.** Inline `assets/osl/brand.css` then `assets/osl/components.css` **verbatim** into a single `<style>` block (brand layer first, components second). The class tables below document *which classes exist* so section-renderer agents know what to use; the CSS *source* is the vendored file. Section-renderer agents must not invent CSS classes or emit `<style>`. If a new class is genuinely needed, add it to `assets/osl/components.css` (consuming OSL tokens) and document it here first — never inline ad-hoc CSS.
 
 ### Structural / layout components
 
@@ -161,6 +161,20 @@ Sticky nav usage pattern:
 <a href="#verdict" onclick="navScrollTo('verdict'); return false;">Verdict</a>
 ```
 
+## Masthead (static shell)
+
+The masthead sits at the top of `<body>` (before the sticky nav is fine; place per page order). Inline the OSL logo lockup at its top, verbatim from `assets/osl/logo-lockup.svg`, then the eyebrow/title/subtitle/meta:
+
+```html
+<header class="masthead">
+  <!-- inline the full contents of assets/osl/logo-lockup.svg here, with class="brand-logo" on the <svg> -->
+  <div class="eyebrow">AI &amp; Automation Opportunity Assessment</div>
+  <h1>[engagement title from scope.md]</h1>
+  <p class="subtitle">[one-line framing]</p>
+  <p class="meta-line">[client · preparer · date]</p>
+</header>
+```
+
 ## Sticky nav HTML
 
 The static shell includes a sticky nav immediately after `<body>`:
@@ -192,6 +206,7 @@ The static shell includes a sticky nav immediately after `<body>`:
   - Pass to each renderer: engagement folder path and its section ID. Each renderer reads the source files it needs for its section. Do not pass document content to renderers.
 - [ ] Each renderer writes its section to `<engagement-folder>/_staging/phase11/<section-id>.html`. Returns one-line confirmation: "section <id> written." Orchestrator collects confirmations, then assembles `deliverable.html` from staging files. The orchestrator does NOT receive HTML block content from renderers.
 - [ ] Verify each return: no `<html>`, no `<body>`, no `<style>`, no `<script>`. If any agent returns wrapper markup, reject and re-dispatch.
+- [ ] Verify the assembled shell `<style>` is exactly `assets/osl/brand.css` + `assets/osl/components.css` inlined verbatim (no hand-authored CSS), and the masthead inlines `assets/osl/logo-lockup.svg`.
 - [ ] Assemble in main context in the specified page order (see assembly pattern below)
 - [ ] Write `<engagement>/deliverable.html`
 - [ ] Open the file and confirm: scroll works, sticky nav links target correct sections, all 9 anchors present, no missing-class artifacts
@@ -238,7 +253,7 @@ Pull all headline figures from `model/results.json` — renderers cite computed 
 | "Generate any missing content here — the source file has a gap." | Phase 11 generates no content. A gap in the source is a Phase 1–9 problem. Fix the source, re-run the affected renderer. |
 | "Place the three executive blocks adjacent to each other." | The page order is intentional. #verdict opens the page; #risks and #actions close it after the portfolio and roadmap. Assembly interleaving is the design. |
 | "Section renderers can return full HTML pages — easier to collect." | Full pages cannot be interleaved. Agents return inner `<div class="section-block">` only. Wrapper markup from agents is rejected. |
-| "Invent a CSS class if you need a new visual." | The shell defines the design system. Inventing classes breaks the package. Use existing classes; if a new one is genuinely needed, that is a shell change — add it here and document it before using it. |
+| "Invent a CSS class / hand-write the `<style>` for this build." | The `<style>` is the vendored OSL shell (`assets/osl/brand.css` + `components.css`), inlined verbatim — never author or tweak CSS per build, and never invent classes. A genuinely-needed class is a shell change: add it to `assets/osl/components.css` (OSL tokens) and document it here first. |
 
 ## Chain to next skill
 

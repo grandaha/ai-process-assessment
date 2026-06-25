@@ -59,3 +59,26 @@ def test_components_use_tokens_not_raw_hex():
     hexes = re.findall(r"#[0-9A-Fa-f]{3,6}\b", css)
     assert not hexes, f"components.css must use var(--token), found raw hex: {hexes}"
     assert "var(--blue-500)" in css, "components.css should consume OSL tokens"
+
+
+CHECKPOINT_SKILL = REPO / "skills" / "building-checkpoint" / "SKILL.md"
+
+
+def test_deliverable_skill_inlines_vendored_shell():
+    text = DELIVERABLE_SKILL.read_text(encoding="utf-8")
+    assert "assets/osl/brand.css" in text and "assets/osl/components.css" in text, \
+        "building-deliverable must reference the vendored CSS"
+    assert "assets/osl/logo-lockup.svg" in text, "masthead must inline the OSL logo"
+    assert "verbatim" in text, "skill must say inline the shell verbatim"
+    # The old model-authored-CSS instruction must be gone.
+    assert "Section-renderer agents must not invent new CSS classes" not in text or \
+        "do not author" in text.lower(), "remove/replace the model-authors-CSS wording"
+
+
+def test_checkpoint_skill_inlines_vendored_shell():
+    text = CHECKPOINT_SKILL.read_text(encoding="utf-8")
+    assert "assets/osl/brand.css" in text and "assets/osl/components.css" in text, \
+        "building-checkpoint must reference the vendored CSS"
+    assert "assets/osl/logo-lockup.svg" in text, "checkpoint masthead must inline the OSL logo"
+    assert "Generate the `<style>` from that documented design system" not in text, \
+        "remove the model-generates-CSS instruction"
