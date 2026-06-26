@@ -8,15 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- **First contact is now deterministic and consistent** (#125). The same opener used to
-  produce different behavior across runs — selectable buttons one time, a freeform typed
-  prompt the next — because the "clear request → skip the greeting and start" branch was
-  fuzzy for a target-less opener, and the path menu was plain markdown that may or may not
-  render as buttons. First contact now follows the same two beats every time, regardless of
-  phrasing: (1) always reflect the user's intent back and confirm in one line — a named
-  target only fills in the confirmation sentence — then (2) present the next step as
-  selectable options. The legacy skip-straight-in bypass is removed. Anti-regression guards
-  added in `tests/test_guards.py`.
+- **First contact is now consistent across runs and openers** (#125). The same opener used to
+  behave differently from one run to the next, because a fuzzy "clear request → skip the
+  greeting and start" branch sometimes skipped the path offer entirely. First contact now
+  follows the same conversational shape every time, regardless of phrasing: always reflect the
+  user's intent back and confirm in one line — a named target only fills in what gets reflected
+  — then offer the paths. The canonical reflect-and-confirm line lives in a jargon-free
+  narration block (same convention as the greeting), with guards in `tests/test_onboarding.py`.
+  Stays conversational prose only — no UI/widget mechanism — so it holds across Claude Code,
+  Cowork, and Claude.ai.
+
+## [2.22.1] - 2026-06-25
 
 ### Fixed
 - **Sample run is now Conductor-driven end to end** (#122). Resolves two defects hit when
