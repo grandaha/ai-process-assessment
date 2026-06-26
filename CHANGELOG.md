@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **First-contact greeting now advertises the sample-scenario choice** (#128). The "See it
+  work first" path read as one fixed sample, hiding that you choose the scenario. It now says
+  you pick: a ready-made professional-services demo, or a fresh one for your world (retail,
+  healthcare, finance, manufacturing, or describe your own). Wording-only; conversational
+  prose, greeting stays jargon-free.
+
 ## [2.22.2] - 2026-06-25
 
 ### Fixed
