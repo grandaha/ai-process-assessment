@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **First contact is now consistent across runs and openers** (#125). The same opener used to
+  behave differently from one run to the next, because a fuzzy "clear request → skip the
+  greeting and start" branch sometimes skipped the path offer entirely. First contact now
+  follows the same conversational shape every time, regardless of phrasing: always reflect the
+  user's intent back and confirm in one line — a named target only fills in what gets reflected
+  — then offer the paths. The canonical reflect-and-confirm line lives in a jargon-free
+  narration block (same convention as the greeting), with guards in `tests/test_onboarding.py`.
+  Stays conversational prose only — no UI/widget mechanism — so it holds across Claude Code,
+  Cowork, and Claude.ai.
+
 ## [2.22.1] - 2026-06-25
 
 ### Fixed
