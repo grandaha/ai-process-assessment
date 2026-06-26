@@ -64,11 +64,13 @@ capability-framed — no step/phase names, no commands:
 
 <!-- greeting:start -->
 > I turn plain-language goals into **audited numbers** on where AI and automation can save
-> your team time and money. You don't need to know any steps or commands — just pick one:
+> your team time and money. You don't need to know any steps or commands — just tell me which
+> you'd like:
 >
-> - **Start an assessment** — the team, process, or goal you want to look at.
-> - **See it work first** — I'll run a complete sample on a realistic (fictional) company,
->   end to end.
+> - **Start an assessment** — tell me the team, process, or goal you want to look at.
+> - **See it work first** — I'll run a complete sample end to end, and **you pick the
+>   scenario**: a ready-made professional-services demo, or a fresh one for your world —
+>   retail, healthcare, finance, manufacturing, or just describe your own.
 
 When resumable engagements exist, prepend a leading option (and, if more than one, list them
 to choose from):
