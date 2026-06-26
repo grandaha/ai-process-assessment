@@ -6,8 +6,8 @@ methodology's HTML artifacts are self-contained and need no plugin at runtime.
 - **Source plugin:** `one-step-labs-design`
 - **Source repo:** https://github.com/grandaha/one-step-labs-design
 - **Vendored from:** `~/.claude/plugins/marketplaces/grandaha/plugins/one-step-labs-design/skills/one-step-labs-design/`
-- **OSL commit:** 7e7d85d
-- **Vendored on:** 2026-06-24
+- **OSL commit:** 4f2f23e
+- **Vendored on:** 2026-06-26
 
 ## Files
 - `brand.css` — flattened from OSL `tokens/{colors,typography,fonts,spacing,radius,shadow}.css` + `tokens/base.css`.

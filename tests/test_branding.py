@@ -31,6 +31,23 @@ def test_logo_is_svg():
     assert "one step labs" in svg.lower(), "logo lockup text missing"
 
 
+def test_logo_is_name_only_no_tagline():
+    """The lockup must be the current name-only logo — no 'Coaching · Consulting'
+    tagline (that is the old logo, #132). Guards the vendored asset and the golden
+    sample that inlines it. Scoped to the logo's distinctive tagline markers so the
+    sample's fictional company name ('Lattice Consulting Group') is not a false positive."""
+    OLD_TAGLINE = "COACHING · CONSULTING"
+    OLD_ARIA = 'aria-label="One Step Labs — coaching consulting"'
+    # A logo never legitimately says "coaching" — assert it is absent from the asset outright.
+    logo = LOGO.read_text(encoding="utf-8")
+    assert "coaching" not in logo.lower(), "vendored logo still carries the old tagline (#132)"
+    # The golden sample inlines the logo; check the distinctive old-logo markers only
+    # (not bare 'consulting', which appears in the fictional company name).
+    golden = (REPO / "golden" / "pso-delivery" / "deliverable.html").read_text(encoding="utf-8")
+    assert OLD_TAGLINE not in golden, "golden sample still inlines the old logo tagline (#132)"
+    assert OLD_ARIA not in golden, "golden sample still has the old logo aria-label (#132)"
+
+
 def _contract_classes() -> set[str]:
     """Class tokens named in building-deliverable's 'Required CSS components' section."""
     text = DELIVERABLE_SKILL.read_text(encoding="utf-8")

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **OSL logo is now the name-only lockup** (#132). The vendored logo carried an outdated
+  "Coaching · Consulting" tagline. Re-vendored the corrected name-only lockup (dot-mark +
+  "one step labs" wordmark, tagline removed) from `one-step-labs-design`, updated the golden
+  reference and `SOURCE.md` provenance, and added a branding guard so the tagline can't
+  drift back.
+
 ## [2.22.3] - 2026-06-26
 
 ### Changed
