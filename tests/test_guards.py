@@ -539,5 +539,3 @@ def test_conductor_resume_detects_sample_marker(methodology):
         "conducting-engagement must recognize a generated sample (.sample-run.md without "
         ".conductor.md) as resumable in BOTH first-contact resolution and drive-loop step 0"
     )
-
-
