@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.2] - 2026-06-25
+
 ### Fixed
 - **First contact is now consistent across runs and openers** (#125). The same opener used to
   behave differently from one run to the next, because a fuzzy "clear request → skip the
