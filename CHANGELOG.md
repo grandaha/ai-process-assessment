@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.3] - 2026-06-26
+
 ### Changed
 - **First-contact greeting now advertises the sample-scenario choice** (#128). The "See it
   work first" path read as one fixed sample, hiding that you choose the scenario. It now says
