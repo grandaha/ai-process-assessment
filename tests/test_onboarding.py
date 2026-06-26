@@ -59,3 +59,27 @@ def test_greeting_is_jargon_free():
     greeting = body[start:end]
     for token in GREETING_BLOCKLIST:
         assert token not in greeting, f"greeting leaks methodology jargon: {token!r}"
+
+
+def test_first_contact_always_reflects_and_confirms():
+    """First contact must ALWAYS reflect the user's intent back and confirm before
+    advancing — and the legacy 'clear request -> skip the greeting and start' bypass that
+    let a target-less opener skip straight in (the #125 non-determinism) must be gone."""
+    body = _body()
+    assert "skip the greeting and start" not in body, \
+        "legacy skip-the-greeting bypass must be removed (caused inconsistent first contact, #125)"
+    assert "reflect their intent back and confirm" in body.lower(), \
+        "first contact must instruct the Conductor to reflect intent back and confirm every time"
+
+
+def test_reflect_confirm_narration_is_jargon_free():
+    """The canonical reflect-and-confirm line is the user-facing text; like every other
+    narration block it must be fenced and free of methodology jargon."""
+    body = _body()
+    start = body.find("<!-- reflect-confirm:start -->")
+    end = body.find("<!-- reflect-confirm:end -->")
+    assert start != -1 and end != -1 and end > start, \
+        "reflect-confirm narration must be wrapped in <!-- reflect-confirm:start --> ... :end -->"
+    narration = body[start:end]
+    for token in GREETING_BLOCKLIST:
+        assert token not in narration, f"reflect-confirm narration leaks jargon: {token!r}"
