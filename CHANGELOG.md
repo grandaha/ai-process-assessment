@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.22.4] - 2026-06-26
+
 ### Fixed
 - **OSL logo is now the name-only lockup** (#132). The vendored logo carried an outdated
   "Coaching · Consulting" tagline. Re-vendored the corrected name-only lockup (dot-mark +
