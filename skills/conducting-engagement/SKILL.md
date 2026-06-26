@@ -21,44 +21,46 @@ magic phrase required.
 
 ## First contact
 
-Every first contact follows the **same two beats, in the same order, no matter how the user
-opens** — a bare "hi", "lets do an ai assessment", and "assess my billing team" all get the
-identical shape. This consistency is the point: it is AI-native, so the experience never
-varies by phrasing or from one run to the next. **No opener bypasses these beats** — there is
-no "clear enough to skip straight in" path.
+Every first contact follows the **same shape, no matter how the user opens** — a bare "hi",
+"lets do an ai assessment", and "assess my billing team" all get the identical flow. That is
+the AI-native promise: plain conversation, the same way every time, with the methodology
+invisible. **No opener bypasses this** — there is no "clear enough to skip straight in" path,
+because that is exactly what made the experience vary from one run to the next.
 
-**Beat 1 — Reflect their intent back and confirm, in one line.** Whatever they said, mirror
-it and ask for a yes *before doing anything else*. Whether the request **names a target**
-only changes what you reflect — never whether you reflect:
+**First, reflect their intent back and confirm — in one line, before anything else.** Mirror
+what they said and ask for a yes. Whether the request **names a target** (a team, process, or
+goal) only changes what you reflect, never whether you reflect: if they named one, name it
+back; if they did not, reflect the general intent. Canonical line for a target-less opener:
 
-- *Names a target* ("assess my billing team", "let me do a sales team assessment"):
-  > I'm hearing you want to assess the processes of your sales team — is that right?
-- *No target yet* ("lets do an ai assessment", "hi", "what is this", or nothing specific):
-  > I'm hearing you'd like to find where AI and automation can help — is that right?
+<!-- reflect-confirm:start -->
+> Happy to help with that — I'm hearing you'd like to find where AI and automation could save
+> your team time and money. Have I got that right?
+<!-- reflect-confirm:end -->
 
-Infer **register** (consultant vs operator) from how they phrased it and let it set your
-voice from here on; never run a cold multiple-choice quiz. A "continue/resume" opener is
-reflected the same way ("Looks like you want to pick up &lt;name&gt; — yes?").
+When they name a target, fold it into the same sentence ("…assess how your sales team works and
+where AI and automation could help — have I got that right?"). Infer **register** (consultant vs
+operator) from how they phrased it and let it set your voice from here on; never run a cold
+multiple-choice quiz. A "continue/resume" opener is reflected the same way ("Looks like you'd
+like to pick up where we left off — yes?").
 
-**Beat 2 — On their yes, present the next step as selectable options.** Always surface the
-discrete paths as **selectable options** (buttons) — never as freeform prose the user has to
-answer by typing. Offer only the paths that fit what already exists.
+**Then, on their yes, offer the paths that fit what already exists** — in plain conversational
+language. You write the words; each surface renders the conversation its own way (do not assume
+or require buttons or a menu widget).
 
 Resolve existing engagements first (folders with a `.conductor.md` whose work is incomplete,
 **or a `.sample-run.md`** marker from a generated/bundled sample whose work is incomplete — a
 freshly generated sample has only `.sample-run.md` until Phase 1 stamps `.conductor.md`, so a
 resolution that keys on `.conductor.md` alone would miss it and report "nothing to resume" —
-the same resolution the drive loop's step 0 performs), then present these as selectable
-options:
+the same resolution the drive loop's step 0 performs), then offer:
 
-| Engagements found | Selectable options |
+| Engagements found | Offer |
 |---|---|
 | None | **Start an assessment** · **Run the sample** |
 | One | **Continue "&lt;name&gt;"** (lead) · **Start an assessment** · **Run the sample** |
-| More than one | **Continue…** (list them to pick) · **Start an assessment** · **Run the sample** |
+| More than one | list them, then **Continue one (which?)** · **Start an assessment** · **Run the sample** |
 
-Continue appears only when there is something to continue. The framing is warm and
-jargon-free — no step/phase names, no commands:
+Continue appears only when there is something to continue. The offer is warm and
+capability-framed — no step/phase names, no commands:
 
 <!-- greeting:start -->
 > I turn plain-language goals into **audited numbers** on where AI and automation can save
@@ -74,13 +76,10 @@ to choose from):
 > - **Continue "&lt;name&gt;"** — pick up where we left off.
 <!-- greeting:end -->
 
-Surface these with your platform's selectable-options UI so the **same buttons appear every
-time** — they are a choice prompt, not a typed question.
+Route the user's choice:
 
-Route the user's selection:
-
-- **Start an assessment** → continue into **Intake** below (register already inferred in beat
-  1, then Phase 1). If beat 1 already captured a target, carry it in — do not re-ask.
+- **Start an assessment** → continue into **Intake** below (register already inferred above,
+  then Phase 1). If the reflect-and-confirm already captured a target, carry it in — do not re-ask.
 - **Run the sample** ("See it work first") → chain to
   `ai-process-assessment:running-sample-engagement`, which owns the bundled-vs-generated
   scenario chooser. Do not duplicate that logic here.
