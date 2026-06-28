@@ -155,6 +155,23 @@ CHECKPOINTS["scope"] = Checkpoint(
     output="checkpoints/checkpoint-scope.docx",
     outcome="checkpoints/CP-scope-outcome.md", build=_build_scope)
 
+def _build_portfolio(root):
+    roadmap = _read(root, "roadmap.md")
+    blocks = [docx.heading("Opportunity Portfolio & Roadmap — For Your Confirmation", 1)]
+    blocks += prose_section("Sequencing", roadmap, "Sequencing thesis")
+    wh, wr = md_table(roadmap, after_heading="Wave summary")
+    blocks += table_section("Roadmap waves", wh, wr)
+    sh, sr = md_table(_read(root, "scores/_index.md"))
+    blocks += table_section("Scored opportunities", sh, sr)
+    blocks += note("Please confirm the prioritization and sequencing, or note changes.")
+    blocks += signoff_block("Decision-maker / sponsor")
+    return blocks
+
+CHECKPOINTS["portfolio"] = Checkpoint(
+    "portfolio", per_process=False, gate=False,
+    output="checkpoints/checkpoint-portfolio.docx",
+    outcome="checkpoints/CP-portfolio-outcome.md", build=_build_portfolio)
+
 def render_checkpoint(engagement_dir, checkpoint_id):
     cp = CHECKPOINTS[checkpoint_id]
     root = Path(engagement_dir)
