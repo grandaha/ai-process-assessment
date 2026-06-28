@@ -530,6 +530,13 @@ def test_generating_sample_intake_verifies_before_claiming(methodology):
     )
 
 
+def test_conductor_gates_phase5_on_process_validation(methodology):
+    body = methodology.skills["ai-process-assessment:conducting-engagement"].body
+    assert "process-validation` gate" in body or "`process-validation`" in body, \
+        "Conductor must check the process-validation gate before Phase 5 (#136)"
+    assert "Before Phase 5" in body, "Conductor must block Phase 5 on owner sign-off (#136)"
+
+
 def test_conductor_resume_detects_sample_marker(methodology):
     """Defect B: a generated sample has only .sample-run.md (no .conductor.md until Phase 1
     stamps it), so resume resolution must treat .sample-run.md as a resumable signal too —

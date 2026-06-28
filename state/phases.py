@@ -44,6 +44,7 @@ PHASES: list[Phase] = [
 GATES: list[Gate] = [
     Gate("grc", "Governance & Risk (Gate A)", "grc/_index.md", header_based=True),
     Gate("deliverable", "Deliverable Gate (Gate B)", "evidence-log.md"),
+    Gate("process-validation", "Process Validation (owner sign-off)", "checkpoints/process-validation/"),
 ]
 
 # Maps a model/*.json input stem to the human key surfaced in the snapshot.

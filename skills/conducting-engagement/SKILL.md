@@ -163,6 +163,14 @@ Repeat until Phase 11 is done and Gate B is cleared:
    non-Green GRC flags. Before entering Phase 6 or any portfolio phase, check `gates`: if
    `grc.status == "required"`, run Gate A first (step 8). Reading only `phases` here would
    skip Gate A.
+
+   **Before Phase 5 (opportunity identification):** check the `process-validation` gate in the
+   `state.state` snapshot's `gates` array. If `status == "required"`, you may not start Phase 5 —
+   run `ai-process-assessment:building-checkpoint` (checkpoint `process-validation`) and get each
+   process owner's sign-off recorded (`Confirmed` or `Waived (reason)`; a `Waived` is a must-ask
+   operator decision) in `checkpoints/process-validation/CP-PROC-NNN-outcome.md`. A
+   `Changes requested` routes that process back to Phase 4. This mirrors how the GRC gate blocks
+   Phase 6.
 5. **Gather gaps, then execute** per the execution model below.
 6. **After a step that wrote a `model/*.json` input,** run
    `python3 <engine_root>/engine/run.py <folder>/` then
