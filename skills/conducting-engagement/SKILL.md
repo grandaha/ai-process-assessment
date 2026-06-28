@@ -178,6 +178,20 @@ Repeat until Phase 11 is done and Gate B is cleared:
 7. **At a checkpoint insertion point** (per the `building-checkpoint` registry: after
    Phase 2 `scope`, Phase 4 `baseline`, Phase 7 `portfolio`): offer to generate it
    (should-confirm); its stakeholder **outcome** is must-ask.
+
+   **Per-phase review doc offers** — offered, opt-in, recommended-and-recorded, NOT hard gates
+   (only process-validation gates are hard gates). At the end of each boundary phase, offer to
+   generate the corresponding review doc via `ai-process-assessment:building-checkpoint`:
+   - End of Phase 3 (tech inventory): offer checkpoint id `tech-data` (predecessor: `tech-inventory.md`)
+   - End of Phase 5 (opportunity identification): offer checkpoint id `opportunities` (predecessor: `opportunities/_index.md`)
+   - End of Phase 8 (use-case packaging): offer checkpoint id `use-case-briefs` (predecessor: `usecase-briefs/_index.md`)
+   - End of Phase 9 (business case): offer checkpoint id `business-case` (predecessor: `business-case.md`)
+
+   These are should-confirm in guided mode. Narrate jargon-free:
+
+   <!-- per-phase-review-offer-narration:start -->
+   > Want a short write-up of what we just captured that you can share or confirm? Totally optional.
+   <!-- per-phase-review-offer-narration:end -->
 8. **If a gate triggers** (GRC non-green in `opportunities/_index.md`, or before any
    external share): run the gate; surface the result.
 9. **Record this step's structural-class decisions** to the decision log (below).

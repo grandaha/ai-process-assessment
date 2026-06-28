@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:building-checkpoint
-description: Cross-cutting checkpoint — renders an interim, client-facing stakeholder-validation artifact at a defined point in the methodology (all 4 ids wired: `scope`, `baseline`, `portfolio`, `process-validation`). Every checkpoint routes through the deterministic `.docx` renderer — no LLM-authored content, no HTML path. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
+description: Cross-cutting checkpoint — renders an interim, client-facing stakeholder-validation artifact at a defined point in the methodology (all 8 ids wired: `scope`, `baseline`, `portfolio`, `process-validation`, `tech-data`, `opportunities`, `use-case-briefs`, `business-case`). Every checkpoint routes through the deterministic `.docx` renderer — no LLM-authored content, no HTML path. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
 ---
 
 # [CROSS-CUTTING] Building a Stakeholder Validation Checkpoint
@@ -10,8 +10,8 @@ description: Cross-cutting checkpoint — renders an interim, client-facing stak
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
-3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. Halt with a clear message naming whichever file is missing if not.
+3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`, `tech-data`, `opportunities`, `use-case-briefs`, `business-case`). Look up its row in the Checkpoint Registry below.
+4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. For `tech-data`: `tech-inventory.md`. For `opportunities`: `opportunities/_index.md`. For `use-case-briefs`: `usecase-briefs/_index.md`. For `business-case`: `business-case.md`. Halt with a clear message naming whichever file is missing if not.
 
 **Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
 from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
@@ -27,7 +27,7 @@ It is **recommended-and-recorded**, not a hard gate: the keystone recommends inv
 
 ## Checkpoint Registry
 
-All four checkpoint ids are active — the checkpoint pattern is complete.
+All eight checkpoint ids are active — the checkpoint pattern is complete.
 
 | id | Insert after | Audience | Source files | Output | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|
@@ -35,6 +35,10 @@ All four checkpoint ids are active — the checkpoint pattern is complete.
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `checkpoints/checkpoint-baseline.docx` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
 | `portfolio` | Phase 7 | Decision-maker + sponsor + IT lead | `scores/_index.md`, `scores/OPP-NNN.md`, `opportunities/_index.md`, `opportunities/OPP-NNN.md`, `roadmap.md`, `scope.md` (header only) | `checkpoints/checkpoint-portfolio.docx` | `checkpoints/CP-portfolio-outcome.md` | Phase 6 (`ai-process-assessment:scoring-opportunities`) for score/ranking changes; Phase 7 (`ai-process-assessment:prioritizing-roadmap`) for wave/sequencing changes |
 | `process-validation` | Phase 4 (before `baseline`) | Process owner (one per process) | `processes/_index.md`, `processes/PROC-NNN.md` | `checkpoints/process-validation/PROC-NNN.docx` (one per process) | `checkpoints/process-validation/CP-PROC-NNN-outcome.md` (one per process) | Phase 4 (`ai-process-assessment:discovering-processes`) for the affected process |
+| `tech-data` | Phase 3 | IT lead + sponsor | `tech-inventory.md` | `checkpoints/checkpoint-tech-data.docx` | `checkpoints/CP-tech-data-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `opportunities` | Phase 5 | Sponsor + decision-maker | `opportunities/_index.md` | `checkpoints/checkpoint-opportunities.docx` | `checkpoints/CP-opportunities-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `use-case-briefs` | Phase 8 | Sponsor + process owners | `usecase-briefs/_index.md`, `usecase-briefs/UC-NNN.md` | `checkpoints/checkpoint-use-case-briefs.docx` | `checkpoints/CP-use-case-briefs-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `business-case` | Phase 9 | Decision-maker + sponsor | `business-case.md` | `checkpoints/checkpoint-business-case.docx` | `checkpoints/CP-business-case-outcome.md` | n/a — advisory review doc, opt-in, no gate |
 
 ## Orchestration
 
@@ -78,6 +82,7 @@ After the output is produced, the checkpoint is taken to the stakeholders named 
 - `scope`: on Confirmed → `ai-process-assessment:inventorying-tech-data` (Phase 3); on Changes Requested → `ai-process-assessment:scoping-engagement` (Phase 1, scope fields) / `ai-process-assessment:mapping-context` (Phase 2, context fields).
 - `portfolio`: on Confirmed → `ai-process-assessment:packaging-usecases` (Phase 8); on Changes Requested → `ai-process-assessment:scoring-opportunities` (Phase 6, score fields) / `ai-process-assessment:prioritizing-roadmap` (Phase 7, sequencing fields).
 - `process-validation`: per-process sign-off is recorded in `checkpoints/process-validation/CP-PROC-NNN-outcome.md`; on all processes Confirmed → return to `ai-process-assessment:conducting-engagement` (Conductor continues to Phase 5); on any Changes Requested → route that process back to `ai-process-assessment:discovering-processes` (Phase 4), re-run, regenerate, then re-record.
+- `tech-data` / `opportunities` / `use-case-briefs` / `business-case`: advisory review docs offered at Phases 3 / 5 / 8 / 9 (opt-in). Record the outcome in `CP-<id>-outcome.md` if the client signs off. No route-back, nothing blocks — declining is fine.
 
 **Output rule:** Do NOT reproduce or echo the document content in this response. State the file path only.
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Per-phase review documents** (#99). The Conductor now offers an optional, client-facing
+  Word review doc at four more phase boundaries — tech & data (P3, IT confirms the systems +
+  data-sensitivity that drive governance), opportunity landscape (P5), use-case briefs (P8),
+  and business case (P9). Each renders deterministically from the phase's source files (on the
+  #131 registry) with a sign-off block; offered/opt-in, not gates. Adding a future per-phase
+  artifact is now a registry entry.
+
 ## [2.24.0] - 2026-06-28
 
 ### Changed

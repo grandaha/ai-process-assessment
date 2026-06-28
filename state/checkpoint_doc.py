@@ -45,10 +45,47 @@ def prose_section(title, md, heading):
         return []
     out = [docx.heading(title, 2)]
     for line in body.splitlines():
-        s = line.strip().lstrip("-* ").strip()
+        s = re.sub(r"^[-*]\s+", "", line.strip()).strip()
         if s and not s.startswith("|"):     # skip table rows; keep prose + bullets as paragraphs
             out.append(docx.paragraph(s))
     return out
+
+def blocks_from_markdown(text):
+    """Render a markdown body as docx blocks: contiguous pipe-table lines become a table,
+    other non-empty lines become paragraphs (leading bullet/number markers stripped)."""
+    out, tbl = [], []
+    def _flush():
+        if tbl:
+            h, r = md_table("\n".join(tbl))
+            if h:
+                out.append(docx.table(h, r))
+            tbl.clear()
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|"):
+            tbl.append(s)
+            continue
+        _flush()
+        s = re.sub(r"^[-*]\s+", "", s).strip()      # strip a bullet marker only, not **bold**
+        if s:
+            out.append(docx.paragraph(s))
+    _flush()
+    return out
+
+def full_section(title, md, heading):
+    body = md_section(md, heading)
+    return [docx.heading(title, 2)] + blocks_from_markdown(body) if body else []
+
+def _first_table(md):
+    """Header+rows of the FIRST contiguous pipe-table block; ([], []) if none."""
+    block = []
+    for line in md.splitlines():
+        s = line.strip()
+        if s.startswith("|"):
+            block.append(s)
+        elif block:
+            break
+    return md_table("\n".join(block))
 
 def table_section(title, headers, rows):
     return [docx.heading(title, 2), docx.table(headers, rows)] if rows else []
@@ -87,6 +124,12 @@ def _ready_processes(root):
 def _read(root, name):
     p = Path(root) / name
     return p.read_text(encoding="utf-8") if p.exists() else ""
+
+def _require(root, name):
+    md = _read(root, name)
+    if not md.strip():
+        raise FileNotFoundError(f"required source missing or empty: {name}")
+    return md
 
 # build functions for scope/baseline/portfolio land in Tasks 3-5.
 def _build_process_validation(root, proc_md):
@@ -155,6 +198,46 @@ CHECKPOINTS["scope"] = Checkpoint(
     output="checkpoints/checkpoint-scope.docx",
     outcome="checkpoints/CP-scope-outcome.md", build=_build_scope)
 
+def _build_tech_data(root):
+    md = _require(root, "tech-inventory.md")
+    blocks = [docx.heading("Technology & Data Inventory — For Your Confirmation", 1)]
+    blocks += note("Please confirm your systems and data-sensitivity classifications are "
+                   "captured correctly — these drive the downstream governance review.")
+    # ponytail: tech-inventory.md is entirely client-facing — every section renders, no exclusion.
+    for m in re.finditer(r"^##\s+(.+?)\s*$", md, re.MULTILINE):
+        title = m.group(1).strip()
+        blocks += full_section(title, md, title)
+    blocks += signoff_block("IT lead / sponsor")
+    return blocks
+
+CHECKPOINTS["tech-data"] = Checkpoint(
+    "tech-data", per_process=False, gate=False,
+    output="checkpoints/checkpoint-tech-data.docx",
+    outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
+
+def _build_use_case_briefs(root):
+    idx = _require(root, "usecase-briefs/_index.md")
+    blocks = [docx.heading("Use-Case Briefs — For Your Review", 1)]
+    blocks += note("These are the packaged use cases. Confirm each reflects how the work really "
+                   "happens, or note corrections.")
+    h, r = md_table(idx)                                  # the UC↔OPP mapping table
+    blocks += table_section("Brief index", h, r)
+    for uc in sorted((Path(root) / "usecase-briefs").glob("UC-*.md")):
+        text = uc.read_text(encoding="utf-8")
+        m = re.search(r"^#\s+(.+?)\s*$", text, re.MULTILINE)
+        title = m.group(1).strip() if m else uc.stem
+        th, tr = _first_table(text)                       # only the Field/Value summary; later tables intentionally dropped
+        blocks += [docx.heading(title, 2)]
+        if tr:
+            blocks += [docx.table(th, tr)]   # table only — the UC title is the heading above
+    blocks += signoff_block("Sponsor / process owners")
+    return blocks
+
+CHECKPOINTS["use-case-briefs"] = Checkpoint(
+    "use-case-briefs", per_process=False, gate=False,
+    output="checkpoints/checkpoint-use-case-briefs.docx",
+    outcome="checkpoints/CP-use-case-briefs-outcome.md", build=_build_use_case_briefs)
+
 def _build_portfolio(root):
     roadmap = _read(root, "roadmap.md")
     blocks = [docx.heading("Opportunity Portfolio & Roadmap — For Your Confirmation", 1)]
@@ -171,6 +254,36 @@ CHECKPOINTS["portfolio"] = Checkpoint(
     "portfolio", per_process=False, gate=False,
     output="checkpoints/checkpoint-portfolio.docx",
     outcome="checkpoints/CP-portfolio-outcome.md", build=_build_portfolio)
+
+def _build_business_case(root):
+    md = _require(root, "business-case.md")
+    blocks = [docx.heading("Business Case — For Your Review", 1)]
+    blocks += note("Confirm the cost and value figures and the funding recommendation, or tell "
+                   "us what to revisit.")
+    for m in re.finditer(r"^##\s+(.+?)\s*$", md, re.MULTILINE):
+        title = m.group(1).strip()
+        blocks += full_section(title, md, title)
+    blocks += signoff_block("Decision-maker / sponsor")
+    return blocks
+
+CHECKPOINTS["business-case"] = Checkpoint(
+    "business-case", per_process=False, gate=False,
+    output="checkpoints/checkpoint-business-case.docx",
+    outcome="checkpoints/CP-business-case-outcome.md", build=_build_business_case)
+
+def _build_opportunities(root):
+    h, r = md_table(_require(root, "opportunities/_index.md"))
+    blocks = [docx.heading("Opportunity Landscape — For Your Review", 1)]
+    blocks += note("Here are the opportunities we identified. Tell us if any are missing or "
+                   "mischaracterized before we score and prioritize them.")
+    blocks += table_section("Opportunities", h, r)
+    blocks += signoff_block("Sponsor / decision-maker")
+    return blocks
+
+CHECKPOINTS["opportunities"] = Checkpoint(
+    "opportunities", per_process=False, gate=False,
+    output="checkpoints/checkpoint-opportunities.docx",
+    outcome="checkpoints/CP-opportunities-outcome.md", build=_build_opportunities)
 
 def render_checkpoint(engagement_dir, checkpoint_id):
     cp = CHECKPOINTS[checkpoint_id]
