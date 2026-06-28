@@ -97,3 +97,18 @@ def test_portfolio_doc_has_waves_and_scores(tmp_path):
     with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-portfolio.docx") as z:
         xml = z.read("word/document.xml").decode()
     assert "OPP-003" in xml and "Foundation" in xml and "Clean data first." in xml
+
+def test_tech_data_doc_renders_sections_excludes_contract_notes(tmp_path):
+    (tmp_path / "tech-inventory.md").write_text(
+        "# Technology & Data Inventory\n"
+        "## 1. System inventory\nPolaris PSA is the system of record.\n"
+        "## 3. Data asset catalog\n| Asset | Sensitivity |\n|---|---|\n| Deliverables | High |\n"
+        "## Phase-3 input-contract notes\nINTERNAL: do not show the client.\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "tech-data")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-tech-data.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "Polaris PSA" in xml and "Deliverables" in xml and "High" in xml
+    assert "INTERNAL: do not show" not in xml and "input-contract" not in xml.lower()
+    assert "Confirmed" in xml                                  # sign-off present

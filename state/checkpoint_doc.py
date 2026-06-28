@@ -181,6 +181,27 @@ CHECKPOINTS["scope"] = Checkpoint(
     output="checkpoints/checkpoint-scope.docx",
     outcome="checkpoints/CP-scope-outcome.md", build=_build_scope)
 
+# Context sections that must never reach the client doc (tech-data guard).
+_TECH_EXCLUDE = ("phase-3 input-contract notes",)
+
+def _build_tech_data(root):
+    md = _read(root, "tech-inventory.md")
+    blocks = [docx.heading("Technology & Data Inventory — For Your Confirmation", 1)]
+    blocks += note("Please confirm your systems and data-sensitivity classifications are "
+                   "captured correctly — these drive the downstream governance review.")
+    for m in re.finditer(r"^##\s+(.+?)\s*$", md, re.MULTILINE):
+        title = m.group(1).strip()
+        if any(x in title.lower() for x in _TECH_EXCLUDE):
+            continue
+        blocks += full_section(title, md, title)
+    blocks += signoff_block("IT lead / sponsor")
+    return blocks
+
+CHECKPOINTS["tech-data"] = Checkpoint(
+    "tech-data", per_process=False, gate=False,
+    output="checkpoints/checkpoint-tech-data.docx",
+    outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
+
 def _build_portfolio(root):
     roadmap = _read(root, "roadmap.md")
     blocks = [docx.heading("Opportunity Portfolio & Roadmap — For Your Confirmation", 1)]
