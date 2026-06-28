@@ -139,3 +139,20 @@ def test_business_case_doc_renders_sections_and_cost_table(tmp_path):
         xml = z.read("word/document.xml").decode()
     assert "Fund the quick win first." in xml and "$111,000" in xml   # prose + cost table
     assert "Confirmed" in xml
+
+def test_use_case_briefs_doc_has_index_and_per_brief(tmp_path):
+    d = tmp_path / "usecase-briefs"; d.mkdir()
+    (d / "_index.md").write_text(
+        "# Use-Case Briefs\n## UC ↔ OPP mapping\n"
+        "| UC-NNN | Title | Wave |\n|---|---|---|\n| UC-001 | Status Assistant | 1 |\n")
+    (d / "UC-001.md").write_text(
+        "# UC-001 — Status Assistant\n\n| Field | Value |\n|---|---|\n"
+        "| Opportunity type | Chain Automation |\n## Situation\nThe PM assembles reports.\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "use-case-briefs")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "UC-001" in xml and "Status Assistant" in xml          # index + brief title
+    assert "Chain Automation" in xml                              # per-brief field table
+    assert "Confirmed" in xml

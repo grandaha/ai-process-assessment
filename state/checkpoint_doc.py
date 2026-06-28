@@ -202,6 +202,28 @@ CHECKPOINTS["tech-data"] = Checkpoint(
     output="checkpoints/checkpoint-tech-data.docx",
     outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
 
+def _build_use_case_briefs(root):
+    idx = _read(root, "usecase-briefs/_index.md")
+    blocks = [docx.heading("Use-Case Briefs — For Your Review", 1)]
+    blocks += note("These are the packaged use cases. Confirm each reflects how the work really "
+                   "happens, or note corrections.")
+    h, r = md_table(idx)                                  # the UC↔OPP mapping table
+    blocks += table_section("Brief index", h, r)
+    for uc in sorted((Path(root) / "usecase-briefs").glob("UC-*.md")):
+        text = uc.read_text(encoding="utf-8")
+        m = re.search(r"^#\s+(.+?)\s*$", text, re.MULTILINE)
+        title = m.group(1).strip() if m else uc.stem
+        th, tr = md_table(text)                           # first table = the Field/Value summary
+        blocks += [docx.heading(title, 2)]
+        blocks += table_section("", th, tr) if tr else []
+    blocks += signoff_block("Sponsor / process owners")
+    return blocks
+
+CHECKPOINTS["use-case-briefs"] = Checkpoint(
+    "use-case-briefs", per_process=False, gate=False,
+    output="checkpoints/checkpoint-use-case-briefs.docx",
+    outcome="checkpoints/CP-use-case-briefs-outcome.md", build=_build_use_case_briefs)
+
 def _build_portfolio(root):
     roadmap = _read(root, "roadmap.md")
     blocks = [docx.heading("Opportunity Portfolio & Roadmap — For Your Confirmation", 1)]
