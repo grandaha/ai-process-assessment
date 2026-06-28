@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Interim checkpoints are now deterministic Word (`.docx`) documents** (#131). scope,
+  baseline, portfolio, and process-validation all render from one declarative registry +
+  shared layer (`state/checkpoint_doc.py` on `state/docx.py`) — identical every run,
+  client-commentable. Replaces the per-checkpoint LLM HTML renderers (the three
+  `section-renderer-checkpoint-*` agents and deliverable-gate Checkpoint Mode are deleted).
+  The Phase 11 deliverable stays HTML. The scope CP1 internal-context exclusion now lives in
+  code with an integration test. Adding a future per-phase checkpoint is now a registry entry
+  (foundation for #99; delivers the interim half of #120).
+
 ## [2.23.0] - 2026-06-28
 
 ### Added
