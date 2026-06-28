@@ -377,35 +377,17 @@ def test_running_sample_engagement_writes_marker(methodology):
 
 
 # --- #checkpoint-scope leak guard (defends: internal assessments leaking into client artifact) ---
-# section-renderer-checkpoint-scope must (a) carry the blanket-exclusion refusal naming Risk posture
-# and AI / automation maturity, and (b) not render those labels as table rows inside the #context block.
+# #131: section-renderer-checkpoint-scope.md is deleted — all checkpoints now route through the
+# deterministic state.checkpoint_doc command, which renders from source files directly.
+# The LLM-authored HTML path (and its leak risk) is eliminated by construction.
 
-def test_scope_renderer_excludes_internal_context():
-    text = (REPO_ROOT / "agents" / "section-renderer-checkpoint-scope.md").read_text(encoding="utf-8")
-
-    # 1. Hard-refusal for political landscape must be present.
-    assert "NEVER render the political landscape" in text, \
-        "scope renderer must carry the political-landscape hard refusal"
-
-    # 2. Blanket exclusion naming both internal fields must be present.
-    assert "Risk posture" in text, \
-        "scope renderer must name 'Risk posture' in its blanket-exclusion refusal"
-    assert "AI / automation maturity" in text, \
-        "scope renderer must name 'AI / automation maturity' in its blanket-exclusion refusal"
-
-    # 3. The #context table body must NOT render those labels as row headers.
-    # Slice from the id="context" anchor to the next </div> or section boundary.
-    context_start = text.find('id="context"')
-    assert context_start != -1, "scope renderer must contain a block with id=\"context\""
-    context_end = text.find("</div>", context_start)
-    if context_end == -1:
-        context_end = len(text)
-    context_block = text[context_start:context_end]
-
-    for forbidden_label in ("Risk posture", "Political landscape", "AI / automation maturity"):
-        assert f"<th>{forbidden_label}</th>" not in context_block, (
-            f"scope renderer #context block must not render '{forbidden_label}' as a table row"
-        )
+def test_scope_checkpoint_uses_deterministic_renderer_not_lm_agent():
+    # Guard: the scope renderer agent must not exist (it was deleted in #131).
+    scope_renderer = REPO_ROOT / "agents" / "section-renderer-checkpoint-scope.md"
+    assert not scope_renderer.exists(), (
+        "section-renderer-checkpoint-scope.md still exists — it was deleted in #131 "
+        "because all checkpoints now route through state.checkpoint_doc"
+    )
 
 
 def test_eliciting_phase_skills_check_sample_run_marker(methodology):

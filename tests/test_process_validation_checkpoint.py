@@ -8,8 +8,8 @@ def test_registry_has_process_validation_row():
     assert "checkpoints/process-validation/PROC-NNN.docx" in SKILL
 
 def test_process_validation_is_deterministic_path():
-    # It must run the renderer module, NOT the LLM section-renderer / HTML-shell path.
-    assert "state.process_review" in SKILL
+    # #131: all ids including process-validation route through state.checkpoint_doc.
+    assert "python3 -m state.checkpoint_doc" in SKILL
     assert "section-renderer-checkpoint-process-validation" not in SKILL
 
 def test_session_start_wired_values_includes_process_validation():
@@ -36,32 +36,27 @@ def test_session_start_predecessor_check_for_process_validation():
         "(Session Start step 4 predecessor check missing)"
     )
 
-def test_gate_and_orchestration_have_routing_skip_for_process_validation():
-    # There must be an explicit routing note (containing both "process-validation" and "skip")
-    # that appears before or within the Gate/Orchestration sections so an executor is sent
-    # to the deterministic section instead of the HTML path.
+def test_orchestration_covers_all_ids_including_process_validation():
+    # #131: Gate condition is deleted; unified Orchestration must cover all ids.
+    # Gate condition and separate special-case sections must be gone.
+    assert "## Gate condition" not in SKILL
+    assert "## Deterministic checkpoint" not in SKILL
+    # Orchestration section must exist and mention the deterministic command.
     lines = SKILL.splitlines()
-    # Find Gate condition section
-    gate_idx = next((i for i, l in enumerate(lines) if "## Gate condition" in l), None)
-    assert gate_idx is not None, "'## Gate condition' section not found"
-    # The skip/routing note must appear at or before the Gate section (could be just before it
-    # or as the first content of Gate condition).  Search from just before Gate through
-    # Orchestration end (defined as start of next ## heading after Orchestration).
     orch_idx = next((i for i, l in enumerate(lines) if "## Orchestration" in l), None)
     assert orch_idx is not None, "'## Orchestration' section not found"
-    # Find end of Orchestration section
     next_section_idx = next(
         (i for i, l in enumerate(lines) if i > orch_idx and l.startswith("## ")),
         len(lines),
     )
-    routing_zone = "\n".join(lines[max(0, gate_idx - 5):next_section_idx])
-    assert "process-validation" in routing_zone and "skip" in routing_zone.lower(), (
-        "No routing/skip note for 'process-validation' found near Gate condition or Orchestration"
+    orch_block = "\n".join(lines[orch_idx:next_section_idx])
+    assert "python3 -m state.checkpoint_doc" in orch_block, (
+        "Orchestration must reference the deterministic command"
     )
 
-def test_phase_checklist_exempts_process_validation():
-    # The Phase checklist must note that process-validation is exempt from the
-    # gate / section-renderer / HTML-assembly steps.
+def test_phase_checklist_covers_process_validation():
+    # #131: all ids use the same path; the checklist must cover process-validation
+    # (via the unified deterministic command step, not an exemption note).
     lines = SKILL.splitlines()
     checklist_idx = next((i for i, l in enumerate(lines) if "## Phase checklist" in l), None)
     assert checklist_idx is not None, "'## Phase checklist' section not found"
@@ -70,8 +65,8 @@ def test_phase_checklist_exempts_process_validation():
         len(lines),
     )
     checklist_block = "\n".join(lines[checklist_idx:next_section_idx])
-    assert "process-validation" in checklist_block, (
-        "'process-validation' exemption missing from Phase checklist"
+    assert "checkpoint_doc" in checklist_block, (
+        "Phase checklist must include the deterministic checkpoint_doc command step"
     )
 
 def test_chain_to_next_skill_has_process_validation():
