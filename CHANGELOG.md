@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Current-state process-validation checkpoint** (#136). A new per-process, owner-facing
+  checkpoint after Phase 4 emits one editable Word (`.docx`) per in-scope process — the
+  step-by-step current-state map for that owner to confirm — and **hard-gates Phase 5** until
+  every process has a recorded sign-off. Includes a stdlib-only `.docx` generator
+  (`state/docx.py`) reusable by #131.
+
 ## [2.22.4] - 2026-06-26
 
 ### Fixed
