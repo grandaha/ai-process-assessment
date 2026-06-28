@@ -215,7 +215,8 @@ def _build_use_case_briefs(root):
         title = m.group(1).strip() if m else uc.stem
         th, tr = md_table(text)                           # first table = the Field/Value summary
         blocks += [docx.heading(title, 2)]
-        blocks += table_section("", th, tr) if tr else []
+        if tr:
+            blocks += [docx.table(th, tr)]   # table only — the UC title is the heading above
     blocks += signoff_block("Sponsor / process owners")
     return blocks
 
