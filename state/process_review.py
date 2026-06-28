@@ -72,11 +72,3 @@ def build_blocks(proc_md):
                docx.paragraph("Comments:")]
     return blocks
 
-def _ready_processes(index_md):
-    out = []
-    for line in index_md.splitlines():
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) >= 3 and cells[0].startswith("PROC-") and cells[2].lower() == "ready":
-            out.append(cells[0])
-    return out
-
