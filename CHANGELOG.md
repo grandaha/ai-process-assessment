@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.23.0] - 2026-06-28
+
 ### Added
 - **Current-state process-validation checkpoint** (#136). A new per-process, owner-facing
   checkpoint after Phase 4 emits one editable Word (`.docx`) per in-scope process — the
