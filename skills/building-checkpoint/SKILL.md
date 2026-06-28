@@ -32,6 +32,7 @@ The `baseline` (Checkpoint 2), `scope` (Checkpoint 1), and `portfolio` (Checkpoi
 | id | Insert after | Audience | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|---|
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
+| `process-validation` | Phase 4 (before `baseline`) | Process owner (one per process) | `processes/_index.md`, `processes/PROC-NNN.md` | *(deterministic — `state.process_review`, no LLM renderer)* | `checkpoints/process-validation/PROC-NNN.docx` (one per process) | `checkpoints/process-validation/CP-PROC-NNN-outcome.md` (one per process) | Phase 4 (`ai-process-assessment:discovering-processes`) for the affected process |
 | `scope` | Phase 2 | Sponsor + decision-maker | `scope.md`, `context.md` | `section-renderer-checkpoint-scope` | `checkpoints/checkpoint-scope.html` | `checkpoints/CP-scope-outcome.md` | Phase 1 (`ai-process-assessment:scoping-engagement`) for scope-field changes; Phase 2 (`ai-process-assessment:mapping-context`) for context-field changes |
 | `portfolio` | Phase 7 | Decision-maker + sponsor + IT lead | `scores/_index.md`, `scores/OPP-NNN.md`, `opportunities/_index.md`, `opportunities/OPP-NNN.md`, `roadmap.md`, `scope.md` (header only) | `section-renderer-checkpoint-portfolio` | `checkpoints/checkpoint-portfolio.html` | `checkpoints/CP-portfolio-outcome.md` | Phase 6 (`ai-process-assessment:scoring-opportunities`) for score/ranking changes; Phase 7 (`ai-process-assessment:prioritizing-roadmap`) for wave/sequencing changes |
 
@@ -48,6 +49,21 @@ The checkpoint's predecessor outputs exist (for `baseline`: `processes/_index.md
 5. Assemble `<name>/checkpoints/checkpoint-<id>.html` from the checkpoint shell (below), interleaving the staged section blocks in the order the shell's sticky nav lists them.
 6. Open the file and confirm: scroll works, sticky-nav links target the right anchors, all anchors present, no missing-class artifacts.
 7. Prompt the user to record the stakeholder outcome (see "Recording the outcome").
+
+## Deterministic checkpoint: `process-validation`
+
+`process-validation` is a **per-process, owner-facing Word checkpoint** and does NOT use the
+section-renderer / HTML-shell / Gate-B path above. It is a faithful transform of the process
+maps (no model-authored content, so nothing to gate for fabrication). For this id only:
+
+1. Run: `PYTHONPATH="<engine_root>" python3 -m state.process_review <name>`
+   — writes one `checkpoints/process-validation/PROC-NNN.docx` and one
+   `CP-PROC-NNN-outcome.md` (Outcome: Pending) per in-scope (`Ready`) process.
+2. Tell the user a per-process Word review was generated for each process owner to confirm or
+   mark up, and that **each owner's sign-off must be recorded** in its `CP-PROC-NNN-outcome.md`
+   (`Confirmed` | `Changes requested` | `Waived (reason)`) before Phase 5.
+3. On any `Changes requested`, route that process back to Phase 4, re-run, and regenerate
+   (re-run the command — it preserves existing outcome files).
 
 ## Checkpoint shell
 
