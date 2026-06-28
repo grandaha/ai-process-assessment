@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.25.0] - 2026-06-28
+
 ### Added
 - **Per-phase review documents** (#99). The Conductor now offers an optional, client-facing
   Word review doc at four more phase boundaries — tech & data (P3, IT confirms the systems +
