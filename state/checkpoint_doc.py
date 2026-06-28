@@ -126,12 +126,34 @@ CHECKPOINTS["baseline"] = Checkpoint(
     output="checkpoints/checkpoint-baseline.docx",
     outcome="checkpoints/CP-baseline-outcome.md", build=_build_baseline)
 
-# ponytail: temporary scope entry so Task 2's single-doc test passes; Task 4 replaces the lambda.
+# Context sections that must never reach the client doc (CP1 guard).
+_SCOPE_EXCLUDE = ("risk posture", "ai / automation maturity", "ai/automation maturity",
+                  "automation maturity", "political landscape")
+
+def _build_scope(root):
+    scope = _read(root, "scope.md")
+    context = _read(root, "context.md")
+    blocks = [docx.heading("Engagement Scope — For Your Confirmation", 1)]
+    for label in ("Client", "Sponsor", "Decision-maker"):
+        blocks += field_section(label, scope, label)
+    blocks += prose_section("Sponsoring question", scope, "Sponsoring question")
+    blocks += prose_section("In scope", scope, "In-scope domains")
+    h, r = md_table(scope, after_heading="Out-of-scope boundaries")
+    blocks += table_section("Out of scope", h, r)
+    # context.md: include only non-internal sections (exclude the CP1-guarded ones).
+    for m in re.finditer(r"^##\s+(.+?)\s*$", context, re.MULTILINE):
+        title = m.group(1).strip()
+        if title.strip().lower() in _SCOPE_EXCLUDE:
+            continue
+        blocks += prose_section(title, context, title)
+    blocks += note("Please confirm the scope above is correct, or note what should change.")
+    blocks += signoff_block("Sponsor / decision-maker")
+    return blocks
+
 CHECKPOINTS["scope"] = Checkpoint(
-    "scope", False, False,
-    "checkpoints/checkpoint-scope.docx",
-    "checkpoints/CP-scope-outcome.md",
-    lambda root: [docx.heading("Scope", 1)])
+    "scope", per_process=False, gate=False,
+    output="checkpoints/checkpoint-scope.docx",
+    outcome="checkpoints/CP-scope-outcome.md", build=_build_scope)
 
 def render_checkpoint(engagement_dir, checkpoint_id):
     cp = CHECKPOINTS[checkpoint_id]
