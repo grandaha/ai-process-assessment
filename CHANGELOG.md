@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.24.0] - 2026-06-28
+
 ### Changed
 - **Interim checkpoints are now deterministic Word (`.docx`) documents** (#131). scope,
   baseline, portfolio, and process-validation all render from one declarative registry +
