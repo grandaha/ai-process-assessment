@@ -32,35 +32,6 @@ Any output (interim or final) is about to be shared with anyone outside the enga
 - **Communication readiness** — the portfolio view (waves, value, sequencing) is present and coherent in `roadmap.md` and `scores/_index.md`, so the executive summary (Phase 10) can lead with it rather than with methodology narrative. Gate B runs *before* Phase 10, so `executive-summary.md` does not yet exist and is not inspected here — this dimension confirms the raw material to lead with the portfolio view is in place.
 - **Determinism integrity** — every numeric figure in every markdown deliverable equals its source in `model/results.json`. No number is computed in prose. A figure that does not match `results.json` (or that has no `results.json` source) blocks the gate. PENDING values must appear as PENDING, never as an invented number.
 
-## Checkpoint Mode (interim validation)
-
-When invoked by `ai-process-assessment:building-checkpoint` with a `checkpoint=<id>`, the gate runs in **Checkpoint Mode**: it inspects only the files that exist at that point in the methodology and treats not-yet-produced phase files as **legitimately absent, not failures**. The terminal gate (invoked with no checkpoint id) is unaffected and still requires all phase files per Session Start.
-
-For `checkpoint=baseline` (after Phase 4), read only: `scope.md`, `processes/_index.md`, the relevant `processes/PROC-NNN.md` files, and `model/baselines.json`. If `model/baselines.json` is missing, the checkpoint does **NOT** clear — route back to Phase 4 for remediation; a missing baseline must not silently pass. Run only the applicable dimensions:
-
-- **Evidence integrity** — every figure to be rendered traces to a `processes/PROC-NNN.md` / `model/baselines.json` source. No figure floats free.
-- **Determinism integrity** — every numeric figure equals its `model/baselines.json` source; PENDING renders as PENDING, never an invented number.
-- **Completeness** — every in-scope process domain from `scope.md` that Phase 4 should have covered is present in `processes/`, or its gap is acknowledged.
-
-Dimensions that require later phases (Logic chain through scores/roadmap/briefs, Business Case, Communication readiness) are **not applicable** at this checkpoint and are skipped — note them as "deferred to later checkpoints / terminal gate." Do **not** dispatch the `opportunity-reviewer` subagent in Checkpoint Mode (opportunities do not exist yet); checkpoint clearance is a lighter, scoped pass.
-
-Record clearance as a distinct checkpoint entry in `evidence-log.md`, e.g. `Checkpoint baseline — cleared (Evidence, Determinism, Completeness)`. On non-clearance, route to the dimension's owning phase (for `baseline`: Phase 4) for remediation before the checkpoint renders.
-
-For `checkpoint=scope` (after Phase 2), read only: `scope.md` and `context.md`. Run only the applicable dimensions:
-
-- **Completeness** — every in-scope domain named in `scope.md` is present and legible in the rendered scope view, and the scope is internally coherent (sponsoring question ↔ success criteria ↔ in/out-of-scope align).
-- **Evidence integrity** — every claim to be rendered traces to a `scope.md` / `context.md` source.
-
-**Determinism integrity is not applicable** at the `scope` checkpoint — no numeric figures exist yet; state this rather than checking it. Record clearance as `Checkpoint scope — cleared (Completeness, Evidence)`. On non-clearance, route a scope-field gap (sponsoring question, decision-maker, in/out-of-scope, success criteria, constraints) to Phase 1 and a context-field gap (business model, strategic priorities, funding model) to Phase 2 before the checkpoint renders.
-
-For `checkpoint=portfolio` (after Phase 7), read only: `scope.md` (header), `scores/_index.md`, the `scores/OPP-NNN.md` files, `opportunities/_index.md`, the `opportunities/OPP-NNN.md` files, `roadmap.md`, and the computed inputs `model/scores.json` (composites, stamped in Phase 6) and `model/initiatives.json` (wave membership, Phase 7). If `scores/_index.md` or `roadmap.md` is missing, the checkpoint does **NOT** clear — route back (scores → Phase 6, roadmap → Phase 7); a missing portfolio must not silently pass. Run only the applicable dimensions:
-
-- **Completeness** — every OPP-ID in `scores/_index.md` is reflected in the portfolio and has a `scores/OPP-NNN.md`; every wave in `roadmap.md` is present; the portfolio is internally coherent (ranking ↔ wave assignment ↔ Build/Buy/Partner align).
-- **Evidence integrity** — every figure to be rendered traces to a `scores/` / `opportunities/` / `roadmap.md` source.
-- **Determinism integrity** — every composite equals its `model/scores.json` source (composites are stamped in Phase 6; the engine is not run until Phase 9); the investment/ROM figures are the `roadmap.md` Budget Envelope estimate, and wave membership traces to `model/initiatives.json` — cost actuals are deferred to Phase 8.5/9. PENDING renders as PENDING, never an invented number.
-
-Dimensions that require later phases (Business Case, Communication readiness) are not applicable at this checkpoint — note them as deferred. Do **not** dispatch the `opportunity-reviewer` subagent in Checkpoint Mode; checkpoint clearance is a lighter, scoped pass. Record clearance as `Checkpoint portfolio — cleared (Completeness, Evidence, Determinism)` in `evidence-log.md`. On non-clearance, route a score/ranking gap to Phase 6 (`scoring-opportunities`) and a wave/sequencing gap to Phase 7 (`prioritizing-roadmap`) for remediation before the checkpoint renders.
-
 ## Phase checklist
 
 - [ ] Run Evidence integrity check — sample value claims, walk each to its baseline

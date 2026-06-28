@@ -53,25 +53,3 @@ def test_build_blocks_has_signoff():
     text = repr(pr.build_blocks(PROC))
     assert "Sign-off" in text and "Confirmed" in text and "Changes requested" in text
 
-def test_render_all_writes_docx_and_outcome_per_ready_process(tmp_path):
-    (tmp_path / "processes").mkdir()
-    (tmp_path / "processes" / "_index.md").write_text(
-        "| PROC-ID | Process Name | Baseline |\n|---|---|---|\n"
-        "| PROC-001 | Staffing | Ready |\n| PROC-002 | Held | Pending |\n")
-    (tmp_path / "processes" / "PROC-001.md").write_text(PROC)
-    ids = pr.render_all(str(tmp_path))
-    assert ids == ["PROC-001"]                              # only Ready ones
-    cp = tmp_path / "checkpoints" / "process-validation"
-    assert (cp / "PROC-001.docx").exists()
-    assert (cp / "CP-PROC-001-outcome.md").exists()
-    assert "Outcome: Pending" in (cp / "CP-PROC-001-outcome.md").read_text()
-
-def test_render_all_does_not_clobber_existing_outcome(tmp_path):
-    (tmp_path / "processes").mkdir()
-    (tmp_path / "processes" / "_index.md").write_text(
-        "| PROC-ID | Process Name | Baseline |\n|---|---|---|\n| PROC-001 | Staffing | Ready |\n")
-    (tmp_path / "processes" / "PROC-001.md").write_text(PROC)
-    cp = tmp_path / "checkpoints" / "process-validation"; cp.mkdir(parents=True)
-    (cp / "CP-PROC-001-outcome.md").write_text("Outcome: Confirmed\n")
-    pr.render_all(str(tmp_path))
-    assert "Confirmed" in (cp / "CP-PROC-001-outcome.md").read_text()  # preserved

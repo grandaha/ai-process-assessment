@@ -3,8 +3,6 @@
 # from the PROC file; internal analysis (color notes, conflicts, chain scan, challenge
 # hypothesis) is deliberately excluded — see #136 spec.
 import re
-import sys
-from pathlib import Path
 
 from state import docx
 
@@ -74,32 +72,3 @@ def build_blocks(proc_md):
                docx.paragraph("Comments:")]
     return blocks
 
-def _ready_processes(index_md):
-    out = []
-    for line in index_md.splitlines():
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) >= 3 and cells[0].startswith("PROC-") and cells[2].lower() == "ready":
-            out.append(cells[0])
-    return out
-
-def render_all(engagement_dir):
-    root = Path(engagement_dir)
-    index = root / "processes" / "_index.md"
-    ids = _ready_processes(index.read_text(encoding="utf-8")) if index.exists() else []
-    out_dir = root / "checkpoints" / "process-validation"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    for pid in ids:
-        proc = root / "processes" / f"{pid}.md"
-        if not proc.exists():
-            continue
-        docx.build_docx(build_blocks(proc.read_text(encoding="utf-8")),
-                        str(out_dir / f"{pid}.docx"))
-        outcome = out_dir / f"CP-{pid}-outcome.md"
-        if not outcome.exists():
-            outcome.write_text(f"# {pid} — process validation outcome\n\nOutcome: Pending\n"
-                               "<!-- set to: Confirmed | Changes requested | Waived (reason) -->\n",
-                               encoding="utf-8")
-    return ids
-
-if __name__ == "__main__":
-    print("\n".join(render_all(sys.argv[1])))

@@ -90,13 +90,13 @@ def test_deliverable_skill_inlines_vendored_shell():
         "the old model-authors-CSS wording must be removed, not left alongside the new"
 
 
-def test_checkpoint_skill_inlines_vendored_shell():
+def test_checkpoint_skill_uses_deterministic_renderer():
+    # #131: all checkpoints route through the deterministic .docx command; no HTML shell.
     text = CHECKPOINT_SKILL.read_text(encoding="utf-8")
-    assert "assets/osl/brand.css" in text and "assets/osl/components.css" in text, \
-        "building-checkpoint must reference the vendored CSS"
-    assert "assets/osl/logo-lockup.svg" in text, "checkpoint masthead must inline the OSL logo"
-    assert "Generate the `<style>` from that documented design system" not in text, \
-        "remove the model-generates-CSS instruction"
+    assert "python3 -m state.checkpoint_doc" in text, \
+        "building-checkpoint must use the deterministic checkpoint_doc command"
+    assert "section-renderer-checkpoint" not in text, \
+        "building-checkpoint must not reference LLM section-renderer agents (dropped in #131)"
 
 
 SAMPLE = REPO / "golden" / "pso-delivery" / "deliverable.html"

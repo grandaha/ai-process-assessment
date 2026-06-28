@@ -68,7 +68,7 @@ def test_numeric_skills_resolve_engine_root_at_session_start():
 
 def test_skills_invoking_engine_use_absolute_path_form():
     # Skills that actually run the engine must use the absolute-path form.
-    for name in ("identifying-opportunities", "building-business-case",
-                 "building-checkpoint"):
+    # building-checkpoint is excluded: it uses `python3 -m state.checkpoint_doc`, not engine/run.py
+    for name in ("identifying-opportunities", "building-business-case"):
         body = _body(name)
         assert "python3 <engine_root>/engine/run.py" in body, name
