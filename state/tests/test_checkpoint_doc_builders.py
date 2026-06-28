@@ -34,3 +34,30 @@ def test_prose_section_paragraphs():
     blocks = cd.prose_section("Sponsoring question", MD, "Sponsoring question")
     texts = [b["text"] for b in blocks if b["type"] == "paragraph"]
     assert "Which initiative should we fund?" in texts and "Second para." in texts
+
+def test_full_section_renders_prose_and_tables():
+    md = """## 3. Data asset catalog
+Polaris holds operational truth.
+
+| Asset | Sensitivity |
+|---|---|
+| Deliverables | High |
+
+Shadow spreadsheets exist.
+## 4. Next
+other
+"""
+    blocks = cd.full_section("Data assets", md, "3. Data asset catalog")
+    assert blocks[0] == {"type": "heading", "text": "Data assets", "level": 2}
+    types = [b["type"] for b in blocks]
+    assert "table" in types and "paragraph" in types          # both rendered
+    tbl = next(b for b in blocks if b["type"] == "table")
+    assert tbl["headers"] == ["Asset", "Sensitivity"] and tbl["rows"] == [["Deliverables", "High"]]
+    paras = [b["text"] for b in blocks if b["type"] == "paragraph"]
+    assert "Polaris holds operational truth." in paras and "Shadow spreadsheets exist." in paras
+    assert "4. Next" not in repr(blocks)                       # stops at next section
+
+def test_prose_section_keeps_bold_leader():
+    md = "## S\n**Important:** do it.\n## T\n"
+    blocks = cd.prose_section("S", md, "S")
+    assert any(b["text"] == "**Important:** do it." for b in blocks)   # bold not stripped

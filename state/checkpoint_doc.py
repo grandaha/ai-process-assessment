@@ -45,10 +45,36 @@ def prose_section(title, md, heading):
         return []
     out = [docx.heading(title, 2)]
     for line in body.splitlines():
-        s = line.strip().lstrip("-* ").strip()
+        s = re.sub(r"^[-*]\s+", "", line.strip()).strip()
         if s and not s.startswith("|"):     # skip table rows; keep prose + bullets as paragraphs
             out.append(docx.paragraph(s))
     return out
+
+def blocks_from_markdown(text):
+    """Render a markdown body as docx blocks: contiguous pipe-table lines become a table,
+    other non-empty lines become paragraphs (leading bullet/number markers stripped)."""
+    out, tbl = [], []
+    def _flush():
+        if tbl:
+            h, r = md_table("\n".join(tbl))
+            if h:
+                out.append(docx.table(h, r))
+            tbl.clear()
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|"):
+            tbl.append(s)
+            continue
+        _flush()
+        s = re.sub(r"^[-*]\s+", "", s).strip()      # strip a bullet marker only, not **bold**
+        if s:
+            out.append(docx.paragraph(s))
+    _flush()
+    return out
+
+def full_section(title, md, heading):
+    body = md_section(md, heading)
+    return [docx.heading(title, 2)] + blocks_from_markdown(body) if body else []
 
 def table_section(title, headers, rows):
     return [docx.heading(title, 2), docx.table(headers, rows)] if rows else []
