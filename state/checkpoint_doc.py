@@ -219,6 +219,20 @@ CHECKPOINTS["portfolio"] = Checkpoint(
     output="checkpoints/checkpoint-portfolio.docx",
     outcome="checkpoints/CP-portfolio-outcome.md", build=_build_portfolio)
 
+def _build_opportunities(root):
+    h, r = md_table(_read(root, "opportunities/_index.md"))
+    blocks = [docx.heading("Opportunity Landscape — For Your Review", 1)]
+    blocks += note("Here are the opportunities we identified. Tell us if any are missing or "
+                   "mischaracterized before we score and prioritize them.")
+    blocks += table_section("Opportunities", h, r)
+    blocks += signoff_block("Sponsor / decision-maker")
+    return blocks
+
+CHECKPOINTS["opportunities"] = Checkpoint(
+    "opportunities", per_process=False, gate=False,
+    output="checkpoints/checkpoint-opportunities.docx",
+    outcome="checkpoints/CP-opportunities-outcome.md", build=_build_opportunities)
+
 def render_checkpoint(engagement_dir, checkpoint_id):
     cp = CHECKPOINTS[checkpoint_id]
     root = Path(engagement_dir)

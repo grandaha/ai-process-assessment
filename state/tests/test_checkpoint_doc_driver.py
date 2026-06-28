@@ -112,3 +112,16 @@ def test_tech_data_doc_renders_sections_excludes_contract_notes(tmp_path):
     assert "Polaris PSA" in xml and "Deliverables" in xml and "High" in xml
     assert "INTERNAL: do not show" not in xml and "input-contract" not in xml.lower()
     assert "Confirmed" in xml                                  # sign-off present
+
+def test_opportunities_doc_renders_landscape(tmp_path):
+    (tmp_path / "opportunities").mkdir()
+    (tmp_path / "opportunities" / "_index.md").write_text(
+        "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |\n"
+        "|--------|---------|------|-------------|----------------|-----|------------|\n"
+        "| OPP-001 | PROC-003 | ChainAutomation | Yellow | Green | Green | addressing-root |\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "opportunities")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-opportunities.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "OPP-001" in xml and "ChainAutomation" in xml and "Confirmed" in xml
