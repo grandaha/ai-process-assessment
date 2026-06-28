@@ -125,3 +125,17 @@ def test_opportunities_doc_renders_landscape(tmp_path):
     with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-opportunities.docx") as z:
         xml = z.read("word/document.xml").decode()
     assert "OPP-001" in xml and "ChainAutomation" in xml and "Confirmed" in xml
+
+def test_business_case_doc_renders_sections_and_cost_table(tmp_path):
+    (tmp_path / "business-case.md").write_text(
+        "# Wave 1 ROM Business Case\n"
+        "## The decision this supports\nFund the quick win first.\n"
+        "## 2. Per-initiative cost structure\n"
+        "| Cost category | Estimate |\n|---|---|\n| Implementation labor | $111,000 |\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "business-case")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-business-case.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "Fund the quick win first." in xml and "$111,000" in xml   # prose + cost table
+    assert "Confirmed" in xml

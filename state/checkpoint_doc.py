@@ -219,6 +219,22 @@ CHECKPOINTS["portfolio"] = Checkpoint(
     output="checkpoints/checkpoint-portfolio.docx",
     outcome="checkpoints/CP-portfolio-outcome.md", build=_build_portfolio)
 
+def _build_business_case(root):
+    md = _read(root, "business-case.md")
+    blocks = [docx.heading("Business Case — For Your Review", 1)]
+    blocks += note("Confirm the cost and value figures and the funding recommendation, or tell "
+                   "us what to revisit.")
+    for m in re.finditer(r"^##\s+(.+?)\s*$", md, re.MULTILINE):
+        title = m.group(1).strip()
+        blocks += full_section(title, md, title)
+    blocks += signoff_block("Decision-maker / sponsor")
+    return blocks
+
+CHECKPOINTS["business-case"] = Checkpoint(
+    "business-case", per_process=False, gate=False,
+    output="checkpoints/checkpoint-business-case.docx",
+    outcome="checkpoints/CP-business-case-outcome.md", build=_build_business_case)
+
 def _build_opportunities(root):
     h, r = md_table(_read(root, "opportunities/_index.md"))
     blocks = [docx.heading("Opportunity Landscape — For Your Review", 1)]
