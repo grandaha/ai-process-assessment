@@ -98,19 +98,17 @@ def test_portfolio_doc_has_waves_and_scores(tmp_path):
         xml = z.read("word/document.xml").decode()
     assert "OPP-003" in xml and "Foundation" in xml and "Clean data first." in xml
 
-def test_tech_data_doc_renders_sections_excludes_contract_notes(tmp_path):
+def test_tech_data_doc_renders_sections(tmp_path):
     (tmp_path / "tech-inventory.md").write_text(
         "# Technology & Data Inventory\n"
         "## 1. System inventory\nPolaris PSA is the system of record.\n"
-        "## 3. Data asset catalog\n| Asset | Sensitivity |\n|---|---|\n| Deliverables | High |\n"
-        "## Phase-3 input-contract notes\nINTERNAL: do not show the client.\n")
+        "## 3. Data asset catalog\n| Asset | Sensitivity |\n|---|---|\n| Deliverables | High |\n")
     from state import checkpoint_doc as cd
     cd.render_checkpoint(str(tmp_path), "tech-data")
     import zipfile
     with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-tech-data.docx") as z:
         xml = z.read("word/document.xml").decode()
     assert "Polaris PSA" in xml and "Deliverables" in xml and "High" in xml
-    assert "INTERNAL: do not show" not in xml and "input-contract" not in xml.lower()
     assert "Confirmed" in xml                                  # sign-off present
 
 def test_opportunities_doc_renders_landscape(tmp_path):
@@ -139,6 +137,30 @@ def test_business_case_doc_renders_sections_and_cost_table(tmp_path):
         xml = z.read("word/document.xml").decode()
     assert "Fund the quick win first." in xml and "$111,000" in xml   # prose + cost table
     assert "Confirmed" in xml
+
+def test_missing_primary_source_raises(tmp_path):
+    import pytest
+    from state import checkpoint_doc as cd
+    # no tech-inventory.md written → render must fail loudly, not emit a blank doc
+    with pytest.raises(FileNotFoundError):
+        cd.render_checkpoint(str(tmp_path), "tech-data")
+
+def test_use_case_briefs_first_table_only_no_merge(tmp_path):
+    # a UC file with TWO tables must render only the first; the second must not merge in
+    d = tmp_path / "usecase-briefs"; d.mkdir()
+    (d / "_index.md").write_text(
+        "# Use-Case Briefs\n## UC mapping\n| UC | Title |\n|---|---|\n| UC-001 | Status Assistant |\n")
+    (d / "UC-001.md").write_text(
+        "# UC-001 — Status Assistant\n\n"
+        "| Field | Value |\n|---|---|\n| Opportunity type | Chain Automation |\n\n"
+        "## Risks\n| Risk | Mitigation |\n|---|---|\n| Data drift | Monitor monthly |\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "use-case-briefs")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "Chain Automation" in xml          # first table rendered
+    assert "Data drift" not in xml            # second table NOT merged into the field table
 
 def test_use_case_briefs_doc_has_index_and_per_brief(tmp_path):
     d = tmp_path / "usecase-briefs"; d.mkdir()

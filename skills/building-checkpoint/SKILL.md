@@ -35,6 +35,10 @@ All eight checkpoint ids are active — the checkpoint pattern is complete.
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `checkpoints/checkpoint-baseline.docx` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
 | `portfolio` | Phase 7 | Decision-maker + sponsor + IT lead | `scores/_index.md`, `scores/OPP-NNN.md`, `opportunities/_index.md`, `opportunities/OPP-NNN.md`, `roadmap.md`, `scope.md` (header only) | `checkpoints/checkpoint-portfolio.docx` | `checkpoints/CP-portfolio-outcome.md` | Phase 6 (`ai-process-assessment:scoring-opportunities`) for score/ranking changes; Phase 7 (`ai-process-assessment:prioritizing-roadmap`) for wave/sequencing changes |
 | `process-validation` | Phase 4 (before `baseline`) | Process owner (one per process) | `processes/_index.md`, `processes/PROC-NNN.md` | `checkpoints/process-validation/PROC-NNN.docx` (one per process) | `checkpoints/process-validation/CP-PROC-NNN-outcome.md` (one per process) | Phase 4 (`ai-process-assessment:discovering-processes`) for the affected process |
+| `tech-data` | Phase 3 | IT lead + sponsor | `tech-inventory.md` | `checkpoints/checkpoint-tech-data.docx` | `checkpoints/CP-tech-data-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `opportunities` | Phase 5 | Sponsor + decision-maker | `opportunities/_index.md` | `checkpoints/checkpoint-opportunities.docx` | `checkpoints/CP-opportunities-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `use-case-briefs` | Phase 8 | Sponsor + process owners | `usecase-briefs/_index.md`, `usecase-briefs/UC-NNN.md` | `checkpoints/checkpoint-use-case-briefs.docx` | `checkpoints/CP-use-case-briefs-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `business-case` | Phase 9 | Decision-maker + sponsor | `business-case.md` | `checkpoints/checkpoint-business-case.docx` | `checkpoints/CP-business-case-outcome.md` | n/a — advisory review doc, opt-in, no gate |
 
 ## Orchestration
 
@@ -78,6 +82,7 @@ After the output is produced, the checkpoint is taken to the stakeholders named 
 - `scope`: on Confirmed → `ai-process-assessment:inventorying-tech-data` (Phase 3); on Changes Requested → `ai-process-assessment:scoping-engagement` (Phase 1, scope fields) / `ai-process-assessment:mapping-context` (Phase 2, context fields).
 - `portfolio`: on Confirmed → `ai-process-assessment:packaging-usecases` (Phase 8); on Changes Requested → `ai-process-assessment:scoring-opportunities` (Phase 6, score fields) / `ai-process-assessment:prioritizing-roadmap` (Phase 7, sequencing fields).
 - `process-validation`: per-process sign-off is recorded in `checkpoints/process-validation/CP-PROC-NNN-outcome.md`; on all processes Confirmed → return to `ai-process-assessment:conducting-engagement` (Conductor continues to Phase 5); on any Changes Requested → route that process back to `ai-process-assessment:discovering-processes` (Phase 4), re-run, regenerate, then re-record.
+- `tech-data` / `opportunities` / `use-case-briefs` / `business-case`: advisory review docs offered at Phases 3 / 5 / 8 / 9 (opt-in). Record the outcome in `CP-<id>-outcome.md` if the client signs off. No route-back, nothing blocks — declining is fine.
 
 **Output rule:** Do NOT reproduce or echo the document content in this response. State the file path only.
 
