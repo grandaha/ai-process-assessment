@@ -83,9 +83,31 @@ def _gate_status(root: Path) -> list[dict]:
         else {"status": "not-run", "reason": None}
     )
 
+    # Process-validation gate — per-process owner sign-off before Phase 5.
+    pv_index = root / "processes" / "_index.md"
+    pv_ready = []
+    if pv_index.exists():
+        for line in pv_index.read_text(encoding="utf-8").splitlines():
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) >= 3 and cells[0].startswith("PROC-") and cells[2].lower() == "ready":
+                pv_ready.append(cells[0])
+    if not pv_ready:
+        pv = {"status": "not-required", "reason": None}
+    else:
+        pending = []
+        for pid in pv_ready:
+            f = root / "checkpoints" / "process-validation" / f"CP-{pid}-outcome.md"
+            txt = f.read_text(encoding="utf-8").lower() if f.exists() else ""
+            if not ("outcome: confirmed" in txt or "outcome: waived" in txt):
+                pending.append(pid)
+        pv = ({"status": "done", "reason": "all process owners signed off"} if not pending
+              else {"status": "required",
+                    "reason": f"{len(pending)} process(es) awaiting owner sign-off"})
+
     return [
         {"id": "grc", "name": GATES[0].name, "output": GATES[0].output, **grc},
         {"id": "deliverable", "name": GATES[1].name, "output": GATES[1].output, **deliverable},
+        {"id": "process-validation", "name": GATES[2].name, "output": GATES[2].output, **pv},
     ]
 
 

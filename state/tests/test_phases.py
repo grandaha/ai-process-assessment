@@ -28,10 +28,11 @@ def test_phase_5_outputs_opportunities_index():
 
 def test_gates_present():
     gate_ids = [g.id for g in GATES]
-    assert gate_ids == ["grc", "deliverable"]
+    assert gate_ids == ["grc", "deliverable", "process-validation"]
     grc = GATES[0]
     assert grc.output == "grc/_index.md"
     assert GATES[1].output == "evidence-log.md"
+    assert GATES[2].output == "checkpoints/process-validation/"
 
 
 def test_phase_is_frozen_dataclass():

@@ -10,8 +10,8 @@ description: Cross-cutting checkpoint — renders an interim, client-facing HTML
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
-3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. Halt with a clear message naming whichever file is missing if not.
+3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`). Look up its row in the Checkpoint Registry below.
+4. Verify the registry row's predecessor outputs exist. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `scope`: both `scope.md` and `context.md`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. Halt with a clear message naming whichever file is missing if not.
 
 **Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
 from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
@@ -32,10 +32,13 @@ The `baseline` (Checkpoint 2), `scope` (Checkpoint 1), and `portfolio` (Checkpoi
 | id | Insert after | Audience | Source files | Renderer(s) | Output HTML | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|---|
 | `baseline` | Phase 4 | Process owners + sponsor | `processes/PROC-NNN.md`, `model/baselines.json`, `scope.md` (header only) | `section-renderer-checkpoint-baseline` | `checkpoints/checkpoint-baseline.html` | `checkpoints/CP-baseline-outcome.md` | Phase 4 (`ai-process-assessment:discovering-processes`) |
+| `process-validation` | Phase 4 (before `baseline`) | Process owner (one per process) | `processes/_index.md`, `processes/PROC-NNN.md` | *(deterministic — `state.process_review`, no LLM renderer)* | `checkpoints/process-validation/PROC-NNN.docx` (one per process) | `checkpoints/process-validation/CP-PROC-NNN-outcome.md` (one per process) | Phase 4 (`ai-process-assessment:discovering-processes`) for the affected process |
 | `scope` | Phase 2 | Sponsor + decision-maker | `scope.md`, `context.md` | `section-renderer-checkpoint-scope` | `checkpoints/checkpoint-scope.html` | `checkpoints/CP-scope-outcome.md` | Phase 1 (`ai-process-assessment:scoping-engagement`) for scope-field changes; Phase 2 (`ai-process-assessment:mapping-context`) for context-field changes |
 | `portfolio` | Phase 7 | Decision-maker + sponsor + IT lead | `scores/_index.md`, `scores/OPP-NNN.md`, `opportunities/_index.md`, `opportunities/OPP-NNN.md`, `roadmap.md`, `scope.md` (header only) | `section-renderer-checkpoint-portfolio` | `checkpoints/checkpoint-portfolio.html` | `checkpoints/CP-portfolio-outcome.md` | Phase 6 (`ai-process-assessment:scoring-opportunities`) for score/ranking changes; Phase 7 (`ai-process-assessment:prioritizing-roadmap`) for wave/sequencing changes |
 
 ## Gate condition
+
+> **Routing:** if the checkpoint id is `process-validation`, skip the Gate condition and Orchestration steps below and follow the "Deterministic checkpoint: process-validation" section instead.
 
 The checkpoint's predecessor outputs exist (for `baseline`: `processes/_index.md` and `model/baselines.json`). Before producing the HTML, this skill MUST invoke `ai-process-assessment:deliverable-gate` in **Checkpoint Mode** for this checkpoint id (see that skill's "Checkpoint Mode" section). Proceed only on checkpoint clearance recorded in `evidence-log.md`.
 
@@ -48,6 +51,21 @@ The checkpoint's predecessor outputs exist (for `baseline`: `processes/_index.md
 5. Assemble `<name>/checkpoints/checkpoint-<id>.html` from the checkpoint shell (below), interleaving the staged section blocks in the order the shell's sticky nav lists them.
 6. Open the file and confirm: scroll works, sticky-nav links target the right anchors, all anchors present, no missing-class artifacts.
 7. Prompt the user to record the stakeholder outcome (see "Recording the outcome").
+
+## Deterministic checkpoint: `process-validation`
+
+`process-validation` is a **per-process, owner-facing Word checkpoint** and does NOT use the
+section-renderer / HTML-shell / Gate-B path above. It is a faithful transform of the process
+maps (no model-authored content, so nothing to gate for fabrication). For this id only:
+
+1. Run: `PYTHONPATH="<engine_root>" python3 -m state.process_review <name>`
+   — writes one `checkpoints/process-validation/PROC-NNN.docx` and one
+   `CP-PROC-NNN-outcome.md` (Outcome: Pending) per in-scope (`Ready`) process.
+2. Tell the user a per-process Word review was generated for each process owner to confirm or
+   mark up, and that **each owner's sign-off must be recorded** in its `CP-PROC-NNN-outcome.md`
+   (`Confirmed` | `Changes requested` | `Waived (reason)`) before Phase 5.
+3. On any `Changes requested`, route that process back to Phase 4, re-run, and regenerate
+   (re-run the command — it preserves existing outcome files).
 
 ## Checkpoint shell
 
@@ -103,11 +121,12 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 
 - [ ] Read `scope.md`; resolve engagement folder; check `.sample-run.md`
 - [ ] Resolve checkpoint id and registry row; verify predecessor output exists
+- [ ] **If `process-validation`:** follow the "Deterministic checkpoint: process-validation" section — the steps below (deliverable-gate, section-renderers, wrapper-markup check, HTML assembly) do not apply; skip to outcome recording.
 - [ ] Invoke `deliverable-gate` in Checkpoint Mode; proceed only on clearance
 - [ ] Dispatch the registry renderer(s) to `_staging/checkpoint-<id>/`
 - [ ] Verify no wrapper markup in returns; assemble `checkpoints/checkpoint-<id>.html`
 - [ ] Open and confirm scroll/nav/anchors/classes
-- [ ] Record `checkpoints/CP-<id>-outcome.md`; route Changes Requested back to the route-back phase
+- [ ] Record outcome file; route Changes Requested back to the route-back phase
 
 ## Rationalization Table
 
@@ -123,6 +142,7 @@ After the HTML is produced, the checkpoint is taken to the stakeholders named in
 - `baseline`: on Confirmed → `ai-process-assessment:identifying-opportunities` (Phase 5); on Changes Requested → `ai-process-assessment:discovering-processes` (Phase 4).
 - `scope`: on Confirmed → `ai-process-assessment:inventorying-tech-data` (Phase 3); on Changes Requested → `ai-process-assessment:scoping-engagement` (Phase 1, scope fields) / `ai-process-assessment:mapping-context` (Phase 2, context fields).
 - `portfolio`: on Confirmed → `ai-process-assessment:packaging-usecases` (Phase 8); on Changes Requested → `ai-process-assessment:scoring-opportunities` (Phase 6, score fields) / `ai-process-assessment:prioritizing-roadmap` (Phase 7, sequencing fields).
+- `process-validation`: per-process sign-off is recorded in `checkpoints/process-validation/CP-PROC-NNN-outcome.md`; on all processes Confirmed → return to `ai-process-assessment:conducting-engagement` (Conductor continues to Phase 5); on any Changes Requested → route that process back to `ai-process-assessment:discovering-processes` (Phase 4), re-run, regenerate, then re-record.
 
 **Output rule:** Do NOT reproduce or echo the HTML content in this response. State the file path only.
 
