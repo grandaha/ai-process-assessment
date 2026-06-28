@@ -1,6 +1,6 @@
 ---
 name: ai-process-assessment:building-checkpoint
-description: Cross-cutting checkpoint — renders an interim, client-facing stakeholder-validation artifact at a defined point in the methodology (all 4 ids wired: `scope`, `baseline`, `portfolio`, `process-validation`). Every checkpoint routes through the deterministic `.docx` renderer — no LLM-authored content, no HTML path. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
+description: Cross-cutting checkpoint — renders an interim, client-facing stakeholder-validation artifact at a defined point in the methodology (all 8 ids wired: `scope`, `baseline`, `portfolio`, `process-validation`, `tech-data`, `opportunities`, `use-case-briefs`, `business-case`). Every checkpoint routes through the deterministic `.docx` renderer — no LLM-authored content, no HTML path. Synthesis renderers, not document converters — no new content; every figure traces to a prior-phase source.
 ---
 
 # [CROSS-CUTTING] Building a Stakeholder Validation Checkpoint
@@ -10,8 +10,8 @@ description: Cross-cutting checkpoint — renders an interim, client-facing stak
 This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
-3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. Halt with a clear message naming whichever file is missing if not.
+3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`, `tech-data`, `opportunities`, `use-case-briefs`, `business-case`). Look up its row in the Checkpoint Registry below.
+4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. For `tech-data`: `tech-inventory.md`. For `opportunities`: `opportunities/_index.md`. For `use-case-briefs`: `usecase-briefs/_index.md`. For `business-case`: `business-case.md`. Halt with a clear message naming whichever file is missing if not.
 
 **Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
 from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
@@ -27,7 +27,7 @@ It is **recommended-and-recorded**, not a hard gate: the keystone recommends inv
 
 ## Checkpoint Registry
 
-All four checkpoint ids are active — the checkpoint pattern is complete.
+All eight checkpoint ids are active — the checkpoint pattern is complete.
 
 | id | Insert after | Audience | Source files | Output | Outcome record | Route-back phase |
 |---|---|---|---|---|---|---|
