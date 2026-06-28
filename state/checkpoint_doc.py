@@ -1,5 +1,6 @@
 # state/checkpoint_doc.py — deterministic, declarative checkpoint documents (#131).
 # Stdlib only. No fabrication: every value is copied from a source file.
+import json
 import re
 import sys
 from dataclasses import dataclass
@@ -92,6 +93,25 @@ def _build_process_validation(root, proc_md):
     from state.process_review import build_blocks
     return build_blocks(proc_md)
 
+def _build_baseline(root):
+    index = _read(root, "processes/_index.md")
+    names = {r[0]: r[1] for r in md_table(index)[1] if r and r[0].startswith("PROC-")}
+    try:
+        data = json.loads(_read(root, "model/baselines.json") or "{}")
+    except ValueError:
+        data = {}
+    rows = []
+    for pid in _ready_processes(root):
+        b = data.get(pid, {})
+        def g(k): return b.get(k) or "PENDING"
+        rows.append([pid, names.get(pid, ""), g("volume"), g("cycle_time"), g("error_rate"), g("fte")])
+    blocks = [docx.heading("As-Is Baselines — For Your Confirmation", 1)]
+    blocks += note("Please confirm these baseline figures for each process, or note corrections.")
+    blocks += table_section("Baselines",
+        ["Process", "Name", "Volume", "Cycle time", "Error/exception", "FTE"], rows)
+    blocks += signoff_block("Sponsor / process owners")
+    return blocks
+
 CHECKPOINTS = {
     "process-validation": Checkpoint(
         "process-validation", per_process=True, gate=True,
@@ -100,6 +120,11 @@ CHECKPOINTS = {
         build=_build_process_validation),
     # "scope"/"baseline"/"portfolio" added in Tasks 3-5.
 }
+
+CHECKPOINTS["baseline"] = Checkpoint(
+    "baseline", per_process=False, gate=False,
+    output="checkpoints/checkpoint-baseline.docx",
+    outcome="checkpoints/CP-baseline-outcome.md", build=_build_baseline)
 
 # ponytail: temporary scope entry so Task 2's single-doc test passes; Task 4 replaces the lambda.
 CHECKPOINTS["scope"] = Checkpoint(

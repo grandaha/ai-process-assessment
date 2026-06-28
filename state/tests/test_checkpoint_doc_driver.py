@@ -45,3 +45,17 @@ def test_render_single_doc_checkpoint(tmp_path):
     written = cd.render_checkpoint(str(tmp_path), "scope")
     assert (tmp_path / "checkpoints" / "checkpoint-scope.docx").exists()
     assert (tmp_path / "checkpoints" / "CP-scope-outcome.md").exists()
+
+def test_baseline_doc_has_metrics_and_pending(tmp_path):
+    (tmp_path / "processes").mkdir()
+    (tmp_path / "processes" / "_index.md").write_text(
+        "| PROC-ID | Process Name | Baseline |\n|---|---|---|\n| PROC-001 | Staffing | Ready |\n")
+    (tmp_path / "model").mkdir()
+    (tmp_path / "model" / "baselines.json").write_text(
+        '{"PROC-001": {"volume": "~140/mo", "cycle_time": "3d/11d", "error_rate": "22%", "fte": "3.5"}}')
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "baseline")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-baseline.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "Staffing" in xml and "~140/mo" in xml
