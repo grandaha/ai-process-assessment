@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Process-validation document quality** (#148). The per-process validation `.docx` renderer
+  now captures full multi-item fields — *Decision points* and *Exceptions* no longer drop all
+  but the first item — strips leaked step ratings (`— **Green/Yellow/Red** (rationale)`), and
+  renders clean step actions. This closes the parity gap with the v2.25.1 checkpoint renderer.
+
+### Added
+- **List-aware document rendering** (#148). New `docx.bullet_list` plus consecutive-list
+  grouping in the shared markdown→blocks renderer: bulleted source renders as a real `•` list
+  and numbered source as a numbered list across all checkpoint/review documents.
+
 ## [2.25.1] - 2026-06-28
 
 ### Fixed
