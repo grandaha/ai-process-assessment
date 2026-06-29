@@ -24,9 +24,11 @@ def _title(md):
 
 def _steps(md):
     # numbered lines under "**Steps:**" up to the next blank line / bold label. Each step is
-    # "action — **Rating** (rationale)"; return (action, note) so the renderer can show the
-    # rating + rationale as an indented sub-bullet. The action may itself contain em-dashes,
-    # so split on the bolded rating (" — **"), not the first dash.
+    # "action — **Rating** (rationale)"; the rating is internal assessor analysis (it drives the
+    # chain scan / opportunity identification, NOT owner validation — like Conflicts / Chain scan
+    # / Challenge hypothesis), so strip it and keep only the clean action. Anchor the split on the
+    # bolded rating (" — **") since the action may itself contain em-dashes; this strips every
+    # rating variant (incl. compound ones like "Yellow/GRC-flagged"). Legacy " → " form handled.
     block = re.search(r"\*\*Steps:\*\*\s*\n(.*?)(?:\n\s*\n|\n\*\*)", md, re.DOTALL)
     if not block:
         return []
@@ -36,15 +38,9 @@ def _steps(md):
         if not m:
             continue
         text = m.group(1).strip()
-        rating = re.match(r"^(.*?)\s+—\s+(\*\*.*)$", text)          # action — **Rating** (…)
-        if rating:
-            action, note = rating.group(1), rating.group(2)
-        elif " → " in text:                                         # legacy arrow form
-            action, note = text.split(" → ", 1)
-        else:
-            action, note = text, None
-        out.append((_clean_inline(action).strip(),
-                    _clean_inline(note).strip() if note else None))
+        rating = re.match(r"^(.*?)\s+—\s+\*\*.*$", text)            # drop "— **Rating** (…)"
+        action = rating.group(1) if rating else text.split(" → ")[0]
+        out.append(_clean_inline(action).strip())
     return out
 
 
@@ -87,11 +83,7 @@ def build_blocks(proc_md):
         blocks += [docx.heading("Trigger", 2)] + blocks_from_markdown(trigger)
     steps = _steps(proc_md)
     if steps:
-        blocks.append(docx.heading("Steps", 2))
-        for i, (action, note) in enumerate(steps, 1):
-            blocks.append(docx.paragraph(f"{i}. {action}"))
-            if note:
-                blocks.append(docx.bullet_list([note], indent=720))   # rating + rationale, indented
+        blocks += [docx.heading("Steps", 2), docx.numbered_list(steps)]
     for label in ("Actors", "Decision points", "Exceptions", "Upstream / downstream"):
         body = _field_body(proc_md, label)
         if not body:
