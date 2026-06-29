@@ -10,6 +10,7 @@ _CT = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Default Extension="xml" ContentType="application/xml"/>
 <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
 <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
 </Types>'''
 
 _RELS = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -20,7 +21,19 @@ _RELS = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 _DOC_RELS = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
 </Relationships>'''
+
+# OSL-branded page footer (the reusable template, on every page of every doc): a subtle top
+# rule (#E5E7EB), an orange signature dot (#E06030), and the muted (#6B7280) "one step labs"
+# wordmark in DM Sans. Mirrors the OSL `.doc-footer` convention. ponytail: text/native — no
+# image part, no asset pipeline; the graphical dot-mark can drop in here later.
+_FOOTER = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+           '<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+           '<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="6" w:color="E5E7EB"/></w:pBdr></w:pPr>'
+           '<w:r><w:rPr><w:color w:val="E06030"/><w:sz w:val="18"/></w:rPr><w:t>●</w:t></w:r>'
+           '<w:r><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/></w:rPr>'
+           '<w:t xml:space="preserve"> one step labs</w:t></w:r></w:p></w:ftr>')
 
 _STYLES = ('''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
@@ -29,11 +42,12 @@ _STYLES = ('''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
  + ''.join(
      f'<w:style w:type="paragraph" w:styleId="Heading{n}"><w:name w:val="heading {n}"/>'
      f'<w:pPr><w:outlineLvl w:val="{n-1}"/></w:pPr>'
-     f'<w:rPr><w:b/><w:color w:val="1B75BC"/><w:sz w:val="{sz}"/></w:rPr></w:style>'
-     for n, sz in ((1, 36), (2, 28), (3, 24)))
+     f'<w:rPr><w:b/><w:color w:val="111827"/><w:sz w:val="{sz}"/></w:rPr></w:style>'
+     for n, sz in ((1, 42), (2, 30), (3, 24)))
  + '</w:styles>')
 
-_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+_NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+       'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"')
 
 def _p(text, style=None):
     ppr = f'<w:pPr><w:pStyle w:val="{style}"/></w:pPr>' if style else ''
@@ -71,12 +85,14 @@ def build_docx(blocks, out_path):
     body = ''.join(_block(b) for b in blocks)
     document = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
                 f'<w:document {_NS}><w:body>{body}'
-                '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/></w:sectPr></w:body></w:document>')
+                '<w:sectPr><w:footerReference w:type="default" r:id="rId2"/>'
+                '<w:pgSz w:w="12240" w:h="15840"/></w:sectPr></w:body></w:document>')
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml", _CT)
         z.writestr("_rels/.rels", _RELS)
         z.writestr("word/_rels/document.xml.rels", _DOC_RELS)
         z.writestr("word/styles.xml", _STYLES)
+        z.writestr("word/footer1.xml", _FOOTER)
         z.writestr("word/document.xml", document)
     return out_path
 

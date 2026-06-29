@@ -216,3 +216,66 @@ def test_build_baseline_pending_for_missing_process(tmp_path):
     assert row[3] == "PENDING"          # cycle time
     assert row[4] == "PENDING"          # error rate
     assert row[5] == "PENDING"          # fte
+
+
+# --- OSL-branded template: footer + heading color (#154) ---
+def test_styles_use_neutral_heading_color_not_blue():
+    # OSL: headings are neutral-900 #111827; blue is accent only.
+    from state import docx
+    assert "111827" in docx._STYLES
+    assert "1B75BC" not in docx._STYLES
+
+
+def test_footer_part_is_wired(tmp_path):
+    from state import docx
+    out = tmp_path / "d.docx"
+    docx.build_docx([docx.paragraph("body")], str(out))
+    with zipfile.ZipFile(out) as z:
+        names = z.namelist()
+        assert "word/footer1.xml" in names
+        ct = z.read("[Content_Types].xml").decode()
+        assert "/word/footer1.xml" in ct                       # content-type override present
+        rels = z.read("word/_rels/document.xml.rels").decode()
+        assert "footer1.xml" in rels                           # relationship present
+        doc = z.read("word/document.xml").decode()
+        assert "footerReference" in doc                        # sectPr references the footer
+        footer = z.read("word/footer1.xml").decode()
+    assert "one step labs" in footer                           # wordmark
+    assert "E06030" in footer                                  # orange signature dot
+    assert "6B7280" in footer                                  # muted text
+    assert "E5E7EB" in footer                                  # subtle top rule
+
+
+def test_footer_present_on_every_checkpoint_doc(tmp_path):
+    # the template lives in build_docx, so any doc gets it
+    from state import docx
+    out = tmp_path / "x.docx"
+    docx.build_docx([docx.heading("H", 1), docx.bullet_list(["a"])], str(out))
+    with zipfile.ZipFile(out) as z:
+        assert "one step labs" in z.read("word/footer1.xml").decode()
+
+
+# --- Actors readability: semicolon split (#154) ---
+def test_actors_renders_as_bullets():
+    from state import process_review as pr
+    blocks = pr.build_blocks(PROC)
+    idx = next(i for i, b in enumerate(blocks)
+               if b["type"] == "heading" and b["text"] == "Actors")
+    lst = blocks[idx + 1]
+    assert lst["type"] == "bullet_list"
+    # PROC fixture Actors: "Tyler Brooks / PM team; HubSpot; Zapier; Teamwork." -> 4 items
+    assert len(lst["items"]) == 4
+    assert lst["items"][0].startswith("Tyler Brooks")
+    assert all(";" not in it for it in lst["items"])
+
+
+def test_split_actors_keeps_parenthesized_semicolons_intact():
+    from state import process_review as pr
+    body = ("Priya Nair (coordinator); Lisa Park's team (execution, Step 6; "
+            "checklist items, Step 3); Client (creds, Step 3; scheduling, Step 5)")
+    items = pr._split_actors(body)
+    assert items == [
+        "Priya Nair (coordinator)",
+        "Lisa Park's team (execution, Step 6; checklist items, Step 3)",
+        "Client (creds, Step 3; scheduling, Step 5)",
+    ]

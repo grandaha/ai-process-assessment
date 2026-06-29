@@ -51,6 +51,22 @@ def _baselines(md):
     return rows
 
 
+def _split_actors(body):
+    # Split the Actors line into one item per participant on TOP-LEVEL semicolons only —
+    # semicolons inside parentheses (e.g. "(execution, Step 6; checklist items, Step 3)")
+    # belong to one actor and must not split it.
+    out, depth, start = [], 0, 0
+    for i, ch in enumerate(body):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif ch == ";" and depth == 0:
+            out.append(body[start:i])
+            start = i + 1
+    out.append(body[start:])
+    return [_clean_inline(p.strip()) for p in out if p.strip()]
+
 def build_blocks(proc_md):
     pid, name = _title(proc_md)
     blocks = [docx.heading(f"{pid} — {name}", 1),
@@ -64,7 +80,13 @@ def build_blocks(proc_md):
         blocks += [docx.heading("Steps", 2), docx.numbered_list(steps)]
     for label in ("Actors", "Decision points", "Exceptions", "Upstream / downstream"):
         body = _field_body(proc_md, label)
-        if body:
+        if not body:
+            continue
+        # Actors is a single semicolon-separated line in the source — split it into a real
+        # bullet list (verbatim text) instead of one run-on paragraph (#154).
+        if label == "Actors" and not body.lstrip().startswith(("-", "*")):
+            blocks += [docx.heading(label, 2), docx.bullet_list(_split_actors(body))]
+        else:
             blocks += [docx.heading(label, 2)] + blocks_from_markdown(body)
     bl = _baselines(proc_md)
     if bl:
