@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.32.1] - 2026-06-29
+
 ### Changed
 - **Opportunity "Expected value" reads as scannable bullets** (#177). The value figure was one
   dense paragraph (per-project math and annualized hrs/FTE crammed together). It now renders one
