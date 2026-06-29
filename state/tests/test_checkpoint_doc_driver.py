@@ -125,6 +125,38 @@ def test_opportunities_doc_renders_landscape(tmp_path):
         xml = z.read("word/document.xml").decode()
     assert "OPP-001" in xml and "ChainAutomation" in xml and "Confirmed" in xml
 
+def test_opportunities_doc_renders_per_opportunity_detail(tmp_path):
+    d = tmp_path / "opportunities"; d.mkdir()
+    (d / "_index.md").write_text(
+        "| OPP-ID | Process | Type | Feasibility |\n|---|---|---|---|\n"
+        "| OPP-001 | PROC-001 | Chain-Automation | Yellow |\n")
+    (d / "OPP-001.md").write_text(
+        "## OPP-001 — HubSpot-to-Kickoff Chain Automation (process: PROC-001)\n"
+        "<!-- index: id=OPP-001 grc=Green -->\n\n"
+        "**Type:** Chain Automation\n"
+        "**Type source:** internal chain-scan derivation that must not render.\n"
+        "**Hypothesis:** We believe a direct HubSpot-to-Teamwork integration will save setup time.\n"
+        "**Value hypothesis:** ~3 hrs/project; 216-288 hrs/year recovered.\n"
+        "**Chain formation:** step-by-step internal checkpoint analysis, excluded.\n"
+        "**GRC flag:** Green — internal project data only.\n"
+        "**Data / system dependencies:** HubSpot, Teamwork, Notion.\n"
+        "**Structural response:** optimizing-around — challenge-hypothesis linkage, excluded.\n")
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "opportunities")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-opportunities.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    # name + client-facing fields present
+    assert "HubSpot-to-Kickoff Chain Automation" in xml
+    assert "direct HubSpot-to-Teamwork integration will save setup time" in xml   # Hypothesis
+    assert "216-288 hrs/year recovered" in xml                                     # Value
+    assert "HubSpot, Teamwork, Notion" in xml                                      # dependencies
+    # assessor-derivation fields excluded
+    assert "chain-scan derivation" not in xml                                      # Type source
+    assert "step-by-step internal checkpoint analysis" not in xml                  # Chain formation
+    assert "challenge-hypothesis linkage" not in xml                              # Structural response
+    assert "index: id=OPP-001" not in xml                                          # html comment
+
 def test_business_case_doc_renders_sections_and_cost_table(tmp_path):
     (tmp_path / "business-case.md").write_text(
         "# Wave 1 ROM Business Case\n"
