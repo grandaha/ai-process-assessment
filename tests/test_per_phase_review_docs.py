@@ -4,13 +4,19 @@ REPO = Path(__file__).resolve().parents[1]
 CP = (REPO / "skills" / "building-checkpoint" / "SKILL.md").read_text()
 COND = (REPO / "skills" / "conducting-engagement" / "SKILL.md").read_text()
 IDS = ["tech-data", "opportunities", "use-case-briefs", "business-case"]
-DOCX_PATHS = [f"checkpoints/checkpoint-{i}.docx" for i in IDS]
+# opportunities is per-opportunity (one doc per OPP), so its path differs from the single-doc ids.
+DOCX_PATHS = {
+    "tech-data": "checkpoints/checkpoint-tech-data.docx",
+    "opportunities": "checkpoints/opportunities/OPP-NNN.docx",
+    "use-case-briefs": "checkpoints/checkpoint-use-case-briefs.docx",
+    "business-case": "checkpoints/checkpoint-business-case.docx",
+}
 
 def test_building_checkpoint_wires_new_ids():
     # each id must appear alongside its output .docx path in the registry table
-    for i, path in zip(IDS, DOCX_PATHS):
+    for i in IDS:
         assert i in CP, f"building-checkpoint missing wired id {i}"
-        assert path in CP, f"building-checkpoint registry missing output path {path}"
+        assert DOCX_PATHS[i] in CP, f"building-checkpoint registry missing output path {DOCX_PATHS[i]}"
 
 def test_building_checkpoint_registry_no_gate_semantics():
     # the registry must record opt-in / no-gate for each of the 4 new ids
