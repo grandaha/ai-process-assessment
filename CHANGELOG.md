@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Footer logo size** (#157). Bumped the OSL dot-mark in the document footer from ~20px to ~28px
+  for more presence and better balance with the wordmark.
+
 ## [2.27.1] - 2026-06-29
 
 ### Added

@@ -45,8 +45,8 @@ _FOOTER_RELS = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
                 '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" '
                 'Target="media/logo-mark.png"/></Relationships>')
 
-# logo-mark.png is 300x306 px; render it ~20px tall in the footer. 1 px = 9525 EMU (96 dpi).
-_LOGO_CY = 20 * 9525
+# logo-mark.png is 300x306 px; render it ~28px tall in the footer. 1 px = 9525 EMU (96 dpi).
+_LOGO_CY = 28 * 9525
 _LOGO_CX = _LOGO_CY * 300 // 306
 
 # Inline-picture run for the dot-mark (blip rId1 in the footer's rels).
