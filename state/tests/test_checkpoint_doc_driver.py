@@ -150,6 +150,7 @@ def test_opportunities_doc_renders_per_opportunity_detail(tmp_path):
     assert "HubSpot-to-Kickoff Chain Automation" in xml
     assert "direct HubSpot-to-Teamwork integration will save setup time" in xml   # Hypothesis
     assert "216-288 hrs/year recovered" in xml                                     # Value
+    assert "internal project data only" in xml                                     # GRC flag
     assert "HubSpot, Teamwork, Notion" in xml                                      # dependencies
     # assessor-derivation fields excluded
     assert "chain-scan derivation" not in xml                                      # Type source
