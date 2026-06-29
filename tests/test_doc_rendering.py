@@ -234,7 +234,7 @@ def test_footer_part_is_wired(tmp_path):
         names = z.namelist()
         assert "word/footer1.xml" in names
         ct = z.read("[Content_Types].xml").decode()
-        assert "footer" in ct                                  # content-type override present
+        assert "/word/footer1.xml" in ct                       # content-type override present
         rels = z.read("word/_rels/document.xml.rels").decode()
         assert "footer1.xml" in rels                           # relationship present
         doc = z.read("word/document.xml").decode()

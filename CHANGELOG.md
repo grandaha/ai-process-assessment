@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **OSL-branded document template** (#154). Every generated checkpoint/review `.docx` now carries
+  a One Step Labs page footer on every page — the `one step labs` wordmark with the signature
+  orange dot over a subtle rule, mirroring the OSL `.doc-footer` convention (DM Sans, brand
+  colors). Baked into the single shared generator, so all current and future documents inherit it.
+
+### Changed
+- **Document headings match the OSL design system** (#154). Headings now render in OSL
+  neutral-900 (`#111827`) on the OSL type scale, with brand blue reserved as an accent —
+  previously every heading used the accent blue.
+
+### Fixed
+- **Actors readability** (#154). The per-process *Actors* field — a single semicolon-separated
+  line in the source — now renders as a real bullet list (one participant per line) instead of a
+  wall of text. The split is parenthesis-aware, so a semicolon inside an actor's parenthetical
+  (e.g. "(execution, Step 6; checklist items, Step 3)") no longer breaks the entry.
+
 ## [2.26.1] - 2026-06-29
 
 ### Fixed
