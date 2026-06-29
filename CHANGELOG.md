@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.28.0] - 2026-06-29
+
 ### Changed
 - **Process step ratings render as indented sub-bullets** (#162). Each process step now shows a
   clean numbered action with its Green/Yellow/Red rating and rationale as an indented sub-bullet
