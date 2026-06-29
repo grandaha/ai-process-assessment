@@ -195,18 +195,30 @@ def _build_baseline(root):
     index = _read(root, "processes/_index.md")
     names = {r[0]: r[1] for r in md_table(index)[1] if r and r[0].startswith("PROC-")}
     try:
-        data = json.loads(_read(root, "model/baselines.json") or "{}")
+        data = json.loads(_read(root, "model/baselines.json") or "[]")
     except ValueError:
-        data = {}
+        data = []
+    # model/baselines.json is the engine INPUT shape: a list of per-process objects, each with a
+    # process_id (#149). Index by process_id so we can look one up per ready process.
+    by_pid = ({d["process_id"]: d for d in data if isinstance(d, dict) and "process_id" in d}
+              if isinstance(data, list) else {})
+    def _num(v): return "PENDING" if v is None or v == "" else v
+    def _cycle(b):                                    # median + P90 in one cell
+        m, p = b.get("cycle_time_median"), b.get("cycle_time_p90")
+        if m is None and p is None:
+            return "PENDING"
+        return f"{m if m is not None else '—'} / {p if p is not None else '—'}"
+    def _pct(v): return f"{round(v * 100)}%" if isinstance(v, (int, float)) else "PENDING"
+    def _fte(v): return f"{v:.2f}" if isinstance(v, (int, float)) else "PENDING"
     rows = []
     for pid in _ready_processes(root):
-        b = data.get(pid, {})
-        def g(k): return b.get(k) or "PENDING"
-        rows.append([pid, names.get(pid, ""), g("volume"), g("cycle_time"), g("error_rate"), g("fte")])
+        b = by_pid.get(pid, {})
+        rows.append([pid, names.get(pid, ""), _num(b.get("volume")),
+                     _cycle(b), _pct(b.get("error_rate")), _fte(b.get("fte"))])
     blocks = [docx.heading("As-Is Baselines — For Your Confirmation", 1)]
     blocks += note("Please confirm these baseline figures for each process, or note corrections.")
     blocks += table_section("Baselines",
-        ["Process", "Name", "Volume", "Cycle time", "Error/exception", "FTE"], rows)
+        ["Process", "Name", "Volume", "Cycle time (median / P90)", "Error/exception", "FTE"], rows)
     blocks += signoff_block("Sponsor / process owners")
     return blocks
 

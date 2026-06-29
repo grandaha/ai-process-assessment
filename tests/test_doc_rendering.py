@@ -1,4 +1,5 @@
 # tests/test_doc_rendering.py — renderer-output tests (#148). Run with python3.13.
+import json
 import zipfile
 
 from state import docx
@@ -160,3 +161,58 @@ def test_build_blocks_no_leaked_markers_anywhere():
         for s in [b.get("text", "")] + b.get("items", []):
             assert "**" not in s
             assert " → " not in s
+
+
+# --- baseline checkpoint: real list-of-objects shape (#149) ---
+def _mk_engagement(tmp_path):
+    (tmp_path / "processes").mkdir()
+    (tmp_path / "model").mkdir()
+    (tmp_path / "processes" / "_index.md").write_text(
+        "| Process | Name | Baseline |\n|---|---|---|\n"
+        "| PROC-001 | Client Onboarding | Ready |\n"
+        "| PROC-002 | Change Orders | Ready |\n",
+        encoding="utf-8")
+    # The engine input shape: a LIST of per-process objects (NOT a dict keyed by pid).
+    (tmp_path / "model" / "baselines.json").write_text(json.dumps([
+        {"process_id": "PROC-001", "volume": 7, "cycle_time_median": 18,
+         "cycle_time_p90": 34, "error_rate": 0.20, "fte": 0.197, "source": "x"},
+        {"process_id": "PROC-002", "volume": 19, "cycle_time_median": 3,
+         "cycle_time_p90": 9, "error_rate": 0.35, "fte": 0.297, "source": "y"},
+    ]), encoding="utf-8")
+    return tmp_path
+
+
+def test_build_baseline_does_not_crash_on_list_shape(tmp_path):
+    blocks = cd._build_baseline(_mk_engagement(tmp_path))
+    assert any(b["type"] == "table" for b in blocks)
+
+
+def test_build_baseline_populates_real_fields(tmp_path):
+    blocks = cd._build_baseline(_mk_engagement(tmp_path))
+    table = next(b for b in blocks if b["type"] == "table")
+    row = next(r for r in table["rows"] if r[0] == "PROC-001")
+    proc, name, volume, cycle, err, fte = row
+    assert name == "Client Onboarding"
+    assert str(volume) == "7"
+    assert "18" in str(cycle) and "34" in str(cycle)   # median + P90
+    assert err == "20%"
+    assert fte == "0.20"
+    assert "PENDING" not in [str(c) for c in row]
+
+
+def test_build_baseline_pending_for_missing_process(tmp_path):
+    root = _mk_engagement(tmp_path)
+    # add a third Ready process with no baseline entry -> all metrics PENDING, no crash
+    (root / "processes" / "_index.md").write_text(
+        "| Process | Name | Baseline |\n|---|---|---|\n"
+        "| PROC-001 | Client Onboarding | Ready |\n"
+        "| PROC-003 | Asset Collection | Ready |\n",
+        encoding="utf-8")
+    blocks = cd._build_baseline(root)
+    table = next(b for b in blocks if b["type"] == "table")
+    row = next(r for r in table["rows"] if r[0] == "PROC-003")
+    assert row[1] == "Asset Collection"
+    assert row[2] == "PENDING"          # volume
+    assert row[3] == "PENDING"          # cycle time
+    assert row[4] == "PENDING"          # error rate
+    assert row[5] == "PENDING"          # fte

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Baseline checkpoint crash** (#149). `python3 -m state.checkpoint_doc <engagement> baseline`
+  crashed (`AttributeError: 'list' object has no attribute 'get'`) because the renderer assumed
+  `model/baselines.json` was a dict keyed by process id with a `cycle_time` field. The engine
+  actually reads and writes a list of per-process objects (`cycle_time_median` / `cycle_time_p90`,
+  numeric `error_rate` / `fte`). The baseline document now renders correctly — cycle time as
+  median / P90, error rate as a percentage — with `PENDING` for any ready process lacking a
+  baseline entry.
+
 ## [2.26.0] - 2026-06-29
 
 ### Fixed
