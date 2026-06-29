@@ -306,16 +306,26 @@ def test_actors_renders_as_bullets():
     assert all(";" not in it for it in lst["items"])
 
 
-def test_split_actors_keeps_parenthesized_semicolons_intact():
-    from state import process_review as pr
+def test_split_semicolons_keeps_parenthesized_semicolons_intact():
     body = ("Priya Nair (coordinator); Lisa Park's team (execution, Step 6; "
             "checklist items, Step 3); Client (creds, Step 3; scheduling, Step 5)")
-    items = pr._split_actors(body)
-    assert items == [
+    assert cd._split_semicolons(body) == [
         "Priya Nair (coordinator)",
         "Lisa Park's team (execution, Step 6; checklist items, Step 3)",
         "Client (creds, Step 3; scheduling, Step 5)",
     ]
+
+
+def test_readable_rule_semicolons_and_sentences():
+    # semicolon list -> bullets
+    b = cd._readable("HubSpot (CRM); Teamwork (PM); Notion (KB)")
+    assert b[0]["type"] == "bullet_list" and len(b[0]["items"]) == 3
+    # multi-sentence prose -> sentence bullets
+    b = cd._readable("Green — internal data only. No regulated classes. Failure mode is low.")
+    assert b[0]["type"] == "bullet_list" and len(b[0]["items"]) == 3
+    # single sentence -> paragraph
+    b = cd._readable("Chain Automation")
+    assert b == [docx.paragraph("Chain Automation")]
 
 
 # --- OSL dot-mark logo embedded in footer (#157) ---
