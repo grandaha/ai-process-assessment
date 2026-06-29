@@ -218,15 +218,26 @@ _UC_BRIEF = (
     "- Free-text data quality: use a templated dropdown\n\n"
     "**Wave assignment:** Wave 1 — Month 1–2 target.\n")
 
-def test_use_case_briefs_renders_full_brief_sections(tmp_path):
+def test_use_case_briefs_one_doc_per_brief(tmp_path):
     d = tmp_path / "usecase-briefs"; d.mkdir()
-    (d / "_index.md").write_text(
-        "## UC ↔ OPP mapping\n| UC | Title | Wave |\n|---|---|---|\n| UC-001 | Scope-Gap Capture | 1 |\n")
+    (d / "UC-001.md").write_text(_UC_BRIEF)
+    (d / "UC-002.md").write_text(_UC_BRIEF.replace("UC-001", "UC-002"))
+    from state import checkpoint_doc as cd
+    written = cd.render_checkpoint(str(tmp_path), "use-case-briefs")
+    cp = tmp_path / "checkpoints" / "use-case-briefs"
+    # one .docx + one outcome stub per brief; NO combined doc
+    assert (cp / "UC-001.docx").exists() and (cp / "UC-002.docx").exists()
+    assert (cp / "CP-UC-001-outcome.md").exists() and (cp / "CP-UC-002-outcome.md").exists()
+    assert not (tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx").exists()
+    assert len([w for w in written if w.endswith(".docx")]) == 2
+
+def test_use_case_brief_renders_full_sections(tmp_path):
+    d = tmp_path / "usecase-briefs"; d.mkdir()
     (d / "UC-001.md").write_text(_UC_BRIEF)
     from state import checkpoint_doc as cd
     cd.render_checkpoint(str(tmp_path), "use-case-briefs")
     import zipfile
-    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "use-case-briefs" / "UC-001.docx") as z:
         xml = z.read("word/document.xml").decode()
     assert "Scope-Gap Capture Workflow" in xml                   # brief title
     assert "Situation" in xml and "informal Slack DM" in xml     # SCR section + body
@@ -237,22 +248,9 @@ def test_use_case_briefs_renders_full_brief_sections(tmp_path):
     assert "•" in xml                                            # bullets rendered as a real list
     assert "Wave 1" in xml
     assert "Confirmed" in xml                                    # sign-off
-    assert "Brief index" in xml                                  # index table section rendered
 
-def test_use_case_briefs_index_optional(tmp_path):
-    # no _index.md present — must still render the briefs, not crash
-    d = tmp_path / "usecase-briefs"; d.mkdir()
-    (d / "UC-001.md").write_text(_UC_BRIEF)
+def test_use_case_briefs_empty_renders_nothing(tmp_path):
+    # per-item semantics: no briefs -> writes nothing, no crash (matches opportunities)
+    (tmp_path / "usecase-briefs").mkdir()
     from state import checkpoint_doc as cd
-    cd.render_checkpoint(str(tmp_path), "use-case-briefs")
-    import zipfile
-    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
-        xml = z.read("word/document.xml").decode()
-    assert "Scope-Gap Capture Workflow" in xml and "informal Slack DM" in xml
-
-def test_use_case_briefs_raises_when_empty(tmp_path):
-    import pytest
-    (tmp_path / "usecase-briefs").mkdir()       # no index, no briefs
-    from state import checkpoint_doc as cd
-    with pytest.raises(FileNotFoundError):
-        cd.render_checkpoint(str(tmp_path), "use-case-briefs")
+    assert cd.render_checkpoint(str(tmp_path), "use-case-briefs") == []

@@ -11,7 +11,7 @@ This skill runs as a standalone session. At session start:
 1. Read `scope.md` — extract the `Engagement folder:` field. This is the canonical path for all outputs. Do not ask the user for the path. Halt if scope.md is absent or the field is missing (return to Phase 1). All `<name>` paths below use this value.
 2. Check for `.sample-run.md` in the engagement folder — if present, this is a sample run; proceed with sample data, do not prompt for live stakeholders.
 3. Resolve the checkpoint id (wired values: `baseline`, `scope`, `portfolio`, `process-validation`, `tech-data`, `opportunities`, `use-case-briefs`, `business-case`). Look up its row in the Checkpoint Registry below.
-4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. For `tech-data`: `tech-inventory.md`. For `opportunities`: `opportunities/OPP-NNN.md` (the per-opportunity briefs). For `use-case-briefs`: `usecase-briefs/_index.md`. For `business-case`: `business-case.md`. Halt with a clear message naming whichever file is missing if not.
+4. Verify the registry row's predecessor outputs exist. For `scope`: `scope.md`. For `baseline`: both `processes/_index.md` and `model/baselines.json`. For `portfolio`: both `roadmap.md` and `scores/_index.md`. For `process-validation`: `processes/_index.md`. For `tech-data`: `tech-inventory.md`. For `opportunities`: `opportunities/OPP-NNN.md` (the per-opportunity briefs). For `use-case-briefs`: `usecase-briefs/UC-NNN.md` (the per-brief files). For `business-case`: `business-case.md`. Halt with a clear message naming whichever file is missing if not.
 
 **Session Start — resolve `engine_root`:** read `engine_root` (the absolute plugin root)
 from this engagement's `.conductor.md` (`read_conductor`). Every engine command below is
@@ -37,7 +37,7 @@ All eight checkpoint ids are active — the checkpoint pattern is complete.
 | `process-validation` | Phase 4 (before `baseline`) | Process owner (one per process) | `processes/_index.md`, `processes/PROC-NNN.md` | `checkpoints/process-validation/PROC-NNN.docx` (one per process) | `checkpoints/process-validation/CP-PROC-NNN-outcome.md` (one per process) | Phase 4 (`ai-process-assessment:discovering-processes`) for the affected process |
 | `tech-data` | Phase 3 | IT lead + sponsor | `tech-inventory.md` | `checkpoints/checkpoint-tech-data.docx` | `checkpoints/CP-tech-data-outcome.md` | n/a — advisory review doc, opt-in, no gate |
 | `opportunities` | Phase 5 | Sponsor + decision-maker | `opportunities/OPP-NNN.md` | `checkpoints/opportunities/OPP-NNN.docx` (one per opportunity) | `checkpoints/opportunities/CP-OPP-NNN-outcome.md` (one per opportunity) | n/a — advisory review doc, opt-in, no gate |
-| `use-case-briefs` | Phase 8 | Sponsor + process owners | `usecase-briefs/_index.md`, `usecase-briefs/UC-NNN.md` | `checkpoints/checkpoint-use-case-briefs.docx` | `checkpoints/CP-use-case-briefs-outcome.md` | n/a — advisory review doc, opt-in, no gate |
+| `use-case-briefs` | Phase 8 | Sponsor + process owners | `usecase-briefs/UC-NNN.md` | `checkpoints/use-case-briefs/UC-NNN.docx` (one per brief) | `checkpoints/use-case-briefs/CP-UC-NNN-outcome.md` (one per brief) | n/a — advisory review doc, opt-in, no gate |
 | `business-case` | Phase 9 | Decision-maker + sponsor | `business-case.md` | `checkpoints/checkpoint-business-case.docx` | `checkpoints/CP-business-case-outcome.md` | n/a — advisory review doc, opt-in, no gate |
 
 ## Orchestration
@@ -52,6 +52,8 @@ Every checkpoint id follows the same deterministic path — no LLM renderer, no 
 For `process-validation` specifically: the command writes one `checkpoints/process-validation/PROC-NNN.docx` and one `CP-PROC-NNN-outcome.md` (Outcome: Pending) per in-scope (`Ready`) process. Tell the user a per-process Word review was generated for each process owner to confirm or mark up, and that **each owner's sign-off must be recorded** in its `CP-PROC-NNN-outcome.md` (`Confirmed` | `Changes requested` | `Waived (reason)`) before Phase 5. On any `Changes requested`, route that process back to Phase 4, re-run, and regenerate (re-run the command — it preserves existing outcome files).
 
 For `opportunities` specifically: the command writes **one `checkpoints/opportunities/OPP-NNN.docx` per opportunity** (plus a `CP-OPP-NNN-outcome.md` stub each) rather than a single combined document — one reviewable artifact per opportunity. It is advisory/opt-in: record sign-off per opportunity if the client confirms; nothing blocks. Re-running preserves existing outcome files.
+
+For `use-case-briefs` specifically: likewise writes **one `checkpoints/use-case-briefs/UC-NNN.docx` per brief** (plus a `CP-UC-NNN-outcome.md` stub each) — one reviewable artifact per use case. Advisory/opt-in: record sign-off per brief if the client confirms; nothing blocks. Re-running preserves existing outcome files.
 
 ## Recording the outcome
 

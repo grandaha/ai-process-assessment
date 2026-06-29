@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Use-case briefs are now one document per brief** (#183). Instead of a single combined
+  document, the checkpoint writes one `checkpoints/use-case-briefs/UC-NNN.docx` per brief — each a
+  full brief (Situation / Complication / Resolution / Action / …) with its own sign-off stub —
+  mirroring opportunities and process-validation. The UC↔OPP index table is dropped (each brief
+  carries its own opportunity reference; the portfolio checkpoint provides the overview).
+
 ## [2.33.0] - 2026-06-29
 
 ### Changed

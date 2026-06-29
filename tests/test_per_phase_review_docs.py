@@ -4,11 +4,12 @@ REPO = Path(__file__).resolve().parents[1]
 CP = (REPO / "skills" / "building-checkpoint" / "SKILL.md").read_text()
 COND = (REPO / "skills" / "conducting-engagement" / "SKILL.md").read_text()
 IDS = ["tech-data", "opportunities", "use-case-briefs", "business-case"]
-# opportunities is per-opportunity (one doc per OPP), so its path differs from the single-doc ids.
+# opportunities and use-case-briefs are per-item (one doc each), so their paths differ from the
+# single-doc ids.
 DOCX_PATHS = {
     "tech-data": "checkpoints/checkpoint-tech-data.docx",
     "opportunities": "checkpoints/opportunities/OPP-NNN.docx",
-    "use-case-briefs": "checkpoints/checkpoint-use-case-briefs.docx",
+    "use-case-briefs": "checkpoints/use-case-briefs/UC-NNN.docx",
     "business-case": "checkpoints/checkpoint-business-case.docx",
 }
 
