@@ -62,7 +62,9 @@ _LOGO_DRAWING = (
     '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>'
     '</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>')
 
-_WORDMARK = ('<w:r><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/></w:rPr>'
+# w:position raises the wordmark off the baseline so it sits vertically centered against the
+# ~28px mark (value in half-points).
+_WORDMARK = ('<w:r><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/><w:position w:val="14"/></w:rPr>'
              '<w:t xml:space="preserve"> one step labs</w:t></w:r>')
 
 # Orange text dot — the brand cue when the logo image is unavailable.
@@ -85,11 +87,12 @@ def _footer_xml(has_logo):
 
 _STYLES = ('''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="DM Sans" w:hAnsi="DM Sans"/></w:rPr></w:rPrDefault></w:docDefaults>
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="DM Sans" w:hAnsi="DM Sans"/></w:rPr></w:rPrDefault>
+<w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
 <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>'''
  + ''.join(
      f'<w:style w:type="paragraph" w:styleId="Heading{n}"><w:name w:val="heading {n}"/>'
-     f'<w:pPr><w:outlineLvl w:val="{n-1}"/></w:pPr>'
+     f'<w:pPr><w:spacing w:before="240" w:after="80"/><w:outlineLvl w:val="{n-1}"/></w:pPr>'
      f'<w:rPr><w:b/><w:color w:val="111827"/><w:sz w:val="{sz}"/></w:rPr></w:style>'
      for n, sz in ((1, 42), (2, 30), (3, 24)))
  + '</w:styles>')
@@ -97,8 +100,13 @@ _STYLES = ('''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 _NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"')
 
-def _p(text, style=None):
-    ppr = f'<w:pPr><w:pStyle w:val="{style}"/></w:pPr>' if style else ''
+def _p(text, style=None, indent=0):
+    props = ''
+    if style:
+        props += f'<w:pStyle w:val="{style}"/>'
+    if indent:
+        props += f'<w:ind w:left="{indent}"/>'
+    ppr = f'<w:pPr>{props}</w:pPr>' if props else ''
     return f'<w:p>{ppr}<w:r><w:t xml:space="preserve">{escape(text)}</w:t></w:r></w:p>'
 
 def _tbl(headers, rows):
@@ -124,7 +132,7 @@ def _block(b):
     if t == "numbered_list":
         return ''.join(_p(f"{i}. {item}") for i, item in enumerate(b["items"], 1))
     if t == "bullet_list":
-        return ''.join(_p(f"• {item}") for item in b["items"])
+        return ''.join(_p(f"• {item}", indent=b.get("indent", 0)) for item in b["items"])
     if t == "table":
         return _tbl(b["headers"], b["rows"])
     raise ValueError(f"unknown block type: {t}")
@@ -151,5 +159,5 @@ def build_docx(blocks, out_path):
 def heading(text, level=1): return {"type": "heading", "text": text, "level": level}
 def paragraph(text): return {"type": "paragraph", "text": text}
 def numbered_list(items): return {"type": "numbered_list", "items": list(items)}
-def bullet_list(items): return {"type": "bullet_list", "items": list(items)}
+def bullet_list(items, indent=0): return {"type": "bullet_list", "items": list(items), "indent": indent}
 def table(headers, rows): return {"type": "table", "headers": list(headers), "rows": [list(r) for r in rows]}
