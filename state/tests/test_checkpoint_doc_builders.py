@@ -57,7 +57,30 @@ other
     assert "Polaris holds operational truth." in paras and "Shadow spreadsheets exist." in paras
     assert "4. Next" not in repr(blocks)                       # stops at next section
 
-def test_prose_section_keeps_bold_leader():
+def test_prose_section_strips_bold_leader():
     md = "## S\n**Important:** do it.\n## T\n"
     blocks = cd.prose_section("S", md, "S")
-    assert any(b["text"] == "**Important:** do it." for b in blocks)   # bold not stripped
+    assert any(b["text"] == "Important: do it." for b in blocks)   # bold markers stripped
+    assert not any("**" in b.get("text", "") for b in blocks)
+
+def test_blocks_from_markdown_strips_bold_and_converts_headings():
+    md = "### Cost structure\n**Implementation:** $111k of labor.\n"
+    blocks = cd.blocks_from_markdown(md)
+    assert {"type": "heading", "text": "Cost structure", "level": 3} in blocks
+    para = next(b for b in blocks if b["type"] == "paragraph")
+    assert para["text"] == "Implementation: $111k of labor."
+    assert "**" not in para["text"] and "###" not in repr(blocks)
+
+def test_blocks_from_markdown_splits_adjacent_tables():
+    # two pipe-tables with NO blank line between them must not merge
+    md = ("| Cost | Est |\n|---|---|\n| Labor | $1 |\n"
+          "| Value | Cat |\n|---|---|\n| Revenue | High |\n")
+    tables = [b for b in cd.blocks_from_markdown(md) if b["type"] == "table"]
+    assert len(tables) == 2
+    assert tables[0]["headers"] == ["Cost", "Est"] and tables[0]["rows"] == [["Labor", "$1"]]
+    assert tables[1]["headers"] == ["Value", "Cat"] and tables[1]["rows"] == [["Revenue", "High"]]
+
+def test_clean_inline_preserves_underscores():
+    # identifiers with underscores must survive untouched (no italic/underscore stripping)
+    blocks = cd.blocks_from_markdown("See PROC_001 and model_baselines.json.\n")
+    assert blocks[0]["text"] == "See PROC_001 and model_baselines.json."
