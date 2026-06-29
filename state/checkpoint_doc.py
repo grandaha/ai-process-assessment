@@ -330,33 +330,28 @@ CHECKPOINTS["tech-data"] = Checkpoint(
     output="checkpoints/checkpoint-tech-data.docx",
     outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
 
-def _build_use_case_briefs(root):
-    idx = _read(root, "usecase-briefs/_index.md")          # UC↔OPP mapping (optional)
-    briefs = sorted((Path(root) / "usecase-briefs").glob("UC-*.md"))
-    if not idx.strip() and not briefs:
-        raise FileNotFoundError("required source missing or empty: usecase-briefs/")
-    blocks = [docx.heading("Use-Case Briefs — For Your Review", 1)]
-    blocks += note("These are the packaged use cases. Confirm each reflects how the work really "
-                   "happens, or note corrections.")
-    if idx.strip():
-        h, r = md_table(idx)
-        blocks += table_section("Brief index", h, r)
-    # Each UC-NNN.md is a full client-facing brief — render every section (title + each
-    # **Label:** field as a sub-heading + its body; Action / Risks render as real bullet lists).
-    for uc in briefs:
-        text = uc.read_text(encoding="utf-8")
-        m = re.search(r"^#+\s+(.+?)\s*$", text, re.MULTILINE)
-        blocks.append(docx.heading(m.group(1).strip() if m else uc.stem, 2))
-        for label, body in _labeled_sections(text):
-            blocks.append(docx.heading(label, 3))
-            blocks += blocks_from_markdown(body) if body else []
-    blocks += signoff_block("Sponsor / process owners")
+def _usecase_items(root):
+    # per-item source for use-case-briefs: (UC-id, brief md) for each UC-NNN.md.
+    return [(f.stem, f.read_text(encoding="utf-8"))
+            for f in sorted((Path(root) / "usecase-briefs").glob("UC-*.md"))]
+
+def _build_one_usecase_brief(root, uc_md):
+    # One document per brief: title + every **Label:** section (Situation / Complication /
+    # Resolution / Action / …) as a sub-heading + body via the shared renderer (so the
+    # readability rule applies — Action / Risks become bullet lists). Whole brief is client-facing.
+    m = re.search(r"^#+\s+(.+?)\s*$", uc_md, re.MULTILINE)
+    blocks = [docx.heading(m.group(1).strip() if m else "Use-Case Brief", 1)]
+    blocks += note("Confirm this use case reflects how the work really happens, or note corrections.")
+    for label, body in _labeled_sections(uc_md):
+        blocks.append(docx.heading(label, 2))
+        blocks += blocks_from_markdown(body) if body else []
+    blocks += signoff_block("Sponsor / process owner")
     return blocks
 
 CHECKPOINTS["use-case-briefs"] = Checkpoint(
-    "use-case-briefs", items=None, gate=False,
-    output="checkpoints/checkpoint-use-case-briefs.docx",
-    outcome="checkpoints/CP-use-case-briefs-outcome.md", build=_build_use_case_briefs)
+    "use-case-briefs", items=_usecase_items, gate=False,
+    output="checkpoints/use-case-briefs/{id}.docx",
+    outcome="checkpoints/use-case-briefs/CP-{id}-outcome.md", build=_build_one_usecase_brief)
 
 def _build_portfolio(root):
     roadmap = _read(root, "roadmap.md")
