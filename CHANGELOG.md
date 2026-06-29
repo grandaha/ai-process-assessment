@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Use-case-briefs checkpoint crashed and rendered the wrong content** (#171). It required a
+  `usecase-briefs/_index.md` (raising `FileNotFoundError` when absent) and rendered only a
+  per-brief "first table" — but real `UC-NNN.md` briefs have no leading table; they're full
+  `**Label:**` briefs. The checkpoint now renders each brief in full — title plus every section
+  (Situation / Complication / Resolution / Action / Data requirements / Success metric / Risks &
+  mitigations / Sourcing / Wave), with bulleted sections as real lists. The UC↔OPP index table is
+  now optional (rendered when present); the checkpoint raises only when there are no briefs at all.
+
 ## [2.30.0] - 2026-06-29
 
 ### Added

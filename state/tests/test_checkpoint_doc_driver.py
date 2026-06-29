@@ -179,36 +179,55 @@ def test_missing_primary_source_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         cd.render_checkpoint(str(tmp_path), "tech-data")
 
-def test_use_case_briefs_first_table_only_no_merge(tmp_path):
-    # a UC file with TWO tables must render only the first; the second must not merge in
-    d = tmp_path / "usecase-briefs"; d.mkdir()
-    (d / "_index.md").write_text(
-        "# Use-Case Briefs\n## UC mapping\n| UC | Title |\n|---|---|\n| UC-001 | Status Assistant |\n")
-    (d / "UC-001.md").write_text(
-        "# UC-001 — Status Assistant\n\n"
-        "| Field | Value |\n|---|---|\n| Opportunity type | Chain Automation |\n\n"
-        "## Risks\n| Risk | Mitigation |\n|---|---|\n| Data drift | Monitor monthly |\n")
-    from state import checkpoint_doc as cd
-    cd.render_checkpoint(str(tmp_path), "use-case-briefs")
-    import zipfile
-    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
-        xml = z.read("word/document.xml").decode()
-    assert "Chain Automation" in xml          # first table rendered
-    assert "Data drift" not in xml            # second table NOT merged into the field table
+_UC_BRIEF = (
+    "## UC-001 — Structured Scope-Gap Capture Workflow\n\n"
+    "**Opportunity reference:** OPP-008\n"
+    "**Opportunity type:** RPA\n\n"
+    "**Situation:** Developers surface scope gaps via an informal Slack DM.\n\n"
+    "**Resolution:** A Slack Workflow Builder workflow that captures and dual-routes the gap.\n\n"
+    "**Action:**\n"
+    "- Tyler Brooks, Month 1: configure the workflow and pilot with two developers\n"
+    "- Tyler Brooks + Lisa Park, Month 2: firm-wide rollout\n\n"
+    "**Risks & mitigations:**\n"
+    "- Developer adoption risk: mitigate with a 30-day pilot\n"
+    "- Free-text data quality: use a templated dropdown\n\n"
+    "**Wave assignment:** Wave 1 — Month 1–2 target.\n")
 
-def test_use_case_briefs_doc_has_index_and_per_brief(tmp_path):
+def test_use_case_briefs_renders_full_brief_sections(tmp_path):
     d = tmp_path / "usecase-briefs"; d.mkdir()
     (d / "_index.md").write_text(
-        "# Use-Case Briefs\n## UC ↔ OPP mapping\n"
-        "| UC-NNN | Title | Wave |\n|---|---|---|\n| UC-001 | Status Assistant | 1 |\n")
-    (d / "UC-001.md").write_text(
-        "# UC-001 — Status Assistant\n\n| Field | Value |\n|---|---|\n"
-        "| Opportunity type | Chain Automation |\n## Situation\nThe PM assembles reports.\n")
+        "## UC ↔ OPP mapping\n| UC | Title | Wave |\n|---|---|---|\n| UC-001 | Scope-Gap Capture | 1 |\n")
+    (d / "UC-001.md").write_text(_UC_BRIEF)
     from state import checkpoint_doc as cd
     cd.render_checkpoint(str(tmp_path), "use-case-briefs")
     import zipfile
     with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
         xml = z.read("word/document.xml").decode()
-    assert "UC-001" in xml and "Status Assistant" in xml          # index + brief title
-    assert "Chain Automation" in xml                              # per-brief field table
-    assert "Confirmed" in xml
+    assert "Scope-Gap Capture Workflow" in xml                   # brief title
+    assert "Situation" in xml and "informal Slack DM" in xml     # SCR section + body
+    assert "Resolution" in xml and "dual-route" in xml
+    assert "Risks &amp; mitigations" in xml or "Risks & mitigations" in xml
+    assert "Developer adoption risk" in xml                      # bulleted section body
+    assert "configure the workflow and pilot" in xml            # Action bullet
+    assert "•" in xml                                            # bullets rendered as a real list
+    assert "Wave 1" in xml
+    assert "Confirmed" in xml                                    # sign-off
+    assert "Brief index" in xml                                  # index table section rendered
+
+def test_use_case_briefs_index_optional(tmp_path):
+    # no _index.md present — must still render the briefs, not crash
+    d = tmp_path / "usecase-briefs"; d.mkdir()
+    (d / "UC-001.md").write_text(_UC_BRIEF)
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "use-case-briefs")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-use-case-briefs.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    assert "Scope-Gap Capture Workflow" in xml and "informal Slack DM" in xml
+
+def test_use_case_briefs_raises_when_empty(tmp_path):
+    import pytest
+    (tmp_path / "usecase-briefs").mkdir()       # no index, no briefs
+    from state import checkpoint_doc as cd
+    with pytest.raises(FileNotFoundError):
+        cd.render_checkpoint(str(tmp_path), "use-case-briefs")

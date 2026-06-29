@@ -131,16 +131,12 @@ def full_section(title, md, heading):
     body = md_section(md, heading)
     return [docx.heading(title, 2)] + blocks_from_markdown(body) if body else []
 
-def _first_table(md):
-    """Header+rows of the FIRST contiguous pipe-table block; ([], []) if none."""
-    block = []
-    for line in md.splitlines():
-        s = line.strip()
-        if s.startswith("|"):
-            block.append(s)
-        elif block:
-            break
-    return md_table("\n".join(block))
+def _labeled_sections(md):
+    """[(label, body)] for each top-of-line `**Label:**` field, body running to the next such
+    label or end — captures inline text plus any following block lines (lists, prose, tables)."""
+    return [(m.group(1).strip(), m.group(2).strip()) for m in re.finditer(
+        r"^\*\*([^\n*]+?):\*\*[ \t]*(.*?)(?=^\*\*[^\n*]+?:\*\*|\Z)",
+        md, re.MULTILINE | re.DOTALL)]
 
 def table_section(title, headers, rows):
     return [docx.heading(title, 2), docx.table(headers, rows)] if rows else []
@@ -283,20 +279,25 @@ CHECKPOINTS["tech-data"] = Checkpoint(
     outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
 
 def _build_use_case_briefs(root):
-    idx = _require(root, "usecase-briefs/_index.md")
+    idx = _read(root, "usecase-briefs/_index.md")          # UC↔OPP mapping (optional)
+    briefs = sorted((Path(root) / "usecase-briefs").glob("UC-*.md"))
+    if not idx.strip() and not briefs:
+        raise FileNotFoundError("required source missing or empty: usecase-briefs/")
     blocks = [docx.heading("Use-Case Briefs — For Your Review", 1)]
     blocks += note("These are the packaged use cases. Confirm each reflects how the work really "
                    "happens, or note corrections.")
-    h, r = md_table(idx)                                  # the UC↔OPP mapping table
-    blocks += table_section("Brief index", h, r)
-    for uc in sorted((Path(root) / "usecase-briefs").glob("UC-*.md")):
+    if idx.strip():
+        h, r = md_table(idx)
+        blocks += table_section("Brief index", h, r)
+    # Each UC-NNN.md is a full client-facing brief — render every section (title + each
+    # **Label:** field as a sub-heading + its body; Action / Risks render as real bullet lists).
+    for uc in briefs:
         text = uc.read_text(encoding="utf-8")
-        m = re.search(r"^#\s+(.+?)\s*$", text, re.MULTILINE)
-        title = m.group(1).strip() if m else uc.stem
-        th, tr = _first_table(text)                       # only the Field/Value summary; later tables intentionally dropped
-        blocks += [docx.heading(title, 2)]
-        if tr:
-            blocks += [docx.table(th, tr)]   # table only — the UC title is the heading above
+        m = re.search(r"^#+\s+(.+?)\s*$", text, re.MULTILINE)
+        blocks.append(docx.heading(m.group(1).strip() if m else uc.stem, 2))
+        for label, body in _labeled_sections(text):
+            blocks.append(docx.heading(label, 3))
+            blocks += blocks_from_markdown(body) if body else []
     blocks += signoff_block("Sponsor / process owners")
     return blocks
 
