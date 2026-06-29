@@ -241,7 +241,6 @@ def test_footer_part_is_wired(tmp_path):
         assert "footerReference" in doc                        # sectPr references the footer
         footer = z.read("word/footer1.xml").decode()
     assert "one step labs" in footer                           # wordmark
-    assert "E06030" in footer                                  # orange signature dot
     assert "6B7280" in footer                                  # muted text
     assert "E5E7EB" in footer                                  # subtle top rule
 
@@ -279,3 +278,44 @@ def test_split_actors_keeps_parenthesized_semicolons_intact():
         "Lisa Park's team (execution, Step 6; checklist items, Step 3)",
         "Client (creds, Step 3; scheduling, Step 5)",
     ]
+
+
+# --- OSL dot-mark logo embedded in footer (#157) ---
+def test_footer_embeds_logo_mark_image(tmp_path):
+    from state import docx
+    out = tmp_path / "d.docx"
+    docx.build_docx([docx.paragraph("body")], str(out))
+    with zipfile.ZipFile(out) as z:
+        names = z.namelist()
+        assert "word/media/logo-mark.png" in names                 # media part present
+        ct = z.read("[Content_Types].xml").decode()
+        assert "image/png" in ct                                    # png content-type registered
+        frels = z.read("word/_rels/footer1.xml.rels").decode()
+        assert "media/logo-mark.png" in frels                       # footer->image relationship
+        footer = z.read("word/footer1.xml").decode()
+        assert "<w:drawing>" in footer and "r:embed" in footer      # inline picture referencing the blip
+        assert "one step labs" in footer                            # wordmark still present (live text)
+        png = z.read("word/media/logo-mark.png")
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"                          # real PNG bytes
+
+
+def test_footer_degrades_to_wordmark_when_asset_missing(tmp_path, monkeypatch):
+    # if the logo asset can't be read, the footer must still render (wordmark only), not crash.
+    from state import docx
+    monkeypatch.setattr(docx, "_logo_png_bytes", lambda: None)
+    out = tmp_path / "d.docx"
+    docx.build_docx([docx.paragraph("body")], str(out))
+    with zipfile.ZipFile(out) as z:
+        names = z.namelist()
+        assert "word/media/logo-mark.png" not in names              # no media part
+        footer = z.read("word/footer1.xml").decode()
+        assert "one step labs" in footer                            # wordmark still rendered
+        assert "E06030" in footer                                   # orange text-dot fallback
+        assert "<w:drawing>" not in footer                          # no picture
+        assert "image/png" not in z.read("[Content_Types].xml").decode()  # no png content-type
+    # document still valid/openable
+    from xml.dom import minidom
+    with zipfile.ZipFile(out) as z:
+        for n in z.namelist():
+            if n.endswith(".xml") or n.endswith(".rels"):
+                minidom.parseString(z.read(n))
