@@ -212,7 +212,7 @@ def test_use_case_briefs_renders_full_brief_sections(tmp_path):
     assert "•" in xml                                            # bullets rendered as a real list
     assert "Wave 1" in xml
     assert "Confirmed" in xml                                    # sign-off
-    assert "UC ↔ OPP mapping" in xml or "Scope-Gap Capture" in xml  # index rendered
+    assert "Brief index" in xml                                  # index table section rendered
 
 def test_use_case_briefs_index_optional(tmp_path):
     # no _index.md present — must still render the briefs, not crash
