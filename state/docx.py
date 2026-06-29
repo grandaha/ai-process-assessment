@@ -2,16 +2,32 @@
 # ponytail: only the block types the process review needs; add more when a caller needs them.
 # ponytail: numbered_list renders as "N. text" paragraphs — avoids the fiddly numbering.xml part.
 import zipfile
+from pathlib import Path
 from xml.sax.saxutils import escape
 
-_CT = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
-<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
-</Types>'''
+# The OSL dot-mark, vendored as a transparent PNG (Word can't embed the SVG). Sibling of
+# state/ at the plugin root: <root>/assets/osl/logo-mark.png. See assets/osl/SOURCE.md.
+_LOGO_PATH = Path(__file__).resolve().parent.parent / "assets" / "osl" / "logo-mark.png"
+
+def _logo_png_bytes():
+    # Returns the mark PNG bytes, or None if the asset is unavailable (footer then degrades to
+    # wordmark-only — a missing logo must never crash deliverable generation).
+    try:
+        return _LOGO_PATH.read_bytes()
+    except OSError:
+        return None
+
+def _content_types(has_logo):
+    png = '<Default Extension="png" ContentType="image/png"/>' if has_logo else ''
+    return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+            '<Default Extension="xml" ContentType="application/xml"/>'
+            + png +
+            '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+            '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'
+            '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>'
+            '</Types>')
 
 _RELS = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -24,16 +40,48 @@ _DOC_RELS = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
 </Relationships>'''
 
-# OSL-branded page footer (the reusable template, on every page of every doc): a subtle top
-# rule (#E5E7EB), an orange signature dot (#E06030), and the muted (#6B7280) "one step labs"
-# wordmark in DM Sans. Mirrors the OSL `.doc-footer` convention. ponytail: text/native — no
-# image part, no asset pipeline; the graphical dot-mark can drop in here later.
-_FOOTER = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-           '<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
-           '<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="6" w:color="E5E7EB"/></w:pBdr></w:pPr>'
-           '<w:r><w:rPr><w:color w:val="E06030"/><w:sz w:val="18"/></w:rPr><w:t>●</w:t></w:r>'
-           '<w:r><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/></w:rPr>'
-           '<w:t xml:space="preserve"> one step labs</w:t></w:r></w:p></w:ftr>')
+_FOOTER_RELS = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" '
+                'Target="media/logo-mark.png"/></Relationships>')
+
+# logo-mark.png is 300x306 px; render it ~20px tall in the footer. 1 px = 9525 EMU (96 dpi).
+_LOGO_CY = 20 * 9525
+_LOGO_CX = _LOGO_CY * 300 // 306
+
+# Inline-picture run for the dot-mark (blip rId1 in the footer's rels).
+_LOGO_DRAWING = (
+    '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">'
+    f'<wp:extent cx="{_LOGO_CX}" cy="{_LOGO_CY}"/><wp:effectExtent l="0" t="0" r="0" b="0"/>'
+    '<wp:docPr id="1" name="OSL mark"/>'
+    '<wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr>'
+    '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+    '<pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="OSL mark"/><pic:cNvPicPr/></pic:nvPicPr>'
+    '<pic:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
+    f'<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{_LOGO_CX}" cy="{_LOGO_CY}"/></a:xfrm>'
+    '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>'
+    '</a:graphicData></a:graphic></wp:inline></w:drawing></w:r>')
+
+_WORDMARK = ('<w:r><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/></w:rPr>'
+             '<w:t xml:space="preserve"> one step labs</w:t></w:r>')
+
+# Orange text dot — the brand cue when the logo image is unavailable.
+_DOT = '<w:r><w:rPr><w:color w:val="E06030"/><w:sz w:val="18"/></w:rPr><w:t>●</w:t></w:r>'
+
+_FTR_NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+           'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
+           'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+           'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" '
+           'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"')
+
+def _footer_xml(has_logo):
+    # OSL-branded page footer: subtle top rule (#E5E7EB) + the dot-mark logo (or an orange text
+    # dot when the image is unavailable) + the muted (#6B7280) "one step labs" wordmark.
+    mark = _LOGO_DRAWING if has_logo else _DOT
+    return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            f'<w:ftr {_FTR_NS}>'
+            '<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="6" w:color="E5E7EB"/></w:pBdr></w:pPr>'
+            + mark + _WORDMARK + '</w:p></w:ftr>')
 
 _STYLES = ('''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
@@ -87,12 +135,16 @@ def build_docx(blocks, out_path):
                 f'<w:document {_NS}><w:body>{body}'
                 '<w:sectPr><w:footerReference w:type="default" r:id="rId2"/>'
                 '<w:pgSz w:w="12240" w:h="15840"/></w:sectPr></w:body></w:document>')
+    logo = _logo_png_bytes()
     with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", _CT)
+        z.writestr("[Content_Types].xml", _content_types(logo is not None))
         z.writestr("_rels/.rels", _RELS)
         z.writestr("word/_rels/document.xml.rels", _DOC_RELS)
         z.writestr("word/styles.xml", _STYLES)
-        z.writestr("word/footer1.xml", _FOOTER)
+        z.writestr("word/footer1.xml", _footer_xml(logo is not None))
+        if logo is not None:
+            z.writestr("word/_rels/footer1.xml.rels", _FOOTER_RELS)
+            z.writestr("word/media/logo-mark.png", logo)
         z.writestr("word/document.xml", document)
     return out_path
 
