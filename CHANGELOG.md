@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.33.0] - 2026-06-29
+
 ### Changed
 - **Standing readability rule across all checkpoint/review documents** (#180). Any prose value
   that decomposes into a list now renders as bullets instead of a wall of text: top-level
