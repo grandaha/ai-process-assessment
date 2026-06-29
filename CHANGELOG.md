@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.27.0] - 2026-06-29
+
 ### Added
 - **OSL-branded document template** (#154). Every generated checkpoint/review `.docx` now carries
   a One Step Labs page footer on every page — the `one step labs` wordmark with the signature
