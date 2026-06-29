@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.29.0] - 2026-06-29
+
 ### Changed
 - **Step color ratings removed from the owner process-validation doc** (#165). The per-step
   Green/Yellow/Red ratings are assessor analysis (they drive the chain scan / opportunity
