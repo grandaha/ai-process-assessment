@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Opportunity "Expected value" reads as scannable bullets** (#177). The value figure was one
+  dense paragraph (per-project math and annualized hrs/FTE crammed together). It now renders one
+  bullet per sentence — verbatim text, split only at sentence boundaries (decimals like `0.10` and
+  parenthetical citations are left intact) — so each value point stands on its own line.
+
 ## [2.32.0] - 2026-06-29
 
 ### Changed

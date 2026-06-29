@@ -362,6 +362,11 @@ _OPP_FIELDS = [("Type", "Type"),
                ("GRC flag", "Governance & risk"),
                ("Data / system dependencies", "Systems & data")]
 
+def _sentences(text):
+    # Split prose into sentences on ". " before a capital — leaves decimals (0.10), ranges, and
+    # parenthetical citations intact. Used to make a dense field scannable, verbatim.
+    return [s.strip() for s in re.split(r"(?<=\.)\s+(?=[A-Z])", text) if s.strip()]
+
 def _build_one_opportunity(root, opp_md):
     # One document per opportunity: title + the client-facing fields. The assessor-derivation
     # fields (Type source / Chain formation / Structural response) and the <!-- index --> comment
@@ -372,8 +377,14 @@ def _build_one_opportunity(root, opp_md):
                    "characterized, or note what should change.")
     for src_label, disp in _OPP_FIELDS:
         v = md_field(opp_md, src_label)
-        if v:
-            blocks += [docx.heading(disp, 2), docx.paragraph(_clean_inline(v))]
+        if not v:
+            continue
+        v = _clean_inline(v)
+        blocks.append(docx.heading(disp, 2))
+        # Expected value is a multi-sentence calculation — render one bullet per sentence so the
+        # per-project and annualized figures stand apart instead of forming one block.
+        sents = _sentences(v) if src_label == "Value hypothesis" else [v]
+        blocks.append(docx.bullet_list(sents) if len(sents) > 1 else docx.paragraph(v))
     blocks += signoff_block("Sponsor / decision-maker")
     return blocks
 
