@@ -43,7 +43,7 @@ Then edit `~/.claude/plugins/installed_plugins.json` and add this entry inside t
   {
     "scope": "local",
     "installPath": "/absolute/path/to/ai-process-assessment",
-    "version": "2.33.0",
+    "version": "2.34.0",
     "installedAt": "2026-05-08T21:44:01.000Z",
     "lastUpdated": "2026-05-08T21:44:01.000Z",
     "projectPath": "/absolute/path/to/your/vault"
