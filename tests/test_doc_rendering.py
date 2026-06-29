@@ -13,7 +13,15 @@ def _types(blocks):
 
 def test_bullet_list_factory():
     b = docx.bullet_list(["a", "b"])
-    assert b == {"type": "bullet_list", "items": ["a", "b"]}
+    assert b == {"type": "bullet_list", "items": ["a", "b"], "indent": 0}
+
+
+def test_bullet_list_indent_renders_left_indent(tmp_path):
+    out = tmp_path / "d.docx"
+    docx.build_docx([docx.bullet_list(["sub"], indent=720)], str(out))
+    with zipfile.ZipFile(out) as z:
+        body = z.read("word/document.xml").decode()
+    assert '<w:ind w:left="720"/>' in body and "• sub" in body
 
 
 def test_bullet_list_renders_with_bullet_glyph(tmp_path):
@@ -120,13 +128,42 @@ def test_field_body_single_line_trigger():
     assert "Closed Won" in body
 
 
-def test_steps_are_clean_actions():
+def test_steps_split_action_and_rating_note():
     steps = pr._steps(PROC)
     assert len(steps) == 3
-    joined = " ".join(steps)
-    for marker in ("Green", "Yellow", "Red", "**", "—", "(", "automated trigger"):
-        assert marker not in joined, f"leaked {marker!r} into steps"
-    assert steps[0] == "PM receives Slack notification"
+    action0, note0 = steps[0]
+    assert action0 == "PM receives Slack notification"          # clean action
+    for marker in ("Green", "Yellow", "Red", "**", "—", "("):
+        assert marker not in action0, f"leaked {marker!r} into action"
+    assert note0.startswith("Green")                            # rating kept in the note
+    assert "automated trigger" in note0                         # rationale kept
+    assert "**" not in note0                                    # markers stripped
+
+
+def test_steps_split_anchors_on_bolded_rating_not_action_dash():
+    # the action itself may contain an em-dash; the split must anchor on the bolded rating.
+    md = "**Steps:**\n1. Open checklist (stale — contains old items) — **Yellow** (standardize)\n\n"
+    action, note = pr._steps(md)[0]
+    assert action == "Open checklist (stale — contains old items)"
+    assert note.startswith("Yellow")
+
+
+def test_steps_without_rating_have_no_note():
+    md = "**Steps:**\n1. Just a plain action with no rating\n\n"
+    action, note = pr._steps(md)[0]
+    assert action == "Just a plain action with no rating"
+    assert note is None
+
+
+def test_build_blocks_renders_step_rating_as_indented_subbullet():
+    blocks = pr.build_blocks(PROC)
+    si = next(i for i, b in enumerate(blocks)
+              if b["type"] == "heading" and b["text"] == "Steps")
+    assert blocks[si + 1]["type"] == "paragraph"
+    assert blocks[si + 1]["text"] == "1. PM receives Slack notification"
+    sub = blocks[si + 2]
+    assert sub["type"] == "bullet_list" and sub["indent"] > 0       # indented sub-bullet
+    assert sub["items"][0].startswith("Green")
 
 
 def test_build_blocks_renders_both_decision_points_as_bullets():
@@ -324,3 +361,18 @@ def test_footer_degrades_to_wordmark_when_asset_missing(tmp_path, monkeypatch):
         for n in z.namelist():
             if n.endswith(".xml") or n.endswith(".rels"):
                 minidom.parseString(z.read(n))
+
+
+# --- spacing + footer wordmark alignment (#162) ---
+def test_default_paragraph_spacing_in_styles():
+    # breathing room: default after-spacing + line spacing on every paragraph.
+    assert 'w:after="120"' in docx._STYLES
+    assert 'w:line="276"' in docx._STYLES
+
+
+def test_footer_wordmark_vertically_positioned(tmp_path):
+    out = tmp_path / "d.docx"
+    docx.build_docx([docx.paragraph("body")], str(out))
+    with zipfile.ZipFile(out) as z:
+        footer = z.read("word/footer1.xml").decode()
+    assert "<w:position" in footer            # wordmark raised to center on the mark

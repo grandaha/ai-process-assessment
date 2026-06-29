@@ -23,18 +23,28 @@ def _title(md):
 
 
 def _steps(md):
-    # numbered lines under "**Steps:**" up to the next blank line / bold label;
-    # strip the internal "— **Color** (rationale)" note and any legacy " → …" from each.
+    # numbered lines under "**Steps:**" up to the next blank line / bold label. Each step is
+    # "action — **Rating** (rationale)"; return (action, note) so the renderer can show the
+    # rating + rationale as an indented sub-bullet. The action may itself contain em-dashes,
+    # so split on the bolded rating (" — **"), not the first dash.
     block = re.search(r"\*\*Steps:\*\*\s*\n(.*?)(?:\n\s*\n|\n\*\*)", md, re.DOTALL)
     if not block:
         return []
     out = []
     for line in block.group(1).splitlines():
         m = re.match(r"^\s*\d+\.\s*(.+)$", line)
-        if m:
-            action = re.sub(r"\s*—\s*\*\*(?:Green|Yellow|Red)\*\*.*$", "", m.group(1))
-            action = action.split(" → ")[0]
-            out.append(_clean_inline(action).strip())
+        if not m:
+            continue
+        text = m.group(1).strip()
+        rating = re.match(r"^(.*?)\s+—\s+(\*\*.*)$", text)          # action — **Rating** (…)
+        if rating:
+            action, note = rating.group(1), rating.group(2)
+        elif " → " in text:                                         # legacy arrow form
+            action, note = text.split(" → ", 1)
+        else:
+            action, note = text, None
+        out.append((_clean_inline(action).strip(),
+                    _clean_inline(note).strip() if note else None))
     return out
 
 
@@ -77,7 +87,11 @@ def build_blocks(proc_md):
         blocks += [docx.heading("Trigger", 2)] + blocks_from_markdown(trigger)
     steps = _steps(proc_md)
     if steps:
-        blocks += [docx.heading("Steps", 2), docx.numbered_list(steps)]
+        blocks.append(docx.heading("Steps", 2))
+        for i, (action, note) in enumerate(steps, 1):
+            blocks.append(docx.paragraph(f"{i}. {action}"))
+            if note:
+                blocks.append(docx.bullet_list([note], indent=720))   # rating + rationale, indented
     for label in ("Actors", "Decision points", "Exceptions", "Upstream / downstream"):
         body = _field_body(proc_md, label)
         if not body:

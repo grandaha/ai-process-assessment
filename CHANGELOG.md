@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Process step ratings render as indented sub-bullets** (#162). Each process step now shows a
+  clean numbered action with its Green/Yellow/Red rating and rationale as an indented sub-bullet
+  beneath it, instead of being embedded in (or stripped from) the step text. The split anchors on
+  the bolded rating, so an em-dash inside an action no longer truncates it, and compound ratings
+  like `Yellow/GRC-flagged` are handled.
+- **Document spacing and footer alignment** (#162). Added breathing room between paragraphs/bullets
+  (default after-spacing + 1.15 line spacing, with space before headings), and vertically centered
+  the `one step labs` footer wordmark against the dot-mark.
+
 ## [2.27.2] - 2026-06-29
 
 ### Changed
