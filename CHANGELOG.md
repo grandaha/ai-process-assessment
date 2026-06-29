@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.32.0] - 2026-06-29
+
 ### Changed
 - **Opportunities checkpoint is now one document per opportunity** (#174). Instead of a single
   document containing all opportunities (too much to review at once), the checkpoint writes one
