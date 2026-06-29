@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.31.0] - 2026-06-29
+
 ### Fixed
 - **Use-case-briefs checkpoint crashed and rendered the wrong content** (#171). It required a
   `usecase-briefs/_index.md` (raising `FileNotFoundError` when absent) and rendered only a
