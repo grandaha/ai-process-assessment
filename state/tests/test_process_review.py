@@ -27,20 +27,18 @@ PROC = """## PROC-001 — Staffing & Resource Assignment
 | FTE effort | 3.5 | RMO estimate | Medium |
 """
 
-def test_build_blocks_includes_owner_fields_and_rating_subbullets():
+def test_build_blocks_includes_owner_fields_strips_color_notes():
     blocks = pr.build_blocks(PROC)
     text = "\n".join(b.get("text", "") + " ".join(b.get("items", [])) for b in blocks)
     assert "PROC-001" in text and "Staffing & Resource Assignment" in text
     assert "A project is won" in text                      # trigger
-    assert "EM submits a staffing request." in text        # step action kept (clean)
-    assert "intake is unstructured" in text                # rating note kept (as sub-bullet)
+    assert "EM submits a staffing request." in text        # step action kept
+    # color rating + rationale are assessor analysis — stripped from the owner doc
+    assert "Yellow" not in text and "intake is unstructured" not in text
+    assert "→" not in text
     assert "RMO analyst" in text                           # actors
     assert "Candidate selection" in text                   # decision points
     assert "Double-bookings" in text                       # exceptions
-    # the action paragraph itself must NOT carry the rating note
-    step1 = next(b["text"] for b in blocks
-                 if b["type"] == "paragraph" and b["text"].startswith("1."))
-    assert "Yellow" not in step1 and "→" not in step1
 
 def test_build_blocks_excludes_internal_analysis():
     text = repr(pr.build_blocks(PROC))

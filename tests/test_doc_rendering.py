@@ -128,42 +128,42 @@ def test_field_body_single_line_trigger():
     assert "Closed Won" in body
 
 
-def test_steps_split_action_and_rating_note():
+def test_steps_are_clean_actions_ratings_stripped():
     steps = pr._steps(PROC)
     assert len(steps) == 3
-    action0, note0 = steps[0]
-    assert action0 == "PM receives Slack notification"          # clean action
-    for marker in ("Green", "Yellow", "Red", "**", "—", "("):
-        assert marker not in action0, f"leaked {marker!r} into action"
-    assert note0.startswith("Green")                            # rating kept in the note
-    assert "automated trigger" in note0                         # rationale kept
-    assert "**" not in note0                                    # markers stripped
+    assert steps[0] == "PM receives Slack notification"
+    joined = " ".join(steps)
+    # an action may legitimately contain an em-dash; what must not leak is the rating itself.
+    for marker in ("Green", "Yellow", "Red", "**", "automated trigger"):
+        assert marker not in joined, f"leaked {marker!r} into steps"
 
 
-def test_steps_split_anchors_on_bolded_rating_not_action_dash():
-    # the action itself may contain an em-dash; the split must anchor on the bolded rating.
+def test_steps_strip_anchors_on_bolded_rating_not_action_dash():
+    # the action itself may contain an em-dash; the strip must anchor on the bolded rating.
     md = "**Steps:**\n1. Open checklist (stale — contains old items) — **Yellow** (standardize)\n\n"
-    action, note = pr._steps(md)[0]
-    assert action == "Open checklist (stale — contains old items)"
-    assert note.startswith("Yellow")
+    assert pr._steps(md)[0] == "Open checklist (stale — contains old items)"
 
 
-def test_steps_without_rating_have_no_note():
+def test_steps_compound_rating_fully_stripped():
+    # the #148 bug: a compound rating like "Yellow/GRC-flagged" must be stripped, not leaked.
+    md = "**Steps:**\n1. Run smoke test (~45 min) — **Yellow/GRC-flagged** (automation candidate)\n\n"
+    assert pr._steps(md)[0] == "Run smoke test (~45 min)"
+
+
+def test_steps_without_rating_kept_whole():
     md = "**Steps:**\n1. Just a plain action with no rating\n\n"
-    action, note = pr._steps(md)[0]
-    assert action == "Just a plain action with no rating"
-    assert note is None
+    assert pr._steps(md)[0] == "Just a plain action with no rating"
 
 
-def test_build_blocks_renders_step_rating_as_indented_subbullet():
+def test_build_blocks_renders_steps_as_clean_numbered_list():
     blocks = pr.build_blocks(PROC)
     si = next(i for i, b in enumerate(blocks)
               if b["type"] == "heading" and b["text"] == "Steps")
-    assert blocks[si + 1]["type"] == "paragraph"
-    assert blocks[si + 1]["text"] == "1. PM receives Slack notification"
-    sub = blocks[si + 2]
-    assert sub["type"] == "bullet_list" and sub["indent"] > 0       # indented sub-bullet
-    assert sub["items"][0].startswith("Green")
+    lst = blocks[si + 1]
+    assert lst["type"] == "numbered_list"
+    assert lst["items"][0] == "PM receives Slack notification"
+    assert all("Green" not in it and "Yellow" not in it and "Red" not in it
+               for it in lst["items"])
 
 
 def test_build_blocks_renders_both_decision_points_as_bullets():
