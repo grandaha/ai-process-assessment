@@ -133,7 +133,8 @@ def test_steps_are_clean_actions_ratings_stripped():
     assert len(steps) == 3
     assert steps[0] == "PM receives Slack notification"
     joined = " ".join(steps)
-    for marker in ("Green", "Yellow", "Red", "**", "—", "automated trigger"):
+    # an action may legitimately contain an em-dash; what must not leak is the rating itself.
+    for marker in ("Green", "Yellow", "Red", "**", "automated trigger"):
         assert marker not in joined, f"leaked {marker!r} into steps"
 
 

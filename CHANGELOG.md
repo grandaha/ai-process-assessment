@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Step color ratings removed from the owner process-validation doc** (#165). The per-step
+  Green/Yellow/Red ratings are assessor analysis (they drive the chain scan / opportunity
+  identification, like Conflicts / Chain scan / Challenge hypothesis), not owner-facing
+  current-state. Steps now render as clean numbered actions. The ratings remain in
+  `processes/PROC-NNN.md` and surface client-facing as the opportunity landscape. This replaces
+  the #162 sub-bullet treatment and reliably strips every rating variant (including compound
+  ones like `Yellow/GRC-flagged` that the original #148 strip missed). Paragraph spacing and the
+  footer wordmark centering from 2.28.0 are unchanged.
+
 ## [2.28.0] - 2026-06-29
 
 ### Changed
