@@ -158,6 +158,31 @@ def test_opportunities_per_doc_has_detail_excludes_derivation(tmp_path):
     assert "challenge-hypothesis linkage" not in xml                              # Structural response
     assert "index: id=OPP-001" not in xml                                          # html comment
 
+def test_sentences_splitter_keeps_decimals_and_citations_intact():
+    from state import checkpoint_doc as cd
+    v = ("At 6–8 projects/month (baseline: Tyler Brooks, Medium confidence), eliminating 3 hrs "
+         "is a 60–67% reduction. Across 72–96 projects/year, that is 216–288 hrs/year — roughly "
+         "0.10–0.14 FTE.")
+    sents = cd._sentences(v)
+    assert len(sents) == 2                                  # split into 2 sentences
+    assert sents[0].endswith("60–67% reduction.")          # citation/decimal not split
+    assert "0.10–0.14 FTE" in sents[1]                      # decimal intact
+
+def test_opportunity_expected_value_renders_as_bullets(tmp_path):
+    d = tmp_path / "opportunities"; d.mkdir()
+    multi = ("**Hypothesis:** We automate the setup.\n"
+             "**Value hypothesis:** At 6–8 projects/month, eliminating 3 hrs is a 60–67% reduction. "
+             "Across 72–96 projects/year, that is 216–288 hrs/year — roughly 0.10–0.14 FTE.\n")
+    (d / "OPP-001.md").write_text("## OPP-001 — Test Opportunity\n\n" + multi)
+    from state import checkpoint_doc as cd
+    cd.render_checkpoint(str(tmp_path), "opportunities")
+    import zipfile
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "opportunities" / "OPP-001.docx") as z:
+        xml = z.read("word/document.xml").decode()
+    # Expected value sentences each on their own bullet
+    assert "• At 6–8 projects/month, eliminating 3 hrs is a 60–67% reduction." in xml
+    assert "• Across 72–96 projects/year, that is 216–288 hrs/year — roughly 0.10–0.14 FTE." in xml
+
 def test_business_case_doc_renders_sections_and_cost_table(tmp_path):
     (tmp_path / "business-case.md").write_text(
         "# Wave 1 ROM Business Case\n"
