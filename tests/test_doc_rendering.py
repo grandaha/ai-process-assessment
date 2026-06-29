@@ -214,3 +214,5 @@ def test_build_baseline_pending_for_missing_process(tmp_path):
     assert row[1] == "Asset Collection"
     assert row[2] == "PENDING"          # volume
     assert row[3] == "PENDING"          # cycle time
+    assert row[4] == "PENDING"          # error rate
+    assert row[5] == "PENDING"          # fte
