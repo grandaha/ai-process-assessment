@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.26.0] - 2026-06-29
+
 ### Fixed
 - **Process-validation document quality** (#148). The per-process validation `.docx` renderer
   now captures full multi-item fields — *Decision points* and *Exceptions* no longer drop all
