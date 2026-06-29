@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.34.0] - 2026-06-29
+
 ### Changed
 - **Use-case briefs are now one document per brief** (#183). Instead of a single combined
   document, the checkpoint writes one `checkpoints/use-case-briefs/UC-NNN.docx` per brief — each a
