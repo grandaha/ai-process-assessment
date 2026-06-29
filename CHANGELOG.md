@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.26.1] - 2026-06-29
+
 ### Fixed
 - **Baseline checkpoint crash** (#149). `python3 -m state.checkpoint_doc <engagement> baseline`
   crashed (`AttributeError: 'list' object has no attribute 'get'`) because the renderer assumed
