@@ -61,6 +61,8 @@ def _block(b):
         return _p(b["text"])
     if t == "numbered_list":
         return ''.join(_p(f"{i}. {item}") for i, item in enumerate(b["items"], 1))
+    if t == "bullet_list":
+        return ''.join(_p(f"• {item}") for item in b["items"])
     if t == "table":
         return _tbl(b["headers"], b["rows"])
     raise ValueError(f"unknown block type: {t}")
@@ -81,4 +83,5 @@ def build_docx(blocks, out_path):
 def heading(text, level=1): return {"type": "heading", "text": text, "level": level}
 def paragraph(text): return {"type": "paragraph", "text": text}
 def numbered_list(items): return {"type": "numbered_list", "items": list(items)}
+def bullet_list(items): return {"type": "bullet_list", "items": list(items)}
 def table(headers, rows): return {"type": "table", "headers": list(headers), "rows": [list(r) for r in rows]}

@@ -58,43 +58,73 @@ def prose_section(title, md, heading):
     body = md_section(md, heading)
     if not body:
         return []
-    out = [docx.heading(title, 2)]
-    for line in body.splitlines():
-        if line.strip().startswith("|"):            # skip table rows
+    lines = [line.strip() for line in body.splitlines() if not line.strip().startswith("|")]
+    return [docx.heading(title, 2)] + _grouped_line_blocks(lines)
+
+def _grouped_line_blocks(lines):
+    """Table-free markdown lines -> docx blocks. Consecutive `-`/`*` lines collapse into one
+    bullet_list; consecutive `N.` lines into one numbered_list; everything else via
+    _md_line_block. Empty lines are skipped without breaking an adjacent list."""
+    out, bullets, nums = [], [], []
+    def flush():
+        if bullets:
+            out.append(docx.bullet_list(bullets)); bullets.clear()
+        if nums:
+            out.append(docx.numbered_list(nums)); nums.clear()
+    for s in lines:
+        if not s:
             continue
-        b = _md_line_block(line.strip())
+        mb = re.match(r"^[-*]\s+(.*)$", s)
+        if mb:
+            if nums: flush()
+            bullets.append(_clean_inline(mb.group(1).strip()))
+            continue
+        mn = re.match(r"^\d+\.\s+(.*)$", s)
+        if mn:
+            if bullets: flush()
+            nums.append(_clean_inline(mn.group(1).strip()))
+            continue
+        flush()
+        b = _md_line_block(s)
         if b:
             out.append(b)
+    flush()
     return out
 
+
 def blocks_from_markdown(text):
-    """Render a markdown body as docx blocks: contiguous pipe-table lines become a table,
-    other non-empty lines become headings/paragraphs (markers stripped). Adjacent tables
-    with no blank line between them render as separate tables."""
-    out, tbl = [], []
+    """Render a markdown body as docx blocks: contiguous pipe-table lines become a table;
+    consecutive bullets/numbers become real lists; other non-empty lines become
+    headings/paragraphs (markers stripped). Adjacent tables with no blank line between them
+    render as separate tables."""
+    out, tbl, lines = [], [], []
     def _cells(line): return [c.strip() for c in line.strip().strip("|").split("|")]
-    def _flush():
+    def _flush_tbl():
         if tbl:
             h, r = md_table("\n".join(tbl))
             if h:
                 out.append(docx.table(h, r))
             tbl.clear()
+    def _flush_lines():
+        if lines:
+            out.extend(_grouped_line_blocks(lines))
+            lines.clear()
     for line in text.splitlines():
         s = line.strip()
         if s.startswith("|"):
+            _flush_lines()
             # a separator while one is already buffered = a new table started with no blank line:
             # the line just buffered is its header; flush the completed table first.
             if _is_separator(_cells(s)) and any(_is_separator(_cells(t)) for t in tbl):
                 header = tbl.pop()
-                _flush()
+                _flush_tbl()
                 tbl.append(header)
             tbl.append(s)
             continue
-        _flush()
-        b = _md_line_block(s)
-        if b:
-            out.append(b)
-    _flush()
+        _flush_tbl()
+        lines.append(s)
+    _flush_tbl()
+    _flush_lines()
     return out
 
 def full_section(title, md, heading):
