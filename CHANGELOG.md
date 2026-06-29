@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Standing readability rule across all checkpoint/review documents** (#180). Any prose value
+  that decomposes into a list now renders as bullets instead of a wall of text: top-level
+  semicolons (parenthesis-aware) become one bullet per item, and multi-sentence field prose
+  becomes one bullet per sentence; a single sentence stays a paragraph. Applied through the shared
+  renderer, so every document inherits it — e.g. opportunity *Governance & risk* and *Systems &
+  data* are now bulleted, and process *Actors* routes through the same rule. Tables, headings, and
+  source-authored lists are unchanged; text stays verbatim (split only at semicolon/sentence
+  boundaries). Unifies the previously bespoke per-field splitters.
+
 ## [2.32.1] - 2026-06-29
 
 ### Changed
