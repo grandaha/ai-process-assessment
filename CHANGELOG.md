@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.25.1] - 2026-06-28
+
 ### Fixed
 - **Review-doc prose fidelity** (#144). Generated Word review docs no longer show raw markdown
   markers: `**bold**` emphasis is stripped and `###` sub-headings become real document headings.
