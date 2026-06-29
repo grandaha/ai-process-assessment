@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **OSL dot-mark logo in document footers** (#157). The footer now shows the actual One Step Labs
+  dot-mark (a vendored transparent PNG, `assets/osl/logo-mark.png`) alongside the live-text
+  `one step labs` wordmark — the full lockup, on every page of every checkpoint/review `.docx`.
+  If the logo asset is ever unavailable the footer degrades to the wordmark (with an orange
+  signature dot) and never fails generation.
+
 ## [2.27.0] - 2026-06-29
 
 ### Added

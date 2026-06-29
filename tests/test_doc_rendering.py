@@ -1,5 +1,6 @@
 # tests/test_doc_rendering.py — renderer-output tests (#148). Run with python3.13.
 import json
+import re
 import zipfile
 
 from state import docx
@@ -293,7 +294,11 @@ def test_footer_embeds_logo_mark_image(tmp_path):
         frels = z.read("word/_rels/footer1.xml.rels").decode()
         assert "media/logo-mark.png" in frels                       # footer->image relationship
         footer = z.read("word/footer1.xml").decode()
-        assert "<w:drawing>" in footer and "r:embed" in footer      # inline picture referencing the blip
+        assert "<w:drawing>" in footer                              # inline picture
+        # the blip's r:embed id must match a relationship Id declared in the footer rels
+        m = re.search(r'r:embed="([^"]+)"', footer)
+        assert m and f'Id="{m.group(1)}"' in frels                  # blip id resolves
+        assert "one step labs" in footer                            # wordmark still present (live text)
         assert "one step labs" in footer                            # wordmark still present (live text)
         png = z.read("word/media/logo-mark.png")
     assert png[:8] == b"\x89PNG\r\n\x1a\n"                          # real PNG bytes
