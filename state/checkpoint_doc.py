@@ -46,18 +46,54 @@ def _clean_inline(s):
     # ponytail: leaves single * and _ alone — _ appears in identifiers (PROC_001, file_names).
     return _BOLD_RE.sub(r"\1", s)
 
-def _md_line_block(s):
-    """A single non-table markdown line -> a heading/paragraph block, or None if empty."""
-    m = re.match(r"^(#{1,6})\s+(.*)$", s)
-    if m:
-        return docx.heading(_clean_inline(m.group(2)).strip(), min(len(m.group(1)), 3))
-    s = re.sub(r"^[-*]\s+", "", s).strip()          # strip a leading bullet marker
-    return docx.paragraph(_clean_inline(s)) if s else None
+def _split_semicolons(text):
+    # top-level (paren-aware) semicolons -> list items; a semicolon inside (...) stays put.
+    out, depth, start = [], 0, 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif ch == ";" and depth == 0:
+            out.append(text[start:i]); start = i + 1
+    out.append(text[start:])
+    return [p.strip() for p in out if p.strip()]
+
+# abbreviations that end in "." but do not end a sentence — don't split right after these.
+_ABBREV = ("e.g.", "i.e.", "etc.", "vs.", "Inc.", "Co.", "Ltd.", "No.", "approx.",
+           "Dr.", "Mr.", "Ms.", "St.", "Fig.", "cf.")
+
+def _sentences(text):
+    # split prose on ". " before a capital; rejoin pieces wrongly split after a known
+    # abbreviation. Leaves decimals (0.10) and parenthetical citations intact.
+    out = []
+    for p in re.split(r"(?<=\.)\s+(?=[A-Z])", text):
+        if out and out[-1].endswith(_ABBREV):
+            out[-1] = out[-1] + " " + p
+        else:
+            out.append(p)
+    return [s.strip() for s in out if s.strip()]
+
+def _readable(text):
+    """Standing readability rule: prose that decomposes into a list renders as bullets, not a
+    wall of text. Top-level semicolons -> bullets; else multi-sentence prose -> one bullet per
+    sentence; else a single paragraph. `text` should already be _clean_inline'd."""
+    text = text.strip()
+    if not text:
+        return []
+    parts = _split_semicolons(text)
+    if len(parts) > 1:
+        return [docx.bullet_list(parts)]
+    sents = _sentences(text)
+    if len(sents) > 1:
+        return [docx.bullet_list(sents)]
+    return [docx.paragraph(text)]
 
 def _grouped_line_blocks(lines):
     """Table-free markdown lines -> docx blocks. Consecutive `-`/`*` lines collapse into one
-    bullet_list; consecutive `N.` lines into one numbered_list; everything else via
-    _md_line_block. Empty lines are skipped without breaking an adjacent list."""
+    bullet_list; consecutive `N.` lines into one numbered_list; a heading line becomes a heading;
+    any other prose line goes through the readability rule (_readable). Empty lines are skipped
+    without breaking an adjacent list."""
     out, bullets, nums = [], [], []
     def flush():
         if bullets:
@@ -78,9 +114,11 @@ def _grouped_line_blocks(lines):
             nums.append(_clean_inline(mn.group(1).strip()))
             continue
         flush()
-        b = _md_line_block(s)
-        if b:
-            out.append(b)
+        h = re.match(r"^(#{1,6})\s+(.*)$", s)
+        if h:
+            out.append(docx.heading(_clean_inline(h.group(2)).strip(), min(len(h.group(1)), 3)))
+        else:
+            out.extend(_readable(_clean_inline(s)))
     flush()
     return out
 
@@ -362,29 +400,18 @@ _OPP_FIELDS = [("Type", "Type"),
                ("GRC flag", "Governance & risk"),
                ("Data / system dependencies", "Systems & data")]
 
-def _sentences(text):
-    # Split prose into sentences on ". " before a capital — leaves decimals (0.10), ranges, and
-    # parenthetical citations intact. Used to make a dense field scannable, verbatim.
-    return [s.strip() for s in re.split(r"(?<=\.)\s+(?=[A-Z])", text) if s.strip()]
-
 def _build_one_opportunity(root, opp_md):
-    # One document per opportunity: title + the client-facing fields. The assessor-derivation
-    # fields (Type source / Chain formation / Structural response) and the <!-- index --> comment
-    # are excluded — same owner-vs-analysis split as processes.
+    # One document per opportunity: title + the client-facing fields, each routed through the
+    # readability rule (_readable). The assessor-derivation fields (Type source / Chain formation /
+    # Structural response) and the <!-- index --> comment are excluded — owner-vs-analysis split.
     m = re.search(r"^#+\s+(.+?)\s*$", opp_md, re.MULTILINE)
     blocks = [docx.heading(m.group(1).strip() if m else "Opportunity", 1)]
     blocks += note("Confirm this opportunity reflects a real improvement and is correctly "
                    "characterized, or note what should change.")
     for src_label, disp in _OPP_FIELDS:
         v = md_field(opp_md, src_label)
-        if not v:
-            continue
-        v = _clean_inline(v)
-        blocks.append(docx.heading(disp, 2))
-        # Expected value is a multi-sentence calculation — render one bullet per sentence so the
-        # per-project and annualized figures stand apart instead of forming one block.
-        sents = _sentences(v) if src_label == "Value hypothesis" else [v]
-        blocks.append(docx.bullet_list(sents) if len(sents) > 1 else docx.paragraph(v))
+        if v:
+            blocks += [docx.heading(disp, 2)] + _readable(_clean_inline(v))
     blocks += signoff_block("Sponsor / decision-maker")
     return blocks
 
