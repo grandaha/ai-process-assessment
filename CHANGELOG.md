@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.30.0] - 2026-06-29
+
 ### Added
 - **Opportunities checkpoint now carries per-opportunity detail** (#168). Previously the
   opportunities review doc rendered only the code index (OPP-ID / process / type / ratings),
