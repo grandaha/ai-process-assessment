@@ -53,15 +53,16 @@ def test_baseline_doc_has_metrics_and_pending(tmp_path):
         "| PROC-001 | Staffing | Ready |\n"
         "| PROC-002 | Billing | Ready |\n")
     (tmp_path / "model").mkdir()
+    # engine INPUT shape: a LIST of per-process objects, each with a process_id (#149).
     (tmp_path / "model" / "baselines.json").write_text(
-        '{"PROC-001": {"volume": "~140/mo", "cycle_time": "3d/11d", "error_rate": "22%", "fte": "3.5"}}')
-    from state import checkpoint_doc as cd
+        '[{"process_id": "PROC-001", "volume": 140, "cycle_time_median": 3, '
+        '"cycle_time_p90": 11, "error_rate": 0.22, "fte": 3.5, "source": "Priya"}]')
     cd.render_checkpoint(str(tmp_path), "baseline")
-    import zipfile
     with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-baseline.docx") as z:
         xml = z.read("word/document.xml").decode()
-    assert "Staffing" in xml and "~140/mo" in xml
-    assert "PENDING" in xml
+    assert "Staffing" in xml and "140" in xml          # populated from baselines.json
+    assert "3 / 11" in xml and "22%" in xml            # cycle median / P90 + error rate
+    assert "PENDING" in xml                             # PROC-002 has no entry
 
 def test_scope_doc_includes_scope_excludes_internal_context(tmp_path):
     (tmp_path / "scope.md").write_text(
