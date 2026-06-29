@@ -39,21 +39,40 @@ def field_section(title, md, label):
     v = md_field(md, label)
     return [docx.heading(title, 2), docx.paragraph(v)] if v else []
 
+_BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
+
+def _clean_inline(s):
+    # strip **bold** markers (the only inline emphasis the methodology prose uses).
+    # ponytail: leaves single * and _ alone — _ appears in identifiers (PROC_001, file_names).
+    return _BOLD_RE.sub(r"\1", s)
+
+def _md_line_block(s):
+    """A single non-table markdown line -> a heading/paragraph block, or None if empty."""
+    m = re.match(r"^(#{1,6})\s+(.*)$", s)
+    if m:
+        return docx.heading(_clean_inline(m.group(2)).strip(), min(len(m.group(1)), 3))
+    s = re.sub(r"^[-*]\s+", "", s).strip()          # strip a leading bullet marker
+    return docx.paragraph(_clean_inline(s)) if s else None
+
 def prose_section(title, md, heading):
     body = md_section(md, heading)
     if not body:
         return []
     out = [docx.heading(title, 2)]
     for line in body.splitlines():
-        s = re.sub(r"^[-*]\s+", "", line.strip()).strip()
-        if s and not s.startswith("|"):     # skip table rows; keep prose + bullets as paragraphs
-            out.append(docx.paragraph(s))
+        if line.strip().startswith("|"):            # skip table rows
+            continue
+        b = _md_line_block(line.strip())
+        if b:
+            out.append(b)
     return out
 
 def blocks_from_markdown(text):
     """Render a markdown body as docx blocks: contiguous pipe-table lines become a table,
-    other non-empty lines become paragraphs (leading bullet/number markers stripped)."""
+    other non-empty lines become headings/paragraphs (markers stripped). Adjacent tables
+    with no blank line between them render as separate tables."""
     out, tbl = [], []
+    def _cells(line): return [c.strip() for c in line.strip().strip("|").split("|")]
     def _flush():
         if tbl:
             h, r = md_table("\n".join(tbl))
@@ -63,12 +82,18 @@ def blocks_from_markdown(text):
     for line in text.splitlines():
         s = line.strip()
         if s.startswith("|"):
+            # a separator while one is already buffered = a new table started with no blank line:
+            # the line just buffered is its header; flush the completed table first.
+            if _is_separator(_cells(s)) and any(_is_separator(_cells(t)) for t in tbl):
+                header = tbl.pop()
+                _flush()
+                tbl.append(header)
             tbl.append(s)
             continue
         _flush()
-        s = re.sub(r"^[-*]\s+", "", s).strip()      # strip a bullet marker only, not **bold**
-        if s:
-            out.append(docx.paragraph(s))
+        b = _md_line_block(s)
+        if b:
+            out.append(b)
     _flush()
     return out
 

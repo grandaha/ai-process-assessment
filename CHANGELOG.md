@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Review-doc prose fidelity** (#144). Generated Word review docs no longer show raw markdown
+  markers: `**bold**` emphasis is stripped and `###` sub-headings become real document headings.
+  Adjacent tables with no blank line between them now render as separate tables instead of
+  merging into one garbled table. (Single `_`/`*` are left alone so identifiers like `PROC_001`
+  survive.)
+
 ## [2.25.0] - 2026-06-28
 
 ### Added
