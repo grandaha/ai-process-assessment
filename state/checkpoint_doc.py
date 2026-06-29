@@ -155,11 +155,11 @@ def signoff_block(reviewer_label="Reviewer"):
 @dataclass
 class Checkpoint:
     id: str
-    per_process: bool
+    items: Callable        # None = single doc; else items(root)->[(item_id, item_md), ...]
     gate: bool
-    output: str            # single-doc path, or "{pid}" template for per_process
-    outcome: str           # outcome path, "{pid}" template for per_process
-    build: Callable        # single: build(root)->blocks ; per_process: build(root, proc_md)->blocks
+    output: str            # single-doc path, or "{id}" template for per-item checkpoints
+    outcome: str           # outcome path, "{id}" template for per-item checkpoints
+    build: Callable        # single: build(root)->blocks ; per-item: build(root, item_md)->blocks
 
 def _ready_processes(root):
     idx = Path(root) / "processes" / "_index.md"
@@ -171,6 +171,20 @@ def _ready_processes(root):
         if len(cells) >= 3 and cells[0].startswith("PROC-") and cells[2].lower() == "ready":
             out.append(cells[0])
     return out
+
+def _process_items(root):
+    # per-item source for process-validation: (PROC-id, brief md) for each Ready process.
+    out = []
+    for pid in _ready_processes(root):
+        proc = Path(root) / "processes" / f"{pid}.md"
+        if proc.exists():
+            out.append((pid, proc.read_text(encoding="utf-8")))
+    return out
+
+def _opportunity_items(root):
+    # per-item source for opportunities: (OPP-id, brief md) for each OPP-NNN.md.
+    return [(f.stem, f.read_text(encoding="utf-8"))
+            for f in sorted((Path(root) / "opportunities").glob("OPP-*.md"))]
 
 def _read(root, name):
     p = Path(root) / name
@@ -220,15 +234,15 @@ def _build_baseline(root):
 
 CHECKPOINTS = {
     "process-validation": Checkpoint(
-        "process-validation", per_process=True, gate=True,
-        output="checkpoints/process-validation/{pid}.docx",
-        outcome="checkpoints/process-validation/CP-{pid}-outcome.md",
+        "process-validation", items=_process_items, gate=True,
+        output="checkpoints/process-validation/{id}.docx",
+        outcome="checkpoints/process-validation/CP-{id}-outcome.md",
         build=_build_process_validation),
     # "scope"/"baseline"/"portfolio" added in Tasks 3-5.
 }
 
 CHECKPOINTS["baseline"] = Checkpoint(
-    "baseline", per_process=False, gate=False,
+    "baseline", items=None, gate=False,
     output="checkpoints/checkpoint-baseline.docx",
     outcome="checkpoints/CP-baseline-outcome.md", build=_build_baseline)
 
@@ -257,7 +271,7 @@ def _build_scope(root):
     return blocks
 
 CHECKPOINTS["scope"] = Checkpoint(
-    "scope", per_process=False, gate=False,
+    "scope", items=None, gate=False,
     output="checkpoints/checkpoint-scope.docx",
     outcome="checkpoints/CP-scope-outcome.md", build=_build_scope)
 
@@ -274,7 +288,7 @@ def _build_tech_data(root):
     return blocks
 
 CHECKPOINTS["tech-data"] = Checkpoint(
-    "tech-data", per_process=False, gate=False,
+    "tech-data", items=None, gate=False,
     output="checkpoints/checkpoint-tech-data.docx",
     outcome="checkpoints/CP-tech-data-outcome.md", build=_build_tech_data)
 
@@ -302,7 +316,7 @@ def _build_use_case_briefs(root):
     return blocks
 
 CHECKPOINTS["use-case-briefs"] = Checkpoint(
-    "use-case-briefs", per_process=False, gate=False,
+    "use-case-briefs", items=None, gate=False,
     output="checkpoints/checkpoint-use-case-briefs.docx",
     outcome="checkpoints/CP-use-case-briefs-outcome.md", build=_build_use_case_briefs)
 
@@ -319,7 +333,7 @@ def _build_portfolio(root):
     return blocks
 
 CHECKPOINTS["portfolio"] = Checkpoint(
-    "portfolio", per_process=False, gate=False,
+    "portfolio", items=None, gate=False,
     output="checkpoints/checkpoint-portfolio.docx",
     outcome="checkpoints/CP-portfolio-outcome.md", build=_build_portfolio)
 
@@ -335,7 +349,7 @@ def _build_business_case(root):
     return blocks
 
 CHECKPOINTS["business-case"] = Checkpoint(
-    "business-case", per_process=False, gate=False,
+    "business-case", items=None, gate=False,
     output="checkpoints/checkpoint-business-case.docx",
     outcome="checkpoints/CP-business-case-outcome.md", build=_build_business_case)
 
@@ -348,45 +362,39 @@ _OPP_FIELDS = [("Type", "Type"),
                ("GRC flag", "Governance & risk"),
                ("Data / system dependencies", "Systems & data")]
 
-def _build_opportunities(root):
-    h, r = md_table(_require(root, "opportunities/_index.md"))
-    blocks = [docx.heading("Opportunity Landscape — For Your Review", 1)]
-    blocks += note("Here are the opportunities we identified — an at-a-glance index, then the "
-                   "detail for each. Tell us if any are missing or mischaracterized before we "
-                   "score and prioritize them.")
-    blocks += table_section("Opportunities at a glance", h, r)
-    for opp in sorted((Path(root) / "opportunities").glob("OPP-*.md")):
-        text = opp.read_text(encoding="utf-8")
-        m = re.search(r"^##\s+(.+?)\s*$", text, re.MULTILINE)
-        blocks.append(docx.heading(m.group(1).strip() if m else opp.stem, 2))
-        for src_label, disp in _OPP_FIELDS:
-            v = md_field(text, src_label)
-            if v:
-                blocks += [docx.heading(disp, 3), docx.paragraph(_clean_inline(v))]
+def _build_one_opportunity(root, opp_md):
+    # One document per opportunity: title + the client-facing fields. The assessor-derivation
+    # fields (Type source / Chain formation / Structural response) and the <!-- index --> comment
+    # are excluded — same owner-vs-analysis split as processes.
+    m = re.search(r"^#+\s+(.+?)\s*$", opp_md, re.MULTILINE)
+    blocks = [docx.heading(m.group(1).strip() if m else "Opportunity", 1)]
+    blocks += note("Confirm this opportunity reflects a real improvement and is correctly "
+                   "characterized, or note what should change.")
+    for src_label, disp in _OPP_FIELDS:
+        v = md_field(opp_md, src_label)
+        if v:
+            blocks += [docx.heading(disp, 2), docx.paragraph(_clean_inline(v))]
     blocks += signoff_block("Sponsor / decision-maker")
     return blocks
 
 CHECKPOINTS["opportunities"] = Checkpoint(
-    "opportunities", per_process=False, gate=False,
-    output="checkpoints/checkpoint-opportunities.docx",
-    outcome="checkpoints/CP-opportunities-outcome.md", build=_build_opportunities)
+    "opportunities", items=_opportunity_items, gate=False,
+    output="checkpoints/opportunities/{id}.docx",
+    outcome="checkpoints/opportunities/CP-{id}-outcome.md", build=_build_one_opportunity)
 
 def render_checkpoint(engagement_dir, checkpoint_id):
     cp = CHECKPOINTS[checkpoint_id]
     root = Path(engagement_dir)
     written = []
-    if cp.per_process:
-        for pid in _ready_processes(root):
-            proc = root / "processes" / f"{pid}.md"
-            if not proc.exists():
-                continue
-            out = root / cp.output.format(pid=pid)
+    if cp.items is not None:
+        for item_id, item_md in cp.items(root):
+            out = root / cp.output.format(id=item_id)
             out.parent.mkdir(parents=True, exist_ok=True)
-            docx.build_docx(cp.build(root, proc.read_text(encoding="utf-8")), str(out))
+            docx.build_docx(cp.build(root, item_md), str(out))
             written.append(str(out))
-            oc = root / cp.outcome.format(pid=pid)
+            oc = root / cp.outcome.format(id=item_id)
             if not oc.exists():
-                oc.write_text(f"# {pid} — outcome\n\nOutcome: Pending\n", encoding="utf-8")
+                oc.write_text(f"# {item_id} — outcome\n\nOutcome: Pending\n", encoding="utf-8")
     else:
         out = root / cp.output
         out.parent.mkdir(parents=True, exist_ok=True)

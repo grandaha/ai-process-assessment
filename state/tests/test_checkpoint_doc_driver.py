@@ -112,39 +112,38 @@ def test_tech_data_doc_renders_sections(tmp_path):
     assert "Polaris PSA" in xml and "Deliverables" in xml and "High" in xml
     assert "Confirmed" in xml                                  # sign-off present
 
-def test_opportunities_doc_renders_landscape(tmp_path):
-    (tmp_path / "opportunities").mkdir()
-    (tmp_path / "opportunities" / "_index.md").write_text(
-        "| OPP-ID | Process | Type | Feasibility | Data Readiness | GRC | Structural |\n"
-        "|--------|---------|------|-------------|----------------|-----|------------|\n"
-        "| OPP-001 | PROC-003 | ChainAutomation | Yellow | Green | Green | addressing-root |\n")
-    from state import checkpoint_doc as cd
-    cd.render_checkpoint(str(tmp_path), "opportunities")
-    import zipfile
-    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-opportunities.docx") as z:
-        xml = z.read("word/document.xml").decode()
-    assert "OPP-001" in xml and "ChainAutomation" in xml and "Confirmed" in xml
+_OPP_BRIEF = (
+    "## OPP-001 — HubSpot-to-Kickoff Chain Automation (process: PROC-001)\n"
+    "<!-- index: id=OPP-001 grc=Green -->\n\n"
+    "**Type:** Chain Automation\n"
+    "**Type source:** internal chain-scan derivation that must not render.\n"
+    "**Hypothesis:** We believe a direct HubSpot-to-Teamwork integration will save setup time.\n"
+    "**Value hypothesis:** ~3 hrs/project; 216-288 hrs/year recovered.\n"
+    "**Chain formation:** step-by-step internal checkpoint analysis, excluded.\n"
+    "**GRC flag:** Green — internal project data only.\n"
+    "**Data / system dependencies:** HubSpot, Teamwork, Notion.\n"
+    "**Structural response:** optimizing-around — challenge-hypothesis linkage, excluded.\n")
 
-def test_opportunities_doc_renders_per_opportunity_detail(tmp_path):
+def test_opportunities_one_doc_per_opportunity(tmp_path):
     d = tmp_path / "opportunities"; d.mkdir()
-    (d / "_index.md").write_text(
-        "| OPP-ID | Process | Type | Feasibility |\n|---|---|---|---|\n"
-        "| OPP-001 | PROC-001 | Chain-Automation | Yellow |\n")
-    (d / "OPP-001.md").write_text(
-        "## OPP-001 — HubSpot-to-Kickoff Chain Automation (process: PROC-001)\n"
-        "<!-- index: id=OPP-001 grc=Green -->\n\n"
-        "**Type:** Chain Automation\n"
-        "**Type source:** internal chain-scan derivation that must not render.\n"
-        "**Hypothesis:** We believe a direct HubSpot-to-Teamwork integration will save setup time.\n"
-        "**Value hypothesis:** ~3 hrs/project; 216-288 hrs/year recovered.\n"
-        "**Chain formation:** step-by-step internal checkpoint analysis, excluded.\n"
-        "**GRC flag:** Green — internal project data only.\n"
-        "**Data / system dependencies:** HubSpot, Teamwork, Notion.\n"
-        "**Structural response:** optimizing-around — challenge-hypothesis linkage, excluded.\n")
+    (d / "OPP-001.md").write_text(_OPP_BRIEF)
+    (d / "OPP-002.md").write_text(_OPP_BRIEF.replace("OPP-001", "OPP-002"))
+    from state import checkpoint_doc as cd
+    written = cd.render_checkpoint(str(tmp_path), "opportunities")
+    cp = tmp_path / "checkpoints" / "opportunities"
+    # one .docx + one outcome stub per opportunity; NO combined doc
+    assert (cp / "OPP-001.docx").exists() and (cp / "OPP-002.docx").exists()
+    assert (cp / "CP-OPP-001-outcome.md").exists() and (cp / "CP-OPP-002-outcome.md").exists()
+    assert not (tmp_path / "checkpoints" / "checkpoint-opportunities.docx").exists()
+    assert len([w for w in written if w.endswith(".docx")]) == 2
+
+def test_opportunities_per_doc_has_detail_excludes_derivation(tmp_path):
+    d = tmp_path / "opportunities"; d.mkdir()
+    (d / "OPP-001.md").write_text(_OPP_BRIEF)
     from state import checkpoint_doc as cd
     cd.render_checkpoint(str(tmp_path), "opportunities")
     import zipfile
-    with zipfile.ZipFile(tmp_path / "checkpoints" / "checkpoint-opportunities.docx") as z:
+    with zipfile.ZipFile(tmp_path / "checkpoints" / "opportunities" / "OPP-001.docx") as z:
         xml = z.read("word/document.xml").decode()
     # name + client-facing fields present
     assert "HubSpot-to-Kickoff Chain Automation" in xml
@@ -152,6 +151,7 @@ def test_opportunities_doc_renders_per_opportunity_detail(tmp_path):
     assert "216-288 hrs/year recovered" in xml                                     # Value
     assert "internal project data only" in xml                                     # GRC flag
     assert "HubSpot, Teamwork, Notion" in xml                                      # dependencies
+    assert "Confirmed" in xml                                                       # sign-off
     # assessor-derivation fields excluded
     assert "chain-scan derivation" not in xml                                      # Type source
     assert "step-by-step internal checkpoint analysis" not in xml                  # Chain formation

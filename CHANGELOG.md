@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Opportunities checkpoint is now one document per opportunity** (#174). Instead of a single
+  document containing all opportunities (too much to review at once), the checkpoint writes one
+  `checkpoints/opportunities/OPP-NNN.docx` per opportunity — each with that opportunity's name and
+  client-facing detail (Type, what it is, expected value, governance & risk, systems & data) and
+  its own sign-off stub — mirroring how `process-validation` produces one document per process.
+  Internally, the checkpoint registry's `per_process` flag was generalized to a per-item
+  mechanism; `process-validation` output and behavior are unchanged.
+
 ## [2.31.0] - 2026-06-29
 
 ### Fixed
