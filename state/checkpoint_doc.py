@@ -54,13 +54,6 @@ def _md_line_block(s):
     s = re.sub(r"^[-*]\s+", "", s).strip()          # strip a leading bullet marker
     return docx.paragraph(_clean_inline(s)) if s else None
 
-def prose_section(title, md, heading):
-    body = md_section(md, heading)
-    if not body:
-        return []
-    lines = [line.strip() for line in body.splitlines() if not line.strip().startswith("|")]
-    return [docx.heading(title, 2)] + _grouped_line_blocks(lines)
-
 def _grouped_line_blocks(lines):
     """Table-free markdown lines -> docx blocks. Consecutive `-`/`*` lines collapse into one
     bullet_list; consecutive `N.` lines into one numbered_list; everything else via
@@ -90,6 +83,13 @@ def _grouped_line_blocks(lines):
             out.append(b)
     flush()
     return out
+
+def prose_section(title, md, heading):
+    body = md_section(md, heading)
+    if not body:
+        return []
+    lines = [line.strip() for line in body.splitlines() if not line.strip().startswith("|")]
+    return [docx.heading(title, 2)] + _grouped_line_blocks(lines)
 
 
 def blocks_from_markdown(text):
