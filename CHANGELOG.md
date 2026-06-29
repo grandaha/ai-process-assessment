@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Opportunities checkpoint now carries per-opportunity detail** (#168). Previously the
+  opportunities review doc rendered only the code index (OPP-ID / process / type / ratings),
+  leaving a reader unable to tell what any opportunity actually was. It now keeps that table as
+  an at-a-glance overview and, below it, renders each opportunity's name plus its client-facing
+  fields — Type, what it is (hypothesis), expected value, governance & risk, and systems & data —
+  read verbatim from `opportunities/OPP-NNN.md`. The assessor-derivation fields (Type source,
+  Chain formation, Structural response) are excluded, consistent with the owner-vs-analysis split.
+
 ## [2.29.0] - 2026-06-29
 
 ### Changed

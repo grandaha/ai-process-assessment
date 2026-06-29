@@ -338,12 +338,30 @@ CHECKPOINTS["business-case"] = Checkpoint(
     output="checkpoints/checkpoint-business-case.docx",
     outcome="checkpoints/CP-business-case-outcome.md", build=_build_business_case)
 
+# Per-opportunity fields to surface, in render order: (source label, client-facing heading).
+# The assessor-derivation fields (Type source / Chain formation / Structural response) and the
+# <!-- index --> comment are intentionally excluded — same owner-vs-analysis split as processes.
+_OPP_FIELDS = [("Type", "Type"),
+               ("Hypothesis", "What it is"),
+               ("Value hypothesis", "Expected value"),
+               ("GRC flag", "Governance & risk"),
+               ("Data / system dependencies", "Systems & data")]
+
 def _build_opportunities(root):
     h, r = md_table(_require(root, "opportunities/_index.md"))
     blocks = [docx.heading("Opportunity Landscape — For Your Review", 1)]
-    blocks += note("Here are the opportunities we identified. Tell us if any are missing or "
-                   "mischaracterized before we score and prioritize them.")
-    blocks += table_section("Opportunities", h, r)
+    blocks += note("Here are the opportunities we identified — an at-a-glance index, then the "
+                   "detail for each. Tell us if any are missing or mischaracterized before we "
+                   "score and prioritize them.")
+    blocks += table_section("Opportunities at a glance", h, r)
+    for opp in sorted((Path(root) / "opportunities").glob("OPP-*.md")):
+        text = opp.read_text(encoding="utf-8")
+        m = re.search(r"^##\s+(.+?)\s*$", text, re.MULTILINE)
+        blocks.append(docx.heading(m.group(1).strip() if m else opp.stem, 2))
+        for src_label, disp in _OPP_FIELDS:
+            v = md_field(text, src_label)
+            if v:
+                blocks += [docx.heading(disp, 3), docx.paragraph(_clean_inline(v))]
     blocks += signoff_block("Sponsor / decision-maker")
     return blocks
 
