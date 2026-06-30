@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.36.0] - 2026-06-30
+
 ### Added
 - Confidence self-check (consistency evals) for the two no-alignment judgment agents (#192):
   `state/evals.py` measures run-to-run agreement of `step-capability-tagger` (per-step
