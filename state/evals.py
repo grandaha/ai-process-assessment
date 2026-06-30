@@ -124,3 +124,48 @@ def scorer_consistency(run_texts):
         "bbp": {"values": bbps, "modal": modal, "modal_agreement": modal_agreement},
         "unstable": unstable,
     }
+
+
+def _run_texts(engagement, phase, target):
+    d = Path(engagement) / "_staging" / "evals" / phase / target
+    return [p.read_text(encoding="utf-8") for p in sorted(d.glob("run-*.md"))]
+
+
+def write_target(engagement, phase, target):
+    """Read the N staged run files for one target, compute consistency, write the sidecar
+    evals/<target>.evals.json and rebuild evals/_index.md. Returns the sidecar path."""
+    texts = _run_texts(engagement, phase, target)
+    if phase == "phase4":
+        result = tagger_consistency(texts)
+    elif phase == "phase6":
+        result = scorer_consistency(texts)
+    else:
+        raise ValueError(f"unknown eval phase: {phase!r} (expected phase4 or phase6)")
+    result["target"] = target
+    result["phase"] = phase
+    out = Path(engagement) / "evals" / f"{target}.evals.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(result, indent=2), encoding="utf-8")
+    build_index(engagement)
+    return out
+
+
+def build_index(engagement):
+    ev = Path(engagement) / "evals"
+    rows = []
+    for f in sorted(ev.glob("*.evals.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if d.get("agent") == "step-capability-tagger":
+            u = d.get("unstable_step_count", 0)
+            status = "Stable" if u == 0 else f"{u} step(s) unstable"
+        else:
+            u = 1 if d.get("unstable") else 0
+            status = "Unstable" if d.get("unstable") else "Stable"
+        rows.append((d.get("target", f.stem), d.get("agent", ""), d.get("n_runs", 0), u, status))
+    lines = ["| Target | Agent | Runs | Unstable | Status |", "|---|---|---|---|---|"]
+    lines += [f"| {t} | {a} | {n} | {u} | {s} |" for t, a, n, u, s in rows]
+    (ev / "_index.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    print(write_target(sys.argv[1], sys.argv[2], sys.argv[3]))

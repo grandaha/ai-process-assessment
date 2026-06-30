@@ -87,3 +87,43 @@ def test_scorer_bbp_disagreement_unstable():
 def test_scorer_drops_incomplete_runs():
     res = scorer_consistency([_run(4, "Build"), "no table here", _run(4, "Build")])
     assert res["n_runs"] == 2
+
+
+# write_target and build_index tests
+import json
+from pathlib import Path
+
+from state.evals import write_target
+
+_TAG_TABLE = """**Step capability:**
+| Step | Attributes | Evidence |
+|---|---|---|
+| 1 | structured-data | s |
+"""
+
+
+def test_write_target_tagger(tmp_path):
+    d = tmp_path / "_staging" / "evals" / "phase4" / "PROC-001"
+    d.mkdir(parents=True)
+    for k in (1, 2, 3):
+        (d / f"run-{k}.md").write_text(_TAG_TABLE, encoding="utf-8")
+    out = write_target(str(tmp_path), "phase4", "PROC-001")
+    data = json.loads(Path(out).read_text(encoding="utf-8"))
+    assert data["target"] == "PROC-001"
+    assert data["phase"] == "phase4"
+    assert data["agent"] == "step-capability-tagger"
+    assert data["unstable_step_count"] == 0
+    idx = (tmp_path / "evals" / "_index.md").read_text(encoding="utf-8")
+    assert "PROC-001" in idx
+    assert "Stable" in idx
+
+
+def test_write_target_unknown_phase(tmp_path):
+    d = tmp_path / "_staging" / "evals" / "phaseX" / "PROC-001"
+    d.mkdir(parents=True)
+    (d / "run-1.md").write_text(_TAG_TABLE, encoding="utf-8")
+    try:
+        write_target(str(tmp_path), "phaseX", "PROC-001")
+        assert False, "expected ValueError"
+    except ValueError:
+        pass
