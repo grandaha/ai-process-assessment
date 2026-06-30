@@ -166,7 +166,7 @@ Appended to each `processes/PROC-NNN.md` by the `step-capability-tagger` (Pass 2
 | 1 | structured-data, rule-based | both systems API-available (tech-inventory) |
 ```
 
-**Computed color rule:** `state/capability.py` maps the attribute list to Green (enablers only, no blockers) / Yellow (mix or probabilistic) / Red (any blocker present). Never write a color in `PROC-NNN.md` — the engine computes it.
+**Computed color rule:** `state/capability.py` maps the attribute list to Green (enabler present, no blocker) / Yellow (enabler present, blocker also present) / Red (blocker present, no enabler). A lone `ai-inference` counts as an implicit blocker unless `accuracy-bounded` is also present. Never write a color in `PROC-NNN.md` — the engine computes it.
 
 **Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## PROC-NNN` heading (line 2 of the file). Set `baseline=Ready` when all four baseline fields carry a real sourced value; set `baseline=Unavailable` when any field is missing or unconfirmed. Spaces in the value are not permitted — use `Ready` or `Unavailable` exactly.
 
