@@ -54,12 +54,23 @@ Phase 6: opportunity-scorer     ×N ─┤  (cross-cutting skill: evaluating-con
                                     ▼
         evals/<target>.evals.json   +   evals/_index.md     (sidecar; NOT model/*.json)
                                     ▼
-        state/checkpoint_doc.py renderers read the sidecar
-                                    ▼
-        baseline checkpoint .docx (per-step Confidence)  ·  portfolio checkpoint .docx (per-opp Confidence)
-                                    ▼
-        unstable items highlighted for human adjudication in the checkpoint
+   ┌───────────────────────────────┴───────────────────────────────┐
+   ▼ scorer (client-facing)                                         ▼ tagger (assessor-facing)
+state/checkpoint_doc.py _build_portfolio reads sidecar       Conductor surfaces unstable steps
+   → portfolio checkpoint .docx gains a per-opp Confidence      at Phase 4 + evals/_index.md;
+     column; unstable opportunities flagged for the             assessor re-examines shaky steps
+     decision-maker's adjudication                              before Phase 5. NO client docx
+                                                                (computed color is internal).
 ```
+
+**Why the split (code-grounded):** the scorer's outputs (dimension scores, composite,
+B/B/P) are already shown to the decision-maker in the portfolio checkpoint, so a
+Confidence column there fits. The tagger's output is the per-step **computed color**,
+which the methodology *deliberately hides* from owner-facing docs (`process_review.py`
+strips the rating; the baseline checkpoint is process-level with no step table). Color
+is internal assessor analysis, so its confidence is surfaced to the assessor (Conductor
++ `evals/_index.md`), not injected into a client document. Both are "user-facing" — the
+signal reaches a human decision point — but the right human differs per agent.
 
 ### Layer 1 — `state/evals.py` (pure metrics engine)
 
@@ -114,20 +125,24 @@ structural skill/agent tests (frontmatter, referenced-agent resolution, etc.).
 
 ### Layer 3 — rendering + Conductor wiring
 
-- **Renderer:** extend the `baseline` renderer in `state/checkpoint_doc.py` to read
-  `evals/PROC-NNN.evals.json` and add a **Confidence** column to the per-process step
-  table (per step: "Confirmed N/N runs agree" vs "⚠ Needs review — color varied:
-  Green×3 / Yellow×2"). Extend the `portfolio` renderer to read
-  `evals/OPP-NNN.evals.json` and add a **Confidence** line per opportunity
-  (stable, or "⚠ composite varied 3.5–4.2; Build×3 / Partner×2"). Honors the
-  deliverable-readability rule (lists render as bullets, no run-on walls).
-  When a sidecar is absent (evals not run), the column/section is simply omitted —
-  no PENDING, no error.
+- **Scorer renderer (client-facing):** extend `_build_portfolio` in
+  `state/checkpoint_doc.py` to read `evals/OPP-NNN.evals.json` and add a **Confidence**
+  column to the "Scored opportunities" table — per opportunity: "Stable" or
+  "⚠ Needs review — composite 3.5–4.2; Build×3 / Partner×2". Honors the
+  deliverable-readability rule. When a sidecar is absent (evals not run for an
+  opportunity), the cell reads "—"; the column is omitted entirely if no opportunity
+  has a sidecar. No PENDING, no error.
+- **Tagger surfacing (assessor-facing, no client docx):** computed color is internal
+  (owner docs strip it), so tagger confidence is **not** rendered into any client
+  checkpoint. It lives in `evals/_index.md` and is surfaced by the Conductor at Phase 4
+  (below), so the assessor re-examines shaky steps before opportunities are built.
 - **Conductor wiring (`conducting-engagement`):** after Phase 4 tagging completes and
   before offering the `baseline` checkpoint, the Conductor auto-invokes
-  `evaluating-consistency` for each in-scope process (tagger). After Phase 6 scoring
-  completes and before offering the `portfolio` checkpoint, it auto-invokes it for
-  each scored opportunity (scorer). Recorded (it ran / didn't), non-blocking.
+  `evaluating-consistency` for each in-scope process (tagger) and, if any step is
+  unstable, surfaces those steps to the assessor (names PROC + step + the colors seen)
+  as a non-blocking note. After Phase 6 scoring completes and before offering the
+  `portfolio` checkpoint, it auto-invokes it for each scored opportunity (scorer) so the
+  Confidence column is populated. Recorded (it ran / didn't), non-blocking.
 
 ## Storage decision
 
@@ -199,8 +214,8 @@ result as a regression fixture.
 |---|---|
 | `state/evals.py` | Pure metrics engine + CLI: parse runs → metrics → sidecar + index |
 | `skills/evaluating-consistency/SKILL.md` | Cross-cutting runner: N× dispatch → run engine → summarize |
-| `state/checkpoint_doc.py` | Extend baseline + portfolio renderers to read sidecar, add Confidence |
-| `skills/conducting-engagement/SKILL.md` | Auto-invoke evaluating-consistency at P4 (pre-baseline) and P6 (pre-portfolio) |
+| `state/checkpoint_doc.py` | Extend `_build_portfolio` to read scorer sidecar, add Confidence column |
+| `skills/conducting-engagement/SKILL.md` | Auto-invoke evaluating-consistency at P4 (surface unstable steps to assessor) and P6 (populate portfolio Confidence) |
 | `tests/test_evals.py` | Metrics + thresholds + index against recorded fixtures |
 | `tests/fixtures/evals/...` | Recorded stable/unstable run sets for tagger + scorer |
 | `tests/test_doc_rendering.py` | Confidence rendering assertions (extend existing) |
