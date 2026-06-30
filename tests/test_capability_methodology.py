@@ -44,3 +44,15 @@ def test_phase5_typer_uses_computed_chains():
 def test_phase6_consumes_computed_chains():
     assert "state/capability" in SCORING or "state.capability" in SCORING
     assert "state/capability" in SCORER or "state.capability" in SCORER
+
+SAMPLE = (REPO / "skills" / "generating-sample-intake" / "SKILL.md").read_text()
+
+def test_sample_intake_has_no_prejudged_capability():
+    # the sample generator must produce neutral evidence, not pre-judged capability/chain prose (#188)
+    low = SAMPLE.lower()
+    assert "chain-scan" not in low and "chain scan" not in low
+    assert "chain candidate" not in low
+    assert "per-process ai capability" not in low
+    # neutrality must be stated, and the new flow's tagger named as the deriver
+    assert "step-capability-tagger" in SAMPLE
+    assert "never a verdict" in low or "never as a capability rating" in low

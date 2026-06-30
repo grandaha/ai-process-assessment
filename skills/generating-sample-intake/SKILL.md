@@ -338,12 +338,16 @@ This is the most complex file. Write all four rounds.
 - [Key revenue or cost metric #2 with current value]
 - Total estimated FTE effort in scope: ~[N] FTE administrative / coordination burden
 
-**Per-process AI capability and chain-scan notes:**
-- PROC-01: [Automation potential — e.g., "Strong chain candidate; high-volume, structured trigger, low exception rate. Polaris API enables read path."]
-- PROC-02: [...]
-- [GRC-flagged process]: [Note the sensitive data asset and that Phase 5 should flag this for the GRC gate.]
-- [Politically constrained process]: [Note the stakeholder resistance that will affect Phase 7 roadmap.]
-- [... one bullet per process]
+**Capability evidence — neutral facts only, never a verdict:**
+
+Do **not** write any AI-capability rating, color, or chain-membership conclusion anywhere in the intake. In the new Phase 4 flow the `step-capability-tagger` derives each step's capability *attributes* (and the engine computes the colors and chains) from the factual evidence you already wrote — pre-stating a conclusion here re-introduces the anchoring bias the new flow exists to remove. Instead, make sure the raw evidence each process needs is present and *discriminating*:
+
+- **Round 2 step verbs and decision points** carry whether work is rule-based or human-judgment.
+- **Trigger and inputs** carry whether data arrives structured or unstructured.
+- **Exception rate and types** (already in each baseline) carry the accuracy bounds.
+- **`systems-and-data.md`** carries the API availability and data sensitivity for every system a process touches.
+
+Vary this across the process set so the derived capability mix is non-trivial: include at least one process whose steps are clearly rule-based on structured data, at least one dominated by human judgment or relationship work, and at least one that touches the High-sensitivity asset. State each of these as a plain fact in the step descriptions and the systems/data tables — never as a capability rating.
 ```
 
 ## Step 5 — Write the `.sample-run.md` marker
