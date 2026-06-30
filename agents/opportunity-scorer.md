@@ -27,7 +27,7 @@ Score each dimension 1–5. Every score requires a source citation. Refuse to sc
 
 | Dimension | What it measures | Required source |
 |---|---|---|
-| Value Potential | Magnitude of value if realized | `processes/PROC-NNN.md` Baselines section — must cite a specific figure (FTE, volume, cycle time) |
+| Value Potential | Magnitude of value if realized. For Chain Automation type: use the Phase-5-derived chain value (FTE baseline from `model/baselines.json` allocated across eliminated steps via `state/capability.py` `compute_chains`) as the effort-per-checkpoint source. | `processes/PROC-NNN.md` Baselines section — must cite a specific figure (FTE, volume, cycle time); `model/baselines.json` `fte` for chain opportunities |
 | Technical Feasibility | Buildability given current systems and skills | `tech-inventory.md` — system inventory, API map, enabler gaps |
 | Data Readiness | Whether data needed exists, is accessible, and is fit for purpose | `tech-inventory.md` — data asset catalog (quality, completeness, refresh cadence) |
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` — AI maturity, prior change history, org structure |

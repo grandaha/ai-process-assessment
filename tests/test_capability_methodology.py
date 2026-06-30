@@ -27,3 +27,20 @@ def test_discovering_processes_documents_two_passes_and_table():
     assert "step-capability-tagger" in DISC         # pass 2 wired
     # no hand-authored colors / hand chain scan remain as authoring instructions
     assert "Green / Yellow / Red" not in DISC and "Green/Yellow/Red" not in DISC
+
+IDENT = (REPO / "skills" / "identifying-opportunities" / "SKILL.md").read_text()
+TYPER = (REPO / "agents" / "opportunity-typer.md").read_text()
+SCORING = (REPO / "skills" / "scoring-opportunities" / "SKILL.md").read_text()
+SCORER = (REPO / "agents" / "opportunity-scorer.md").read_text()
+
+def test_phase5_reads_computed_capability():
+    assert "state/capability" in IDENT or "state.capability" in IDENT
+    # chain value derived from the FTE baseline (replacing the deleted per-checkpoint prose)
+    assert "FTE" in IDENT and "baseline" in IDENT.lower()
+
+def test_phase5_typer_uses_computed_chains():
+    assert "state/capability" in TYPER or "state.capability" in TYPER
+
+def test_phase6_consumes_computed_chains():
+    assert "state/capability" in SCORING or "state.capability" in SCORING
+    assert "state/capability" in SCORER or "state.capability" in SCORER

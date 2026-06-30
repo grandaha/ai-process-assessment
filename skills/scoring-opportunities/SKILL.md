@@ -32,13 +32,13 @@ Score each opportunity across all six dimensions on a 1–5 scale. Cite the sour
 
 | Dimension | What it measures | Required source |
 |---|---|---|
-| Value Potential | Magnitude of value if realized. For Chain Automation type: cite checkpoints eliminated × effort per checkpoint × volume. Do not aggregate step-level savings linearly — chain value is non-linear. | `processes/PROC-NNN.md` Baselines section |
+| Value Potential | Magnitude of value if realized. For Chain Automation type: cite checkpoints eliminated × effort per checkpoint × volume — where effort per checkpoint is derived from the Phase-5 chain value (FTE baseline from `model/baselines.json` allocated across eliminated steps, as computed by `state/capability.py` `compute_chains`). Do not aggregate step-level savings linearly — chain value is non-linear. | `processes/PROC-NNN.md` Baselines section; `model/baselines.json` `fte` |
 | Technical Feasibility | Buildability given current systems and skills | `tech-inventory.md` |
 | Data Readiness | Whether data needed exists, is accessible, and is fit for purpose | `tech-inventory.md` (data asset catalog) |
 | Org Change Readiness | Whether the affected team can absorb the change | `context.md` |
 | Strategic Alignment | Fit with stated strategic priorities | `context.md` |
 | Time to Value | Speed from start to first measurable outcome | `tech-inventory.md` + `processes/PROC-NNN.md` |
-| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. **Long-run is NOT a long timeline or complex prerequisites — it specifically means the opportunity cannot deliver value until someone's job or role boundary is redesigned. A long GRC clearance track or missing integration is a dependency (Constraint 1), not a Long-run classification.** | `processes/PROC-NNN.md` chain scan + `context.md` |
+| Execution Horizon | Whether value is achievable within existing job boundaries (Short-run) or requires redesigning how tasks are bundled across workers (Long-run). Short-run is faster and smaller. Long-run is larger but requires org design work as a dependency. **Long-run is NOT a long timeline or complex prerequisites — it specifically means the opportunity cannot deliver value until someone's job or role boundary is redesigned. A long GRC clearance track or missing integration is a dependency (Constraint 1), not a Long-run classification.** | Computed chains from `state/capability.py` (`compute_chains`) + Phase-5-derived chain value + `context.md` |
 
 ### Scale Anchors (apply to all 6 dimensions)
 
@@ -207,7 +207,7 @@ See the Phase checklist and Workflow sections for the authoritative step sequenc
 | "We'll figure out Build/Buy/Partner later." | B/B/P is an input to sequencing and brief writing. Deferring it pushes the same decision into less-prepared phases. |
 | "The reviewer subagent slows us down." | The reviewer is the durability mechanism for this phase. Skipping it is how scored portfolios pass through to delivery with sourcing gaps. |
 | "Scoring in main context lets me calibrate scores across OPPs — parallel agents can't do that." | Cross-OPP calibration happens during the consistency review of the assembled file, not during drafting. The `opportunity-reviewer` subagent is the calibration gate. Scoring inline re-introduces context bloat. |
-| "The value estimate is the sum of each step's individual time savings." | For Chain Automation opportunities, value comes primarily from eliminating human verification checkpoints, not from accelerating individual steps. Linear step-count aggregation is the wrong model. Cite checkpoints eliminated and effort per checkpoint from the chain scan. |
+| "The value estimate is the sum of each step's individual time savings." | For Chain Automation opportunities, value comes primarily from eliminating human verification checkpoints, not from accelerating individual steps. Linear step-count aggregation is the wrong model. Cite checkpoints eliminated and effort per checkpoint from the computed chains (`state/capability.py` `compute_chains`) and the Phase-5-derived chain value (FTE from `model/baselines.json`). |
 
 ## Handoff Protocol
 
