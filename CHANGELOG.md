@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.35.0] - 2026-06-30
+
 ### Changed
 - **Attribute-based deterministic AI-capability tagging** (#186). Phase 4 no longer has a human
   author a Green/Yellow/Red color on each process step (which contaminated the step description).
