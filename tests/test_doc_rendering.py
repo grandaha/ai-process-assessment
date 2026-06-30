@@ -2,6 +2,7 @@
 import json
 import re
 import zipfile
+from pathlib import Path
 
 from state import docx
 from state import checkpoint_doc as cd
@@ -386,3 +387,49 @@ def test_footer_wordmark_vertically_positioned(tmp_path):
     with zipfile.ZipFile(out) as z:
         footer = z.read("word/footer1.xml").decode()
     assert "<w:position" in footer            # wordmark raised to center on the mark
+
+
+# --- Task 5: Portfolio checkpoint Confidence column ---
+from state.checkpoint_doc import _confidence_cell, _with_confidence
+
+
+def _sidecar(root, opp, unstable, **extra):
+    ev = Path(root) / "evals"
+    ev.mkdir(parents=True, exist_ok=True)
+    (ev / f"{opp}.evals.json").write_text(
+        json.dumps({"target": opp, "agent": "opportunity-scorer", "unstable": unstable, **extra}),
+        encoding="utf-8")
+
+
+def test_confidence_cell_stable(tmp_path):
+    _sidecar(tmp_path, "OPP-001", False)
+    assert _confidence_cell(str(tmp_path), "OPP-001") == "Stable"
+
+
+def test_confidence_cell_absent_is_dash(tmp_path):
+    assert _confidence_cell(str(tmp_path), "OPP-099") == "—"
+
+
+def test_confidence_cell_unstable_shows_bbp(tmp_path):
+    _sidecar(tmp_path, "OPP-002", True,
+             bbp={"values": ["Build", "Partner", "Build"]},
+             composite_min=3.0, composite_max=3.0)
+    cell = _confidence_cell(str(tmp_path), "OPP-002")
+    assert cell.startswith("⚠")
+    assert "Build×2" in cell
+    assert "Partner×1" in cell
+
+
+def test_with_confidence_omits_column_when_no_evals(tmp_path):
+    headers, rows = ["OPP-ID", "Composite"], [["OPP-001", "4.0"]]
+    h2, r2 = _with_confidence(str(tmp_path), headers, rows)
+    assert h2 == headers
+    assert r2 == rows
+
+
+def test_with_confidence_adds_column(tmp_path):
+    _sidecar(tmp_path, "OPP-001", False)
+    headers, rows = ["OPP-ID", "Composite"], [["OPP-001", "4.0"]]
+    h2, r2 = _with_confidence(str(tmp_path), headers, rows)
+    assert h2[-1] == "Confidence"
+    assert r2[0][-1] == "Stable"

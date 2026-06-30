@@ -353,6 +353,34 @@ CHECKPOINTS["use-case-briefs"] = Checkpoint(
     output="checkpoints/use-case-briefs/{id}.docx",
     outcome="checkpoints/use-case-briefs/CP-{id}-outcome.md", build=_build_one_usecase_brief)
 
+def _confidence_cell(root, opp_id):
+    # Reads the scorer confidence sidecar for one opportunity. "—" when evals were not run.
+    p = Path(root) / "evals" / f"{opp_id}.evals.json"
+    if not p.exists():
+        return "—"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    if not d.get("unstable"):
+        return "Stable"
+    parts = []
+    lo, hi = d.get("composite_min"), d.get("composite_max")
+    if lo is not None and hi is not None and lo != hi:
+        parts.append(f"composite {lo}–{hi}")
+    vals = d.get("bbp", {}).get("values", [])
+    if vals and len(set(vals)) > 1:
+        parts.append(" / ".join(f"{c}×{vals.count(c)}" for c in dict.fromkeys(vals)))
+    return "⚠ Needs review — " + ("; ".join(parts) if parts else "dimension scores varied")
+
+
+def _with_confidence(root, headers, rows):
+    # Append a Confidence column keyed on the row's OPP-id (first cell). If no opportunity has
+    # a sidecar (evals not run), leave the table unchanged — no empty column, no PENDING.
+    if not headers:
+        return headers, rows
+    cells = [_confidence_cell(root, r[0]) if r else "—" for r in rows]
+    if all(c == "—" for c in cells):
+        return headers, rows
+    return headers + ["Confidence"], [r + [c] for r, c in zip(rows, cells)]
+
 def _build_portfolio(root):
     roadmap = _read(root, "roadmap.md")
     blocks = [docx.heading("Opportunity Portfolio & Roadmap — For Your Confirmation", 1)]
@@ -360,6 +388,7 @@ def _build_portfolio(root):
     wh, wr = md_table(roadmap, after_heading="Wave summary")
     blocks += table_section("Roadmap waves", wh, wr)
     sh, sr = md_table(_read(root, "scores/_index.md"))
+    sh, sr = _with_confidence(str(root), sh, sr)
     blocks += table_section("Scored opportunities", sh, sr)
     blocks += note("Please confirm the prioritization and sequencing, or note changes.")
     blocks += signoff_block("Decision-maker / sponsor")
