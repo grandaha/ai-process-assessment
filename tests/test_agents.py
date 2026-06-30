@@ -6,7 +6,7 @@ import re
 # test_referenced_agents_resolve surfaces a false positive during implementation.
 NON_AGENT_TOKENS: set[str] = set()
 
-# Agents referenced by no skill. Empty today — all 14 agents are referenced.
+# Agents referenced by no skill. Empty today — all 15 agents are referenced.
 ORPHAN_AGENT_ALLOWLIST: set[str] = set()
 
 # Phrasings that unambiguously introduce an agent. Each requires the ENTIRE
