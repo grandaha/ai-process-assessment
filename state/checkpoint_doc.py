@@ -358,7 +358,12 @@ def _confidence_cell(root, opp_id):
     p = Path(root) / "evals" / f"{opp_id}.evals.json"
     if not p.exists():
         return "—"
-    d = json.loads(p.read_text(encoding="utf-8"))
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except ValueError:
+        return "—"
+    if d.get("insufficient"):
+        return "⚠ Needs review — insufficient runs"
     if not d.get("unstable"):
         return "Stable"
     parts = []

@@ -68,6 +68,7 @@ def tagger_consistency(run_texts):
     return {
         "agent": "step-capability-tagger",
         "n_runs": len(runs),
+        "insufficient": len(runs) < 2,
         "unstable_step_count": sum(1 for st in out_steps if st["unstable"]),
         "steps": out_steps,
     }
@@ -117,6 +118,7 @@ def scorer_consistency(run_texts):
     return {
         "agent": "opportunity-scorer",
         "n_runs": len(parsed),
+        "insufficient": len(parsed) < 2,
         "dimensions": dims_out,
         "composite_spread": comp_spread,
         "composite_min": comp_min,
@@ -152,10 +154,14 @@ def write_target(engagement, phase, target):
 
 def build_index(engagement):
     ev = Path(engagement) / "evals"
+    ev.mkdir(parents=True, exist_ok=True)
     rows = []
     for f in sorted(ev.glob("*.evals.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
-        if d.get("agent") == "step-capability-tagger":
+        if d.get("insufficient"):
+            status = "Insufficient (n<2)"
+            u = 0
+        elif d.get("agent") == "step-capability-tagger":
             u = d.get("unstable_step_count", 0)
             status = "Stable" if u == 0 else f"{u} step(s) unstable"
         else:

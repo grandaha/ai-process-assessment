@@ -127,3 +127,62 @@ def test_write_target_unknown_phase(tmp_path):
         assert False, "expected ValueError"
     except ValueError:
         pass
+
+
+# --- Finding 1: insufficient flag ---
+from state.evals import build_index
+
+
+def test_tagger_insufficient_zero_runs():
+    res = tagger_consistency([])
+    assert res["insufficient"] is True
+
+
+def test_scorer_insufficient_zero_runs():
+    res = scorer_consistency([])
+    assert res["insufficient"] is True
+
+
+def test_tagger_insufficient_one_run():
+    res = tagger_consistency([_STABLE])
+    assert res["insufficient"] is True
+
+
+def test_scorer_insufficient_one_run():
+    res = scorer_consistency([_run(4, "Build")])
+    assert res["insufficient"] is True
+
+
+def test_tagger_sufficient_five_runs():
+    res = tagger_consistency([_STABLE] * 5)
+    assert res["insufficient"] is False
+
+
+def test_scorer_sufficient_five_runs():
+    res = scorer_consistency([_run(4, "Build")] * 5)
+    assert res["insufficient"] is False
+
+
+# --- Finding 2: build_index on missing evals dir ---
+def test_build_index_no_evals_dir_does_not_raise(tmp_path):
+    # tmp_path has no evals/ subdir — must not raise FileNotFoundError
+    build_index(str(tmp_path))
+    assert (tmp_path / "evals" / "_index.md").exists()
+
+
+def test_write_target_zero_runs_writes_insufficient_sidecar(tmp_path):
+    # staging dir exists but has zero run files
+    d = tmp_path / "_staging" / "evals" / "phase4" / "PROC-001"
+    d.mkdir(parents=True)
+    out = write_target(str(tmp_path), "phase4", "PROC-001")
+    data = json.loads(Path(out).read_text(encoding="utf-8"))
+    assert data["insufficient"] is True
+
+
+def test_build_index_insufficient_status(tmp_path):
+    # a sidecar with insufficient=True must show "Insufficient (n<2)" in the index
+    d = tmp_path / "_staging" / "evals" / "phase4" / "PROC-001"
+    d.mkdir(parents=True)
+    write_target(str(tmp_path), "phase4", "PROC-001")
+    idx = (tmp_path / "evals" / "_index.md").read_text(encoding="utf-8")
+    assert "Insufficient (n<2)" in idx

@@ -433,3 +433,16 @@ def test_with_confidence_adds_column(tmp_path):
     h2, r2 = _with_confidence(str(tmp_path), headers, rows)
     assert h2[-1] == "Confidence"
     assert r2[0][-1] == "Stable"
+
+
+# --- Finding 3: _confidence_cell guards corrupt / insufficient sidecars ---
+def test_confidence_cell_corrupt_sidecar_returns_dash(tmp_path):
+    ev = Path(tmp_path) / "evals"
+    ev.mkdir(parents=True, exist_ok=True)
+    (ev / "OPP-001.evals.json").write_text("{ not json", encoding="utf-8")
+    assert _confidence_cell(str(tmp_path), "OPP-001") == "—"
+
+
+def test_confidence_cell_insufficient_sidecar_returns_warning(tmp_path):
+    _sidecar(tmp_path, "OPP-001", False, insufficient=True)
+    assert _confidence_cell(str(tmp_path), "OPP-001") == "⚠ Needs review — insufficient runs"
