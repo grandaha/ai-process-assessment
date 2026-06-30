@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Attribute-based deterministic AI-capability tagging** (#186). Phase 4 no longer has a human
+  author a Green/Yellow/Red color on each process step (which contaminated the step description).
+  Mapping and tagging are now separate passes: the `process-mapper` emits step actions only, the
+  orchestrator final-numbers the steps, and a new `step-capability-tagger` agent assigns each step a
+  row of factual attributes from a fixed 10-word vocabulary — five enablers (`structured-data`,
+  `rule-based`, `templated`, `ai-inference`, `accuracy-bounded`) and five blockers (`human-judgment`,
+  `relationship`, `external-dependency`, `physical`, `regulatory-signoff`) — cited to evidence in a
+  `**Step capability:**` table (`Step | Attributes | Evidence`). A new stdlib module
+  `state/capability.py` *computes* the color (Green = enabler & no blocker; Yellow = enabler &
+  blocker; Red = blocker & no enabler; a lone `ai-inference` is an implicit blocker unless
+  `accuracy-bounded` is present) and the consecutive-Green chains — no human writes a color. Phase 5
+  and Phase 6 consume the computed colors/chains, and a chain's human-effort value is derived from
+  the FTE baseline. The `Step capability` table is assessor-only and never renders in the
+  owner-facing process-validation document.
+
 ## [2.34.0] - 2026-06-29
 
 ### Changed
