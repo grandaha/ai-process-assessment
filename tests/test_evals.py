@@ -38,3 +38,52 @@ def test_tagger_color_flip_is_unstable():
     assert s1["unstable"] is True
     assert res["unstable_step_count"] == 1
     assert 0.0 < s1["jaccard_mean"] < 1.0
+
+
+# scorer_consistency tests
+from state.evals import scorer_consistency
+
+_SCORE = """### Dimensional Scores
+| Dimension | Score | Source citation |
+|---|---|---|
+| Value Potential | {v}/5 | x |
+| Technical Feasibility | 3/5 | x |
+| Data Readiness | 3/5 | x |
+| Org Change Readiness | 3/5 | x |
+| Strategic Alignment | 3/5 | x |
+| Time to Value | 3/5 | x |
+
+**Classification:** {b}
+"""
+
+
+def _run(v, b):
+    return _SCORE.format(v=v, b=b)
+
+
+def test_scorer_stable():
+    res = scorer_consistency([_run(4, "Build")] * 5)
+    assert res["agent"] == "opportunity-scorer"
+    assert res["n_runs"] == 5
+    assert res["unstable"] is False
+    assert res["dimensions"]["Value Potential"]["spread"] == 0
+    assert res["bbp"]["modal"] == "Build"
+    assert res["bbp"]["modal_agreement"] == 1.0
+
+
+def test_scorer_dimension_spread_unstable():
+    res = scorer_consistency([_run(2, "Build"), _run(4, "Build"), _run(2, "Build")])
+    assert res["dimensions"]["Value Potential"]["spread"] == 2
+    assert res["unstable"] is True
+
+
+def test_scorer_bbp_disagreement_unstable():
+    res = scorer_consistency([_run(3, "Build"), _run(3, "Partner"), _run(3, "Build")])
+    assert res["bbp"]["modal"] == "Build"
+    assert res["bbp"]["modal_agreement"] < 1.0
+    assert res["unstable"] is True
+
+
+def test_scorer_drops_incomplete_runs():
+    res = scorer_consistency([_run(4, "Build"), "no table here", _run(4, "Build")])
+    assert res["n_runs"] == 2

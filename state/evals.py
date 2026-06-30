@@ -13,7 +13,12 @@ from pathlib import Path
 if __package__ in (None, ""):  # invoked as a script by absolute path
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import re
+from collections import Counter
+from statistics import pstdev
+
 from state.capability import compute_color, parse_step_capability
+from engine.compute import score_composite
 
 # Thresholds — module constants so they are testable and CLAUDE.md-overridable in spirit.
 DIM_SPREAD_UNSTABLE = 2          # a dimension is unstable when max-min >= this
@@ -65,4 +70,57 @@ def tagger_consistency(run_texts):
         "n_runs": len(runs),
         "unstable_step_count": sum(1 for st in out_steps if st["unstable"]),
         "steps": out_steps,
+    }
+
+
+_DIM_RE = re.compile(r"^\|\s*([A-Za-z][^|]*?)\s*\|\s*(\d)\s*/\s*5\s*\|", re.MULTILINE)
+_BBP_RE = re.compile(r"\*\*Classification:\*\*\s*([A-Za-z]+)")
+
+
+def _parse_scorer_run(text):
+    dims = {name.strip(): int(v) for name, v in _DIM_RE.findall(text)}
+    m = _BBP_RE.search(text)
+    return {"dimensions": dims, "bbp": m.group(1) if m else None}
+
+
+def scorer_consistency(run_texts):
+    """run_texts: scorer entry markdown per run (dimensional table + **Classification:**).
+    Only runs with all 6 dimensions count. Unstable = composite spread > 0.5, OR any
+    dimension spread >= 2, OR B/B/P not unanimous."""
+    parsed = [p for p in (_parse_scorer_run(t) for t in run_texts) if len(p["dimensions"]) == 6]
+    dim_names = list(parsed[0]["dimensions"]) if parsed else []
+
+    dims_out, any_dim_unstable = {}, False
+    for name in dim_names:
+        vals = [p["dimensions"][name] for p in parsed]
+        spread = max(vals) - min(vals)
+        any_dim_unstable = any_dim_unstable or spread >= DIM_SPREAD_UNSTABLE
+        dims_out[name] = {
+            "values": vals,
+            "spread": spread,
+            "stdev": round(pstdev(vals), 2) if len(vals) > 1 else 0.0,
+        }
+
+    composites = [score_composite([p["dimensions"][d] for d in dim_names]) for p in parsed]
+    composites = [c for c in composites if isinstance(c, (int, float))]
+    comp_min = round(min(composites), 2) if composites else None
+    comp_max = round(max(composites), 2) if composites else None
+    comp_spread = round(comp_max - comp_min, 2) if composites else 0.0
+
+    bbps = [p["bbp"] for p in parsed if p["bbp"]]
+    modal = Counter(bbps).most_common(1)[0][0] if bbps else None
+    modal_agreement = round(bbps.count(modal) / len(bbps), 2) if bbps else 0.0
+
+    unstable = (comp_spread > COMPOSITE_SPREAD_UNSTABLE
+                or any_dim_unstable
+                or (bool(bbps) and modal_agreement < 1.0))
+    return {
+        "agent": "opportunity-scorer",
+        "n_runs": len(parsed),
+        "dimensions": dims_out,
+        "composite_spread": comp_spread,
+        "composite_min": comp_min,
+        "composite_max": comp_max,
+        "bbp": {"values": bbps, "modal": modal, "modal_agreement": modal_agreement},
+        "unstable": unstable,
     }
