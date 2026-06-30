@@ -35,9 +35,8 @@ Synthesize this round's raw notes into structured per-process entries following 
 For each process the round surfaced, build an entry:
 
 1. **Provisional process tag and name** — a round-scoped tag `R<N>-P<k>` (e.g. `R2-P1`) and a descriptive process name. The orchestrator reconciles tags across rounds into stable Process IDs during assembly.
-2. **Process map fields** — populate every field the round's notes support; for fields the round did not surface, write `not captured this round` rather than guessing.
-3. **AI capability per step** — for each step you capture, mark AI-capable (Green) / Uncertain (Yellow) / Not AI-capable (Red), and record what makes a Red or Yellow step hard for AI (judgment, unstructured input, regulatory requirement, etc.). Do NOT run the chain scan — identifying runs of consecutive Green steps across the assembled map is a main-context judgment.
-4. **Baseline fields** — record Volume, Cycle time (median + P90), Error / exception rate, and FTE effort for the process, each WITH its source and a Source confidence level (High = system-pulled, Medium = sampled, Low = estimated). If the round produced a metric without a traceable source, record it and mark the source `unconfirmed` — do not upgrade its confidence.
+2. **Process map fields** — populate every field the round's notes support; for fields the round did not surface, write `not captured this round` rather than guessing. Capture the step action only; do NOT assess AI capability — a separate `step-capability-tagger` pass does that.
+3. **Baseline fields** — record Volume, Cycle time (median + P90), Error / exception rate, and FTE effort for the process, each WITH its source and a Source confidence level (High = system-pulled, Medium = sampled, Low = estimated). If the round produced a metric without a traceable source, record it and mark the source `unconfirmed` — do not upgrade its confidence.
 
 ## processes/PROC-NNN.md field schema
 
@@ -53,7 +52,6 @@ This is the agent's own working schema; it mirrors the `processes/PROC-NNN.md` K
 | Exceptions | Common deviations and how they're handled |
 | Upstream / downstream | What feeds this; what consumes its output |
 | Conflicts | Where this round's account disagrees with another's (flag for orchestrator) |
-| AI capability per step | Per step: Green / Yellow / Red, with what makes Red/Yellow steps hard |
 
 ## Refusal rules
 
@@ -94,7 +92,6 @@ Each entry follows this structure:
 **Exceptions:** [common deviations and how they're handled]
 **Upstream / downstream:** [what feeds this; what consumes its output]
 **Conflicts:** [disagreement with another round's account, flagged for the orchestrator] OR "None surfaced this round."
-**AI capability per step:** [step → Green/Yellow/Red, with what makes Red/Yellow steps hard]
 **Sponsor structural input:** [Round 1 only — sponsor's raw answers to the boundary / actor model / sequence questions for this process] OR "not captured this round."
 
 **Baselines**

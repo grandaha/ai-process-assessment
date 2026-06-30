@@ -36,9 +36,9 @@ def test_agent_name_matches_filename(methodology):
 
 
 def test_agent_count(methodology):
-    # 14 = 17 prior agents - 3 section-renderer-checkpoint-* agents deleted in #131
-    # (all checkpoints now route through the deterministic checkpoint_doc command).
-    assert len(methodology.agents) == 14
+    # 15 = 14 prior agents + 1 step-capability-tagger added in #186
+    # (14 = 17 prior agents - 3 section-renderer-checkpoint-* agents deleted in #131)
+    assert len(methodology.agents) == 15
 
 
 def _referenced_agent_tokens(methodology) -> set[str]:

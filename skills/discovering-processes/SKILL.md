@@ -55,12 +55,24 @@ Capture each baseline as raw, sourced inputs in the engagement's `model/baseline
 
 ## Subagent Dispatch
 
-Interview-round synthesis is offloaded to subagents to keep the main context clean. The main context owns the gate decisions; subagents own the per-round write-up.
+Phase 4 runs as **two sequential passes**. Interview-round synthesis is offloaded to subagents to keep the main context clean. The main context owns the gate decisions; subagents own the per-round write-up and per-process capability tagging.
+
+### Pass 1 — `process-mapper` (steps only)
 
 - **When:** After raw notes for an interview round are captured, dispatch one `process-mapper` subagent per round to synthesize that round into structured `processes/PROC-NNN.md`-ready content. Rounds are independent — dispatch them in a single parallel tool-call batch where notes for more than one round are ready.
 - **Pass to each subagent:** engagement folder path, round number, and the raw notes for that round only. The agent reads `tech-inventory.md` itself to extract relevant sections, and applies the `processes/PROC-NNN.md` field schema defined in its own agent spec (which mirrors the Key Outputs below). It derives its own `_staging/phase4/round-N.md` output path from the engagement folder path and round number. Do not pass any file content to the subagent.
 - **Return:** Write structured entries to `<engagement-folder>/_staging/phase4/round-N.md`. Return a one-line summary only: "Round N complete: N processes mapped, N baselines captured." The orchestrator assembles `processes/PROC-NNN.md` files from staging files — it does NOT receive entry content from the subagent.
-- **What stays in main context:** The Baseline, Value & Challenge gate, the chain scan across the assembled map, the conflict-resolution decision from Round 4, and **synthesizing the per-process challenge hypothesis** from the Round-1 `Sponsor structural input` (one paragraph per process: structurally sound, or the single surfaced redesign question). These are cross-round judgments and must not be delegated. After synthesis, the orchestrator writes one `processes/PROC-NNN.md` per process and generates `processes/_index.md` via Bash.
+- **What stays in main context:** The Baseline, Value & Challenge gate, the conflict-resolution decision from Round 4, and **synthesizing the per-process challenge hypothesis** from the Round-1 `Sponsor structural input` (one paragraph per process: structurally sound, or the single surfaced redesign question). These are cross-round judgments and must not be delegated. After synthesis, the orchestrator writes one `processes/PROC-NNN.md` per process and **final-numbers the Steps** before Pass 2.
+
+### Pass 2 — `step-capability-tagger` (capability attributes, per process, parallel)
+
+After the orchestrator has assembled and final-numbered the Steps in each `processes/PROC-NNN.md`, dispatch one `step-capability-tagger` subagent per process in a single parallel tool-call batch.
+
+- **Pass to each subagent:** engagement folder path, process ID, path to the assembled `PROC-NNN.md`, and path(s) to the evidence sources (`_staging/phase4/` notes or `evidence-log.md`).
+- **Return:** The tagger appends the `**Step capability:**` table to `processes/PROC-NNN.md` (one row per step, every row evidence-cited, only vocabulary attributes). Returns a one-line summary only.
+- Chains are computed deterministically by `state/capability.py` from the capability table; chain identification and value assessment are Phase 5 work.
+
+After Pass 2, the orchestrator generates `processes/_index.md` via Bash.
 
 ## Phase checklist
 
@@ -70,11 +82,10 @@ Interview-round synthesis is offloaded to subagents to keep the main context cle
 - [ ] Round 3: Adjacent interview(s) — upstream / downstream; record named participants in `evidence-log.md` stakeholder interview log
 - [ ] Round 4: Clarification — resolve conflicts; record named participants in `evidence-log.md` stakeholder interview log
 - [ ] For every process, capture volume, cycle time (median + P90), error/exception rate, FTE effort
-- [ ] For every step in each process, assign AI capability flag (Green / Yellow / Red)
-- [ ] Run chain scan — identify consecutive Green runs; record in `processes/PROC-NNN.md`; flag high-fragmentation processes
+- [ ] Run `step-capability-tagger` (one per process, in parallel) to assign capability attributes — chains are computed deterministically by `state/capability.py` from the capability table; the value of a chain is assessed in Phase 5
 - [ ] Apply the Baseline, Value & Challenge gate — flag any process missing baselines
 - [ ] For every process, synthesize a challenge hypothesis from the sponsor's structural input; flag any process missing one as "challenge hypothesis unavailable"
-- [ ] Save each process to `<name>/processes/PROC-NNN.md` (process map + baselines + challenge hypothesis + chain scan in one file per process)
+- [ ] Save each process to `<name>/processes/PROC-NNN.md` (process map + step capability table + baselines + challenge hypothesis in one file per process)
 - [ ] Generate `processes/_index.md` via Bash from extraction headers
 - [ ] Confirm all `processes/_index.md` Baseline entries are `Ready` (no `Unavailable` rows advance to Phase 5 unless explicitly scoped out with a documented reason)
 - [ ] Confirm `evidence-log.md` stakeholder interview log is complete — one row per session, every participant named
@@ -104,14 +115,18 @@ One file per process. Contains both process map fields and baseline fields in a 
 
 ### Process Map
 
-**Steps:** [actual steps as executed; for each step: step → Green/Yellow/Red — what makes Red/Yellow hard]
+**Steps:** [actual steps as executed — action only; AI capability is assigned in the Step capability table below]
 **Actors:** [roles, systems, external parties]
 **Decision points:** [where humans exercise judgment; what informs the call]
 **Exceptions:** [common deviations and how they're handled]
 **Upstream / downstream:** [what feeds this; what consumes its output]
 **Conflicts:** [where interview rounds disagreed; resolution]
-**Chain scan:** [runs of consecutive Green steps: [step i → step j] — checkpoints eliminated; flag high-fragmentation processes]
 **Challenge hypothesis:** [one paragraph: "structurally sound — [why]" OR the single surfaced redesign question (boundary / actor model / sequence) with its basis]
+
+**Step capability:**
+| Step | Attributes | Evidence |
+|---|---|---|
+| 1 | [attributes from fixed vocabulary] | [evidence citation] |
 
 ### Baselines
 
@@ -122,6 +137,36 @@ One file per process. Contains both process map fields and baseline fields in a 
 | Error / exception rate | [fraction off happy path] | [source] | [High/Medium/Low] |
 | FTE effort | [current human effort] | [source] | [High/Medium/Low] |
 ```
+
+### Step capability table
+
+Appended to each `processes/PROC-NNN.md` by the `step-capability-tagger` (Pass 2). One row per step; every row cites evidence; only vocabulary attributes.
+
+**Fixed vocabulary** (10 attributes — use only these; color is computed by `state/capability.py`):
+
+| Attribute | Meaning | Class |
+|---|---|---|
+| `structured-data` | works on structured/digital data (fields, records, APIs) | enabler |
+| `rule-based` | deterministic logic — if/then, thresholds, lookups | enabler |
+| `templated` | templated/parameterized generation (standard emails, forms) | enabler |
+| `ai-inference` | extraction / classification / drafting from messy input | enabler (probabilistic) |
+| `accuracy-bounded` | a measurable accuracy threshold governs the AI output (valid only with `ai-inference`) | enabler (qualifier) |
+| `human-judgment` | discretion/interpretation/tradeoff a human makes each instance | blocker |
+| `relationship` | interpersonal — negotiation, trust, client management | blocker |
+| `external-dependency` | blocked on a party outside the firm | blocker |
+| `physical` | requires a real-world/offline act | blocker |
+| `regulatory-signoff` | a regulation/policy mandates a human be accountable | blocker |
+
+**Table format:**
+
+```
+**Step capability:**
+| Step | Attributes | Evidence |
+|---|---|---|
+| 1 | structured-data, rule-based | both systems API-available (tech-inventory) |
+```
+
+**Computed color rule:** `state/capability.py` maps the attribute list to Green (enablers only, no blockers) / Yellow (mix or probabilistic) / Red (any blocker present). Never write a color in `PROC-NNN.md` — the engine computes it.
 
 **Extraction header rules:** The `<!-- index: -->` line must immediately follow the `## PROC-NNN` heading (line 2 of the file). Set `baseline=Ready` when all four baseline fields carry a real sourced value; set `baseline=Unavailable` when any field is missing or unconfirmed. Spaces in the value are not permitted — use `Ready` or `Unavailable` exactly.
 
@@ -183,7 +228,6 @@ After each interview round, append rows to the `## Stakeholder Interview Log` se
 | "FTE effort estimates are sensitive — we'll skip them." | FTE is the most credible value lever to a CFO. Capture it with appropriate framing, not by omission. |
 | "Two interview rounds is enough." | Two rounds gives you the sponsor's view and the operator's view but no triangulation. Adjacent and clarification rounds catch what the first two miss. |
 | "Recording participant names is administrative overhead — we know who we talked to." | The stakeholder interview log is the only record that survives the engagement. Without it, the deliverable cannot answer "who did you talk to?" — the first question any skeptical executive will ask. Record as you go; reconstructing it from memory at the end is error-prone and often incomplete. |
-| "These AI-capable steps are scattered through the process, but we can still automate each one individually." | Scattered AI-capable steps each require their own human verification checkpoint. Linear step-count aggregation overstates value. Record the fragmentation — it determines achievable chain length and is a direct input to opportunity scoring. |
 | "The process works — we just need to automate the slow steps." | Automate a broken process and you get a faster broken process. The challenge hypothesis forces the second-order question — is the boundary, actor model, or sequence itself the constraint? — before any automation is typed. Surface it; the client decides. |
 
 ## Handoff Protocol
