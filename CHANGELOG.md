@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Confidence self-check (consistency evals) for the two no-alignment judgment agents (#192):
+  `state/evals.py` measures run-to-run agreement of `step-capability-tagger` (per-step
+  computed color) and `opportunity-scorer` (per-dimension / composite / Build-Buy-Partner),
+  writing an `evals/` confidence sidecar + index. A new cross-cutting
+  `evaluating-consistency` skill drives the N× subagent dispatch (Conductor-invoked,
+  automatic, non-blocking). The portfolio checkpoint gains a **Confidence** column for
+  unstable opportunities; unstable tagger steps are surfaced to the assessor. `opportunity-typer`
+  and `process-mapper` (which need cross-run alignment) are deferred to a follow-up.
+
 ## [2.35.1] - 2026-06-30
 
 ### Changed

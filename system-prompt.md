@@ -136,6 +136,7 @@ The entry is written before the table row — so the escape and the fix are perm
 | "validate the baselines", "review the process maps with the client", "stakeholder checkpoint" | `ai-process-assessment:building-checkpoint` |
 | "validate the scope", "confirm the engagement framing", "scope alignment checkpoint" | `ai-process-assessment:building-checkpoint` |
 | "validate the portfolio", "review the roadmap with the client", "portfolio sequencing checkpoint" | `ai-process-assessment:building-checkpoint` |
+| "how confident are we", "is this score reliable", "consistency check", "confidence" | `ai-process-assessment:evaluating-consistency` |
 
 ## Engagement Folder Convention
 
