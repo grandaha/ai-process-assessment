@@ -35,7 +35,7 @@ Every opportunity is logged with a stable identifier `OPP-NNN` and the following
 | Opportunity type | RPA / AI Augmentation / Chain Automation / AI Automation / Agentic / Data & Analytics |
 | Hypothesis | One-sentence statement: "We believe that [intervention] will [effect] because [mechanism]." |
 | Value hypothesis | Estimated value range, citing specific baseline(s) from `processes/PROC-NNN.md` |
-| Chain formation | If two or more consecutive AI-capable steps from the `processes/PROC-NNN.md` chain scan are involved: describe the chain (step range, checkpoints eliminated, current human effort at each eliminated checkpoint). If this is a single-step opportunity, write "Single step — no chain." |
+| Chain formation | If two or more consecutive AI-capable steps are involved: describe the chain (step range, checkpoints eliminated). Current human effort at each eliminated checkpoint is **derived from the process FTE baseline** (`model/baselines.json` `fte`) allocated across the chain's eliminated steps — cite `model/baselines.json` as the source. If this is a single-step opportunity, write "Single step — no chain." |
 | Feasibility flag | Green / Yellow / Red — based on `tech-inventory.md` |
 | Data readiness flag | Green / Yellow / Red — based on data asset catalog |
 | GRC flag | Green / Yellow / Red — regulatory, model risk, auditability, failure consequence |
@@ -112,7 +112,7 @@ cleanup('<name>/_staging/phase5')
 ## Workflow
 
 1. Load `processes/_index.md`. If missing, return to Phase 4. For each PROC-NNN entry, confirm `processes/PROC-NNN.md` exists.
-2. For each process, review the chain scan from `processes/PROC-NNN.md`. Identify chain formation opportunities first — runs of consecutive Green steps that could eliminate one or more human verification checkpoints. These are Chain Automation type candidates. Then walk the six-row taxonomy for remaining steps. Pick the type that fits the work, not the brand the client wants on the slide.
+2. For each process, read the **computed** per-step colors and consecutive-Green chains from `state/capability.py` (`step_colors`, `compute_chains`) — these are derived, not authored. Identify chain formation opportunities first — runs of consecutive Green steps that could eliminate one or more human verification checkpoints. These are Chain Automation type candidates. Then walk the six-row taxonomy for remaining steps. Pick the type that fits the work, not the brand the client wants on the slide.
 3. Write the hypothesis. The format is forcing: it requires naming the intervention, the effect, and the mechanism.
 4. Estimate value. Cite the baseline by name. If no baseline supports the claim, the process is not opportunity-eligible — return to Phase 4 for baseline capture.
 5. Set the three flags. Be honest about Yellow and Red — they're inputs to scoring and gating, not failures.
@@ -127,7 +127,7 @@ cleanup('<name>/_staging/phase5')
 | "We can estimate value first and write the hypothesis to match." | This is the most common failure mode. Hypothesis-before-value is a hard rule because reversing it produces motivated reasoning. |
 | "GRC flags can be set later — let's not slow things down." | Yellow/Red flags route to a separate gate. Setting them late means flagged opportunities sit in scoring with bad inputs. |
 | "Feasibility is fine — they have AWS." | Feasibility is per-opportunity. Cloud presence is not the same as identity, observability, MLOps, or the specific integration you need. |
-| "We evaluated each step on its own merits and assigned the best type." | Per-step evaluation misses chain opportunities. A step that looks unattractive in isolation may be the right assignment for AI because it sits between two AI-capable steps — eliminating an extra human checkpoint can outweigh per-step comparative disadvantage. Always review chain scan results before typing individual steps. |
+| "We evaluated each step on its own merits and assigned the best type." | Per-step evaluation misses chain opportunities. A step that looks unattractive in isolation may be the right assignment for AI because it sits between two AI-capable steps — eliminating an extra human checkpoint can outweigh per-step comparative disadvantage. Always read the computed chains from `state/capability.py` (`compute_chains`) before typing individual steps. |
 
 ## Handoff Protocol
 
