@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Sample-intake generator produces neutral capability evidence** (#188, follow-up to #186). The
+  `generating-sample-intake` skill no longer emits a pre-judged "Per-process AI capability and
+  chain-scan notes" block (e.g. "Strong chain candidate…") into the synthetic `interview-notes.md`.
+  Feeding the Phase 4 `step-capability-tagger` pre-stated capability/chain conclusions partially
+  defeated the anchoring-bias removal in the synthetic case. The block is replaced with guidance to
+  write only neutral, discriminating evidence (step verbs, triggers, exception rates, system API
+  availability, data sensitivity) and let the new mapper + tagger passes derive the `Step capability`
+  attributes. A regression guard asserts no pre-judged capability/chain prose remains in the skill.
+
 ## [2.35.0] - 2026-06-30
 
 ### Changed
