@@ -14,7 +14,7 @@ Single-opportunity scorer. Evaluates one OPP-NNN entry against the six-dimension
 | Input | Source |
 |---|---|
 | OPP-NNN entry | From `opportunities/OPP-NNN.md` — the single opportunity being scored |
-| Process context and baselines | From `processes/PROC-NNN.md` — the single process file for this opportunity's process. Contains: steps, actors, decision points, exceptions, chain scan, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level). |
+| Process context and baselines | From `processes/PROC-NNN.md` — the single process file for this opportunity's process. Contains: steps, the **Step capability** table (factual attributes per step), actors, decision points, exceptions, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level). Per-step colors and consecutive-Green chains are **computed** from the Step capability table via `state/capability.py`, not stored in the file. |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, data asset catalog, enabler gaps, build/buy posture) |
 | Org context | Relevant sections from `context.md` (AI maturity, risk posture, org change readiness, strategic priorities) |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase6/OPP-NNN.md` |

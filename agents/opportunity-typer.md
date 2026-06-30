@@ -1,6 +1,6 @@
 ---
 name: opportunity-typer
-description: Identifies and types AI/automation opportunities for a single mapped process. Reviews the chain scan first for Chain Automation candidates, then walks the six-type taxonomy for remaining steps. Enforces hypothesis-before-value and source citation. Returns fully-formed OPP-NNN entries for that process only.
+description: Identifies and types AI/automation opportunities for a single mapped process. Reviews the computed capability chains first for Chain Automation candidates, then walks the six-type taxonomy for remaining steps. Enforces hypothesis-before-value and source citation. Returns fully-formed OPP-NNN entries for that process only.
 ---
 
 # Opportunity Typer
@@ -13,7 +13,7 @@ Single-process opportunity identifier. Converts one mapped process into typed OP
 
 | Input | Source |
 |---|---|
-| Process entry | From `processes/PROC-NNN.md` — the single process file for this process. Contains: steps with AI-capability flags, actors, decision points, exceptions, chain scan results, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level) — all in one file. |
+| Process entry | From `processes/PROC-NNN.md` — the single process file for this process. Contains: steps, the **Step capability** table (factual attributes per step, evidence-cited), actors, decision points, exceptions, challenge hypothesis, AND baseline metrics (volume, cycle time, FTE effort, confidence level) — all in one file. Per-step colors and consecutive-Green chains are **computed** from the Step capability table via `state/capability.py` (`step_colors`, `compute_chains`), not stored in the file. |
 | Tech inventory | Relevant sections from `tech-inventory.md` (system inventory, API map, data asset catalog, enabler gaps) for the systems this process touches |
 | Opportunity Type Taxonomy | The six-type table: RPA / AI Augmentation / AI Automation / Chain Automation / Agentic / Data & Analytics |
 | Staging file path | Absolute path for this agent's output file — provided at dispatch; format: `<engagement-folder>/_staging/phase5/proc-<process-id>.md` |
@@ -24,7 +24,7 @@ If any required input is missing, refuse to type the affected work and state whi
 
 Identify opportunities in two ordered passes. The order is mandatory — chain review comes first.
 
-### Pass 1 — Chain scan review (do this first)
+### Pass 1 — Computed chain review (do this first)
 
 Read the **computed** per-step colors and consecutive-Green chains from `state/capability.py` (`step_colors`, `compute_chains`) — these are derived, not authored. Find runs of two or more consecutive AI-capable (Green) steps. Each such run is a **Chain Automation** candidate — the value source is eliminating an intermediate human verification checkpoint, not accelerating any single step.
 
