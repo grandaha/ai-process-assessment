@@ -5,6 +5,7 @@
 #   running-sample-engagement — meta entry point for the bundled demo
 #   generating-sample-intake  — demo-support: synthesizes sample intake files
 #   building-checkpoint   — cross-cutting stakeholder validation checkpoint (interim)
+#   evaluating-consistency — cross-cutting confidence self-check (consistency evals)
 ALLOWLIST_NON_PHASE = {
     "ai-process-assessment:using-methodology",
     "ai-process-assessment:running-sample-engagement",
@@ -12,6 +13,7 @@ ALLOWLIST_NON_PHASE = {
     "ai-process-assessment:building-checkpoint",
     "ai-process-assessment:conducting-engagement",
     "ai-process-assessment:generate-artifact",
+    "ai-process-assessment:evaluating-consistency",
 }
 
 
@@ -46,5 +48,5 @@ def test_no_orphan_skills(methodology):
 
 
 def test_skill_count(methodology):
-    # 14 phase skills + 6 allow-listed non-phase skills (incl. the conductor).
-    assert len(methodology.skills) == 20
+    # 14 phase skills + 7 allow-listed non-phase skills (incl. conductor + evaluating-consistency).
+    assert len(methodology.skills) == 21

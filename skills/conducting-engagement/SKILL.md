@@ -192,6 +192,30 @@ Repeat until Phase 11 is done and Gate B is cleared:
    <!-- per-phase-review-offer-narration:start -->
    > Want a short write-up of what we just captured that you can share or confirm? Totally optional.
    <!-- per-phase-review-offer-narration:end -->
+
+## Confidence self-check (cross-cutting, automatic, non-blocking)
+
+The judgment agents are non-deterministic. To keep recommendations trustworthy, the
+Conductor self-checks run-to-run **consistency** at two points and surfaces the result
+as a confidence signal. This is automatic (the human never invokes it, never sees the
+word "eval") and never blocks a phase — it informs the checkpoint the human already
+reviews.
+
+- **After Phase 4 tagging, before the `baseline` checkpoint:** invoke
+  `ai-process-assessment:evaluating-consistency` (phase `phase4`) for each in-scope
+  process. If any step's computed color is unstable across runs, surface those steps to
+  the assessor (PROC id, step number, the colors seen) as a should-confirm note before
+  Phase 5 — an unstable color can add or remove a chain, hence an opportunity. Computed
+  color is internal; never show it to the client.
+- **After Phase 6 scoring, before the `portfolio` checkpoint:** invoke
+  `ai-process-assessment:evaluating-consistency` (phase `phase6`) for each scored
+  opportunity. The portfolio checkpoint then renders a Confidence column, and unstable
+  opportunities are flagged for the decision-maker's adjudication.
+
+Running the self-check is can-infer (auto); the resulting unstable items are
+should-confirm. The result is recorded in `evals/_index.md`. A CLAUDE.md override may
+change N (default 5) or make resolution mandatory.
+
 8. **If a gate triggers** (GRC non-green in `opportunities/_index.md`, or before any
    external share): run the gate; surface the result.
 9. **Record this step's structural-class decisions** to the decision log (below).
