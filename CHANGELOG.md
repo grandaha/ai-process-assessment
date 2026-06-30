@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.35.1] - 2026-06-30
+
 ### Changed
 - **Sample-intake generator produces neutral capability evidence** (#188, follow-up to #186). The
   `generating-sample-intake` skill no longer emits a pre-judged "Per-process AI capability and
